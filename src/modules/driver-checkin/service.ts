@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { waitingTimeFindings, drivers, events } from '@/lib/db/schema';
+import { waitingTimeFindings, drivers, events, tenants } from '@/lib/db/schema';
 import { generateId } from '@/lib/utils';
 import { eq, and, isNull } from 'drizzle-orm';
 

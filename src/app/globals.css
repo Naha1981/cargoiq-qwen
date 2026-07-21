@@ -4,16 +4,37 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0D1B2A;
   --color-cargoiq-bg: #F1F4F8;
   --color-cargoiq-navy: #1A2332;
   --color-cargoiq-gold: #B8860B;
   --color-cargoiq-green: #16A34A;
   --color-cargoiq-red: #DC2626;
+  --color-cargoiq-textPrimary: #0D1B2A;
+  --color-cargoiq-textSecondary: #4A5568;
+  --color-cargoiq-border: #E2E8F0;
+  --color-cargoiq-warning: #D97706;
+  --color-cargoiq-canvas: #F1F4F8;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-mono {
+  font-family: var(--font-mono), monospace;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }

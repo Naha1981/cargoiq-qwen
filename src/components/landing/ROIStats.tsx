@@ -18,9 +18,9 @@ const stats = [
   },
   {
     icon: BarChart3,
-    value: '7/8',
-    label: 'Compliance Pass Rate',
-    description: 'Documents passing all 7 automated checks',
+    value: '25%',
+    label: 'Carrier Invoices With Errors',
+    description: 'Industry-verified billing error rate we audit line-by-line.',
   },
 ];
 

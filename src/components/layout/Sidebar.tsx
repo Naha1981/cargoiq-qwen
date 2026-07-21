@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/queue", label: "Queue", icon: ClipboardList, badge: 12 },
+  { href: "/queue", label: "Queue", icon: ClipboardList, badge: 5 },
   { href: "/inbox", label: "Inbox", icon: Mail },
   { href: "/portals", label: "Portals", icon: Network },
   { href: "/sentinel", label: "Sentinel", icon: Shield },

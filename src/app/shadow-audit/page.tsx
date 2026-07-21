@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Share2, Download, ChevronDown, ChevronRight, AlertTriangle, CheckCircle2, Clock, FileSearch } from 'lucide-react';
+import Link from 'next/link';
+import { Upload, Share2, Download, ChevronRight, AlertTriangle, CheckCircle2, Clock, FileSearch } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const findings = [
@@ -19,6 +20,15 @@ const findingsDetail = [
   { shipment: 'SHIP-005', finding: 'Rate card expired', amount: 0, status: 'info' },
 ];
 
+const demoFindingsDetail = [
+  { shipment: 'SHIP-D01', finding: '6-digit HS code used — potential misclassification', amount: 18500, status: 'open' },
+  { shipment: 'SHIP-D02', finding: 'Invoice qty (500) vs packing list (480) — 20 units overbilled', amount: 22000, status: 'open' },
+  { shipment: 'SHIP-D03', finding: 'Non-SACU origin; 10% VAT uplift not applied', amount: 12800, status: 'open' },
+  { shipment: 'SHIP-D04', finding: 'Foreign-registered truck with no TMS number on file', amount: 9500, status: 'open' },
+  { shipment: 'SHIP-D05', finding: 'Sugar product missing HPL documentation', amount: 14200, status: 'open' },
+  { shipment: 'SHIP-D06', finding: 'Temporary export with no DA65 stamp', amount: 11400, status: 'open' },
+];
+
 const previousAudits = [
   { id: 1, date: '2025-06-15', shipments: 24, exposure: 142000 },
   { id: 2, date: '2025-05-28', shipments: 18, exposure: 98500 },
@@ -29,10 +39,12 @@ export default function ShadowAuditPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [completed, setCompleted] = useState(0);
-  const [expandedAudit, setExpandedAudit] = useState<number | null>(null);
   const [files, setFiles] = useState<FileList | null>(null);
+  const [showDemo, setShowDemo] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const totalShipments = 18;
+  const demoExposure = demoFindingsDetail.reduce((sum, f) => sum + f.amount, 0);
 
   const handleRunAudit = () => {
     if (!files || files.length === 0) return;
@@ -53,12 +65,28 @@ export default function ShadowAuditPage() {
     }, 600);
   };
 
+  const handleDemoAudit = () => {
+    setShowDemo(true);
+    setProgress(100);
+  };
+
+  const handleCopyProof = (token: string) => {
+    const url = `${window.location.origin}/proof/${token}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const currentFindings = showDemo ? demoFindingsDetail : findingsDetail;
+  const currentExposure = showDemo ? demoExposure : 94500;
+
   return (
     <div className="min-h-screen bg-[#F1F4F8] text-[#0D1B2A] font-sans">
       <div className="mx-auto max-w-6xl p-6 space-y-6">
         <h1 className="text-3xl font-bold text-[#1A2332]">Shadow Audit</h1>
 
-        {!isRunning && progress < 100 && (
+        {!isRunning && progress < 100 && !showDemo && (
           <div className="bg-white rounded-lg border border-[#E2E8F0] p-6">
             <h2 className="text-lg font-semibold text-[#1A2332] mb-4">Run Shadow Audit</h2>
             <div className="rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F1F4F8] p-8 text-center cursor-pointer hover:border-[#B8860B] transition-colors relative">
@@ -75,6 +103,15 @@ export default function ShadowAuditPage() {
               {files && files.length > 0 && (
                 <p className="text-sm text-[#B8860B] mt-2 font-medium">{files.length} file(s) selected</p>
               )}
+            </div>
+
+            <div className="mt-4">
+              <button
+                onClick={handleDemoAudit}
+                className="inline-flex items-center gap-2 border border-[#B8860B] text-[#B8860B] px-6 py-2.5 rounded-md text-sm font-medium hover:bg-[#B8860B] hover:text-white transition-colors"
+              >
+                ▶ Run Demo Audit (sample data — no upload needed)
+              </button>
             </div>
 
             <details className="mt-4">
@@ -128,10 +165,10 @@ export default function ShadowAuditPage() {
           </div>
         )}
 
-        {!isRunning && progress === 100 && (
+        {(showDemo || (!isRunning && progress === 100)) && (
           <div className="bg-white rounded-lg border border-[#E2E8F0] p-6 space-y-6">
             <div className="rounded-lg bg-red-50 border border-red-100 p-4">
-              <p className="text-sm font-medium text-red-700">R94,500 in exposure identified across {totalShipments} shipments</p>
+              <p className="text-sm font-medium text-red-700">R{currentExposure.toLocaleString('en-ZA')} in exposure identified across {showDemo ? 6 : totalShipments} shipments</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -159,7 +196,7 @@ export default function ShadowAuditPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#E2E8F0]">
-                    {findingsDetail.map((row) => (
+                    {currentFindings.map((row) => (
                       <tr key={row.shipment} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3 font-mono text-xs">{row.shipment}</td>
                         <td className="px-4 py-3">{row.finding}</td>
@@ -182,9 +219,12 @@ export default function ShadowAuditPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button className="inline-flex items-center gap-2 bg-[#B8860B] text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#9a7209] transition-colors">
+              <button
+                onClick={() => handleCopyProof(showDemo ? 'demo' : 'live')}
+                className="inline-flex items-center gap-2 bg-[#B8860B] text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#9a7209] transition-colors"
+              >
                 <Share2 className="h-4 w-4" />
-                Share Proof Page
+                {copied ? 'Copied!' : 'Copy proof-page link'}
               </button>
               <button className="inline-flex items-center gap-2 border border-[#B8860B] text-[#B8860B] px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#B8860B] hover:text-white transition-colors">
                 <Download className="h-4 w-4" />
@@ -197,29 +237,17 @@ export default function ShadowAuditPage() {
         <div className="bg-white rounded-lg border border-[#E2E8F0] divide-y divide-[#E2E8F0]">
           <h3 className="px-6 py-4 text-lg font-semibold text-[#1A2332]">Previous Audits</h3>
           {previousAudits.map((audit) => (
-            <div key={audit.id} className="px-6">
-              <button
-                onClick={() => setExpandedAudit(expandedAudit === audit.id ? null : audit.id)}
-                className="w-full flex items-center justify-between py-4 text-left"
-              >
-                <div>
-                  <p className="text-sm font-medium text-[#1A2332]">{audit.date}</p>
-                  <p className="text-xs text-gray-500">{audit.shipments} shipments · R{audit.exposure.toLocaleString('en-ZA')} exposure</p>
-                </div>
-                {expandedAudit === audit.id ? (
-                  <ChevronDown className="h-4 w-4 text-gray-400" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-gray-400" />
-                )}
-              </button>
-              {expandedAudit === audit.id && (
-                <div className="pb-4 text-sm text-gray-600">
-                  <p>Audit ID: SA-{audit.id.toString().padStart(4, '0')}</p>
-                  <p>Status: Completed</p>
-                  <p>Exposure identified: R{audit.exposure.toLocaleString('en-ZA')}</p>
-                </div>
-              )}
-            </div>
+            <Link
+              key={audit.id}
+              href={`/shadow-audit/${audit.id}`}
+              className="w-full flex items-center justify-between py-4 text-left hover:bg-gray-50 transition-colors"
+            >
+              <div>
+                <p className="text-sm font-medium text-[#1A2332]">{audit.date}</p>
+                <p className="text-xs text-gray-500">{audit.shipments} shipments · R{audit.exposure.toLocaleString('en-ZA')} exposure</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-gray-400" />
+            </Link>
           ))}
         </div>
       </div>

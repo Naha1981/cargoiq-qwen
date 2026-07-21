@@ -7,7 +7,7 @@ import { Logo } from '@/components/ui/logo';
 import { Navbar } from './Navbar';
 
 export function Hero() {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(217340);
   const target = 217340;
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export function Hero() {
           href="/calculator"
           className="inline-flex items-center gap-2 bg-[#B8860B] text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#D4922B] transition-colors shadow-lg shadow-[#B8860B]/30"
         >
-          Start My Free 7-Day Shadow Audit
+          Run My Free Shadow Audit
           <ArrowRight className="w-5 h-5" />
         </Link>
         <div className="mt-16 flex items-center justify-center gap-3">

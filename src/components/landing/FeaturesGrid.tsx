@@ -27,22 +27,22 @@ const features = [
   {
     icon: Users,
     name: 'Driver Check-In',
-    description: 'GPS-verified driver arrival and departure logs with automated detention alerts.',
+    description: 'WhatsApp driver arrival and departure timestamps with automatic billable-detention invoices. No app, no GPS hardware.',
   },
   {
     icon: Eye,
     name: 'RLA Sentinel',
-    description: 'Real-time monitoring of Road Logistics Agreements for deviation and penalty triggers.',
+    description: 'Daily monitoring of every importer\'s SARS Registered Local Agent (RLA) status — alerts you to a suspension before you submit a single SAD500.',
   },
   {
     icon: Search,
     name: 'HS Code Classifier',
-    description: 'Machine learning HS code classification with SARB tariff database validation.',
+    description: 'AI HS code classification validated against the SARS 8-digit tariff book, with tariff-amendment alerts.',
   },
   {
     icon: CheckCircle,
     name: 'Shadow Audit',
-    description: '7-day parallel audit that runs silently and surfaces recoverable losses.',
+    description: 'Re-runs all 7 compliance checks over your historical shipments and shows your exact Rand exposure — proof before you pay.',
   },
   {
     icon: Package,
@@ -57,7 +57,7 @@ const features = [
   {
     icon: Award,
     name: 'Savings Certificate',
-    description: 'Verified savings report ready for management, auditors, and HMRC claims.',
+    description: 'Verified monthly savings certificate — boardroom-ready proof of value for management and auditors.',
   },
 ];
 

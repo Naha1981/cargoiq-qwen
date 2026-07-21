@@ -15,7 +15,7 @@ export default function SignupPage() {
         <div className="max-w-lg">
           <Logo size="lg" dark />
           <h2 className="mt-8 text-2xl xl:text-3xl font-medium text-white leading-relaxed">
-            Start your 7-day free shadow audit today.
+             Start your free shadow audit today.
           </h2>
           <p className="mt-4 text-gray-400 text-lg">
             No commitment. No credit card required. See exactly what CargoIQ can recover for your operation.
@@ -23,7 +23,7 @@ export default function SignupPage() {
           <div className="mt-8 space-y-4">
             <div className="flex items-center gap-3">
               <span className="w-2 h-2 bg-[#B8860B] rounded-full" />
-              <span className="text-gray-300">7-day parallel audit with zero disruption</span>
+               <span className="text-gray-300">Parallel audit with zero disruption</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="w-2 h-2 bg-[#B8860B] rounded-full" />
@@ -43,7 +43,7 @@ export default function SignupPage() {
             <h2 className="mt-4 text-2xl font-bold text-[#1A2332]">Create your account</h2>
           </div>
           <h2 className="hidden lg:block text-3xl font-bold text-[#1A2332] mb-2">Create your account</h2>
-          <p className="text-gray-600 mb-8">Start your free 7-day shadow audit</p>
+           <p className="text-gray-600 mb-8">Start your free shadow audit</p>
           <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

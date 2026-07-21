@@ -1,18 +1,20 @@
-name: Wake Up Render Free Tier
-
+name: Keep Render Warm
 on:
   schedule:
     - cron: '*/10 * * * *'
-  workflow_dispatch:
-
+  workflow_dispatch: {}
 jobs:
-  wake:
+  ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping CargoIQ Worker
+      - name: Wake CargoIQ worker
         run: |
-          curl -s -o /dev/null -w "%{http_code}" https://cargoiq-worker.onrender.com/wake || true
-
-      - name: Ping Evolution API
+          echo "Pinging worker at $WORKER_URL"
+          curl -sS -o /dev/null -w "worker_http=%{http_code}\n" "${WORKER_URL}/wake" || true
+        env:
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+      - name: Wake Evolution API (optional)
         run: |
-          curl -s -o /dev/null -w "%{http_code}" ${{ secrets.EVOLUTION_API_URL }}/health || true
+          curl -sS -o /dev/null -w "evolution_http=%{http_code}\n" "${EVOLUTION_API_URL}/" || true
+        env:
+          EVOLUTION_API_URL: ${{ secrets.EVOLUTION_API_URL }}

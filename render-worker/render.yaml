@@ -2,7 +2,7 @@ services:
   - type: web
     name: cargoiq-worker
     runtime: node
-    buildCommand: cd render-worker && npm install && npx playwright install chromium --with-deps
+    buildCommand: cd render-worker && npm install
     startCommand: cd render-worker && npm start
     plan: free
     envVars:

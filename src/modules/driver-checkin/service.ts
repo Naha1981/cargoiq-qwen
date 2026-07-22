@@ -12,6 +12,8 @@ interface CheckInData {
 }
 
 export async function processDriverCheckIn(tenantId: string, driverId: string | null, data: CheckInData) {
+  if (!db) throw new Error("DATABASE_NOT_CONFIGURED");
+
   if (data.type === 'ARRIVED') {
     const newFinding = await db.insert(waitingTimeFindings).values({
       id: generateId(),
@@ -110,6 +112,8 @@ export async function processDriverCheckIn(tenantId: string, driverId: string | 
 }
 
 export async function resolveDriverAndTenant(phoneNumber: string) {
+  if (!db) throw new Error("DATABASE_NOT_CONFIGURED");
+
   const normalized = normalizePhoneNumber(phoneNumber);
   const driver = await db.query.drivers.findFirst({
     where: eq(drivers.phoneNumber, normalized),

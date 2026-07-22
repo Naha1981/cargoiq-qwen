@@ -5,6 +5,9 @@ import { auth } from "@/lib/auth";
 import { generateId } from "@/lib/utils";
 import { z } from "zod";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
@@ -13,6 +16,13 @@ const signupSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  if (!db || !auth) {
+    return NextResponse.json(
+      { error: "SERVICE_UNAVAILABLE", message: "Database or auth not configured." },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await request.json().catch(() => null);
     const parsed = signupSchema.safeParse(body);

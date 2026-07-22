@@ -7,12 +7,22 @@ import { normalizePhoneNumber } from "@/lib/utils";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const createDriverSchema = z.object({
   name: z.string().min(1, "Driver name is required"),
   phoneNumber: z.string().min(1, "Phone number is required"),
 });
 
 export async function POST(request: NextRequest) {
+  if (!auth || !db) {
+    return NextResponse.json(
+      { error: "SERVICE_UNAVAILABLE", message: "Auth or database not configured." },
+      { status: 503 }
+    );
+  }
+
   try {
     const session = await auth.api.getSession({
       headers: request.headers,

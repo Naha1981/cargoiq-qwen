@@ -42,6 +42,8 @@ export async function runAndPersistComplianceShield(
   shipmentId: string,
   doc: ShipmentDocumentInput
 ): Promise<ComplianceReport> {
+  if (!db) throw new Error("DATABASE_NOT_CONFIGURED");
+
   const { results, overallStatus, totalExposureZar } = runComplianceShield(doc);
 
   for (const result of results) {

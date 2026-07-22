@@ -4,9 +4,19 @@ import { tenants, drivers, waitingTimeFindings } from "@/lib/db/schema";
 import { generateId, normalizePhoneNumber } from "@/lib/utils";
 import { eq, and, isNull } from "drizzle-orm";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const SELFTEST_TENANT_ID = "00000000-0000-0000-0000-000000000001";
 
 export async function POST(request: NextRequest) {
+  if (!db) {
+    return NextResponse.json(
+      { error: "SERVICE_UNAVAILABLE", message: "Database not configured." },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await request.json().catch(() => ({}));
     const testPhone = typeof body?.phone === "string" ? body.phone : "27821234567";

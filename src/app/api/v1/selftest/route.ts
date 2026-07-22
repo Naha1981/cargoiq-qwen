@@ -113,9 +113,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     console.error("[Selftest Error]:", error);
     return NextResponse.json(
-      { error: "INTERNAL_ERROR", message: "Selftest failed." },
+      { error: "INTERNAL_ERROR", message, stack: error instanceof Error ? error.stack : undefined },
       { status: 500 }
     );
   }

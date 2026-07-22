@@ -1,5 +1,5 @@
 import { pgTable, varchar, timestamp, integer, decimal, boolean, text } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 
 // ─── TENANTS (Organizations) ───────────────────────────────
 export const tenants = pgTable('tenants', {
@@ -19,6 +19,7 @@ export const users = pgTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }),
   role: varchar('role', { length: 50 }).default('member').notNull(),
+  password_hash: text('password_hash'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -78,12 +79,22 @@ export const complianceResults = pgTable('compliance_results', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
-// ─── EVENTS (Domain Event Log) ─────────────────────────────
+// ─── EVENTS (Domain Event Log) ──────────────────────────────
 export const events = pgTable('events', {
   id: varchar('id', { length: 36 }).primaryKey(),
   tenantId: varchar('tenant_id', { length: 36 }).notNull().references(() => tenants.id),
   type: varchar('type', { length: 100 }).notNull(),
   payload: text('payload'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// ─── SESSIONS ───────────────────────────────────────────────
+export const sessions = pgTable('sessions', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 36 }).notNull().references(() => users.id),
+  tenantId: varchar('tenant_id', { length: 36 }).notNull().references(() => tenants.id),
+  token: varchar('token', { length: 255 }).notNull().unique(),
+  expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -95,8 +106,9 @@ export const tenantsRelations = relations(tenants, ({ many }) => ({
   shipments: many(shipments),
 }));
 
-export const usersRelations = relations(users, ({ one }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   tenant: one(tenants, { fields: [users.tenantId], references: [tenants.id] }),
+  sessions: many(sessions),
 }));
 
 export const driversRelations = relations(drivers, ({ one, many }) => ({
@@ -112,4 +124,9 @@ export const waitingTimeFindingsRelations = relations(waitingTimeFindings, ({ on
 export const shipmentsRelations = relations(shipments, ({ one, many }) => ({
   tenant: one(tenants, { fields: [shipments.tenantId], references: [tenants.id] }),
   complianceResults: many(complianceResults),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+  tenant: one(tenants, { fields: [sessions.tenantId], references: [tenants.id] }),
 }));

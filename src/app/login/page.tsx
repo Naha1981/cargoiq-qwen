@@ -7,6 +7,40 @@ import { Logo } from '@/components/ui/logo';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const email = String(formData.get('email') || '');
+    const password = String(formData.get('password') || '');
+
+    try {
+      const res = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.message || data.error || 'Sign-in failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      window.location.href = '/dashboard';
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -39,12 +73,18 @@ export default function LoginPage() {
           </div>
           <h2 className="text-3xl font-bold text-[#1A2332] mb-2">Welcome back</h2>
           <p className="text-gray-600 mb-8">Sign in to your CargoIQ account</p>
-          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 border border-red-200">
+              {error}
+            </div>
+          )}
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email address
               </label>
               <input
+                name="email"
                 type="email"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B8860B] focus:border-[#B8860B] outline-none transition-all"
@@ -57,6 +97,7 @@ export default function LoginPage() {
               </label>
               <div className="relative">
                 <input
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B8860B] focus:border-[#B8860B] outline-none transition-all"
@@ -82,9 +123,10 @@ export default function LoginPage() {
             </div>
             <button
               type="submit"
-              className="w-full bg-[#1A2332] text-white py-3 rounded-lg font-semibold hover:bg-[#1A2332]/90 transition-colors"
+              disabled={loading}
+              className="w-full bg-[#1A2332] text-white py-3 rounded-lg font-semibold hover:bg-[#1A2332]/90 transition-colors disabled:opacity-70"
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
           <p className="mt-8 text-center text-sm text-gray-600">

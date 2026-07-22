@@ -5,11 +5,10 @@ test.describe('Proof page', () => {
     const response = await page.goto('/proof/demo');
     expect(response?.status() ?? 200).toBeLessThan(400);
     expect(page.url()).toContain('/proof');
-    const bodyText = await page.textContent('body');
-    expect(bodyText).not.toContain('404');
-    expect(bodyText).not.toContain('not found');
-    expect(bodyText).toMatch(/88[\s,.]?400/);
-    expect(bodyText).toContain('Findings Detail');
+    await expect(page.getByRole('heading', { name: 'CargoIQ' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Proof not found' })).not.toBeVisible();
+    await expect(page.getByText(/88[\s,]?400/)).toBeVisible();
+    await expect(page.getByText('Findings Detail')).toBeVisible();
     await expect(page.getByRole('link', { name: /start|trial|free/i })).toBeVisible();
   });
 });

@@ -38,8 +38,9 @@ function getAuditData(token: string) {
   };
 }
 
-export default function PublicProofPage({ params }: { params: { token: string } }) {
-  const data = getAuditData(params.token);
+export default async function PublicProofPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
+  const data = getAuditData(token);
 
   if (!data) {
     return (

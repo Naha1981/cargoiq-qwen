@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     (async () => {
       try {
-        const session = await authClient.getSession();
+        const { data: session } = await authClient.getSession();
         if (!active) return;
         if (session?.user) {
           setUser({ email: session.user.email, name: session.user.name });

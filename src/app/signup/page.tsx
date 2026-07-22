@@ -8,6 +8,52 @@ import { Logo } from '@/components/ui/logo';
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const name = String(formData.get('name') || '');
+    const orgName = String(formData.get('orgName') || '');
+    const email = String(formData.get('email') || '');
+    const password = String(formData.get('password') || '');
+    const confirm = String(formData.get('confirm') || '');
+
+    if (password !== confirm) {
+      setError('Passwords do not match.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, orgName, password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.message || data.error || 'Signup failed.');
+        return;
+      }
+
+      if (data.token) {
+        document.cookie = `better-auth.session_token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
+      }
+
+      window.location.href = '/dashboard';
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -44,12 +90,18 @@ export default function SignupPage() {
           </div>
           <h2 className="hidden lg:block text-3xl font-bold text-[#1A2332] mb-2">Create your account</h2>
            <p className="text-gray-600 mb-8">Start your free shadow audit</p>
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700 border border-red-200">
+              {error}
+            </div>
+          )}
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
               </label>
               <input
+                name="name"
                 type="text"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B8860B] focus:border-[#B8860B] outline-none transition-all"
@@ -61,6 +113,7 @@ export default function SignupPage() {
                 Organisation Name
               </label>
               <input
+                name="orgName"
                 type="text"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B8860B] focus:border-[#B8860B] outline-none transition-all"
@@ -75,6 +128,7 @@ export default function SignupPage() {
                 Email address
               </label>
               <input
+                name="email"
                 type="email"
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B8860B] focus:border-[#B8860B] outline-none transition-all"
@@ -87,6 +141,7 @@ export default function SignupPage() {
               </label>
               <div className="relative">
                 <input
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
                   minLength={8}
@@ -108,6 +163,7 @@ export default function SignupPage() {
               </label>
               <div className="relative">
                 <input
+                  name="confirm"
                   type={showConfirm ? 'text' : 'password'}
                   required
                   minLength={8}
@@ -125,9 +181,10 @@ export default function SignupPage() {
             </div>
             <button
               type="submit"
-              className="w-full bg-[#1A2332] text-white py-3 rounded-lg font-semibold hover:bg-[#1A2332]/90 transition-colors"
+              disabled={loading}
+              className="w-full bg-[#1A2332] text-white py-3 rounded-lg font-semibold hover:bg-[#1A2332]/90 transition-colors disabled:opacity-70"
             >
-              Create Account &amp; Start Free Trial
+              {loading ? 'Creating account...' : 'Create Account & Start Free Trial'}
             </button>
           </form>
           <p className="mt-8 text-center text-sm text-gray-600">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { whatsappCheckInSchema } from '@/modules/driver-checkin/schema';
 import { processDriverCheckIn, resolveDriverAndTenant } from '@/modules/driver-checkin/service';
+import { normalizePhoneNumber } from '@/lib/utils';
 
 const processedMessages = new Set<string>();
 
@@ -26,6 +27,8 @@ export async function POST(req: NextRequest) {
       if (first) processedMessages.delete(first);
     }
 
+    const normalizedSource = normalizePhoneNumber(source);
+
     const msgUpper = message.toUpperCase().trim();
     const match = msgUpper.match(/^(ARRIVED|DEPARTED|STATUS|RLA|HELP)\s*([A-Z0-9\-]*)?\s*(.*)?$/);
 
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
       }, { status: 200 });
     }
 
-    const resolved = await resolveDriverAndTenant(source);
+    const resolved = await resolveDriverAndTenant(normalizedSource);
     if (!resolved) {
       return NextResponse.json({
         status: 'error',

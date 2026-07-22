@@ -1,7 +1,8 @@
 import { db } from '@/lib/db';
 import { waitingTimeFindings, drivers, events, tenants } from '@/lib/db/schema';
-import { generateId } from '@/lib/utils';
+import { generateId, normalizePhoneNumber } from '@/lib/utils';
 import { eq, and, isNull } from 'drizzle-orm';
+import { notifyWaitingTimeFound } from '@/lib/email';
 
 interface CheckInData {
   reference: string;
@@ -84,6 +85,13 @@ export async function processDriverCheckIn(tenantId: string, driverId: string | 
     });
 
     if (billableMinutes > 0) {
+      notifyWaitingTimeFound({
+        to: "fleet-manager@cargoiq.io",
+        subject: `Billable waiting time: ${billableMinutes}min = R${billableAmount}`,
+        html: `<p>Billable waiting time for reference <strong>${data.reference}</strong>: ${billableMinutes} minutes = <strong>R${billableAmount}</strong></p>`,
+        text: `Billable waiting time for reference ${data.reference}: ${billableMinutes} minutes = R${billableAmount}`,
+      }).catch(() => {});
+
       return {
         success: true,
         message: `Billable: ${Math.floor(billableMinutes / 60)}hr ${billableMinutes % 60}min = R${billableAmount}. Invoice ready to generate.`,
@@ -102,8 +110,9 @@ export async function processDriverCheckIn(tenantId: string, driverId: string | 
 }
 
 export async function resolveDriverAndTenant(phoneNumber: string) {
+  const normalized = normalizePhoneNumber(phoneNumber);
   const driver = await db.query.drivers.findFirst({
-    where: eq(drivers.phoneNumber, phoneNumber),
+    where: eq(drivers.phoneNumber, normalized),
   });
 
   if (!driver) return null;

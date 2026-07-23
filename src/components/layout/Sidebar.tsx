@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
+import { SignOutButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -26,7 +27,11 @@ const navItems = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null;
+}
+
+export default function Sidebar({ identity }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -37,10 +42,12 @@ export default function Sidebar() {
             <span className="text-white">Cargo</span>
             <span className="text-[#B8860B]">IQ</span>
           </div>
-          <p className="mt-1 truncate text-xs text-white">Acme Logistics (Pty) Ltd</p>
+          <p className="mt-1 truncate text-xs text-white">
+            {identity?.tenantName || 'CargoIQ'}
+          </p>
         </div>
         <span className="inline-flex w-fit rounded-full bg-[#B8860B]/20 px-2 py-0.5 text-[10px] font-medium text-[#B8860B]">
-          Growth
+          {identity?.plan || 'Starter'}
         </span>
       </div>
 
@@ -77,14 +84,16 @@ export default function Sidebar() {
       </nav>
 
       <div className="mt-auto flex flex-col gap-3 border-t border-white/10 px-5 py-4">
-        <p className="truncate text-xs text-[#64748B]">admin@acme.co.za</p>
-        <button
-          type="button"
-          className="flex items-center gap-2 text-left text-xs text-[#94A3B8] transition-colors hover:text-white"
-        >
-          <LogOut className="h-3.5 w-3.5" />
-          <span>Sign Out</span>
-        </button>
+        <p className="truncate text-xs text-[#64748B]">{identity?.userEmail || ''}</p>
+        <SignOutButton redirectUrl="/">
+          <button
+            type="button"
+            className="flex items-center gap-2 text-left text-xs text-[#94A3B8] transition-colors hover:text-white"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span>Sign Out</span>
+          </button>
+        </SignOutButton>
       </div>
     </aside>
   );

@@ -1,6 +1,5 @@
 import { CheckCircle2, Circle, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import DashboardShell from "@/components/layout/DashboardShell";
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
@@ -33,8 +32,7 @@ export default async function DashboardPage() {
   await ensureTenant();
 
   return (
-    <DashboardShell>
-      <div className="mx-auto max-w-7xl px-6 py-8">
+    <div className="mx-auto max-w-7xl px-6 py-8">
         <h1 className="text-2xl font-bold text-[#0D1B2A] font-sans mb-6">Dashboard</h1>
 
         <div className="grid grid-cols-4 gap-5">
@@ -130,6 +128,5 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
-    </DashboardShell>
   );
 }

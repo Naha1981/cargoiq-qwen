@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import Sidebar from '@/components/layout/Sidebar';
+import DashboardShell from '@/components/layout/DashboardShell';
 
 const dashboardRoutes = [
   '/dashboard',
@@ -16,17 +17,19 @@ const dashboardRoutes = [
   '/portals',
 ];
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+interface ClientLayoutProps {
+  children: React.ReactNode;
+  identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null;
+}
+
+export default function ClientLayout({ children, identity }: ClientLayoutProps) {
   const pathname = usePathname();
   const isDashboardRoute = dashboardRoutes.some((route) => pathname.startsWith(route));
 
   return (
     <AuthProvider>
       {isDashboardRoute ? (
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 ml-60">{children}</main>
-        </div>
+        <DashboardShell identity={identity}>{children}</DashboardShell>
       ) : (
         <div className="min-h-screen">{children}</div>
       )}

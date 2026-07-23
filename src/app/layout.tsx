@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import ClientLayout from '@/components/layout/ClientLayout';
+import { db } from '@/lib/db';
+import { eq } from 'drizzle-orm';
 import './globals.css';
 
 const inter = Inter({
@@ -23,11 +25,39 @@ export const metadata: Metadata = {
   description: "South Africa's first AI-powered compliance and cost-containment platform for freight forwarders and customs clearing agents.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null = null;
+
+  try {
+    const { userId } = await (await import('@clerk/nextjs/server')).auth();
+    if (userId && db) {
+      const user = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.clerk_id, userId),
+      });
+
+      if (user) {
+        const tenant = await db.query.tenants.findFirst({
+          where: (tenants, { eq }) => eq(tenants.id, user.tenantId),
+        });
+
+        if (tenant) {
+          identity = {
+            tenantName: tenant.name,
+            plan: tenant.plan || 'Starter',
+            userEmail: user.email,
+            userName: user.name || '',
+          };
+        }
+      }
+    }
+  } catch {
+    // ignore auth lookup errors
+  }
+
   return (
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
@@ -52,7 +82,7 @@ export default function RootLayout({
             },
           }}
         >
-          <ClientLayout>{children}</ClientLayout>
+          <ClientLayout identity={identity}>{children}</ClientLayout>
         </ClerkProvider>
       </body>
     </html>

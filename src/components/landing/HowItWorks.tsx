@@ -12,7 +12,7 @@ const steps = [
   {
     icon: Search,
     title: '7 Compliance Checks',
-    body: 'Every document runs through seven automated compliance gates — HS codes, SACU/Non-SACU VAT, DA65, TMS pre-declaration, and more.',
+    body: 'Every document runs through seven automated compliance gates — HS codes, valuations, origin rules, and more.',
   },
   {
     icon: TrendingUp,

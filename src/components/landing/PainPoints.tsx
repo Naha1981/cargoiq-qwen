@@ -7,26 +7,26 @@ const painPoints = [
   {
     icon: AlertTriangle,
     amount: 'R14,169',
-    label: 'Average SARS Penalty',
-    description: 'Per customs violation. Compliance failures compound monthly without AI monitoring.',
+    label: 'Typical SARS Penalty (illustrative)',
+    description: 'Modelled from typical SARS administrative penalties per customs violation; actual penalties vary by violation and value. Failures compound monthly without monitoring.',
   },
   {
     icon: TrendingUp,
     amount: '25%',
-    label: 'Carrier Overcharges',
-    description: 'Freight carriers routinely overcharge. Without invoice auditing, these leak straight to your P&L.',
+    label: 'Invoices With Errors (typical)',
+    description: 'Industry benchmarks suggest a meaningful share of carrier invoices contain billing errors; CargoIQ audits every line and surfaces the overcharges.',
   },
   {
     icon: Clock,
     amount: 'R59,400',
-    label: 'Unbilled Detention',
-    description: 'Monthly value of forgotten detention fees. Deadlines expire and revenue vanishes.',
+    label: 'Unbilled Detention (illustrative)',
+    description: 'Modelled monthly exposure from forgotten detention deadlines. Deadlines expire and revenue vanishes without alerts.',
   },
   {
     icon: Shield,
     amount: '99(2)',
-    label: 'Personal Liability',
-    description: 'Customs Act Section 99(2) makes clearing agents personally liable for undeclared or misclassified cargo.',
+    label: 'Personal Liability Risk',
+    description: 'Under the Customs and Excise Act (incl. Section 99(2)), registered agents can be held liable for errors on entries they submit. CargoIQ flags the risk before submission.',
   },
 ];
 

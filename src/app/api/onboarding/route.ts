@@ -8,22 +8,30 @@ import { z } from 'zod';
 import { sql } from 'drizzle-orm';
 
 const schema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  orgName: z.string().min(1, 'Organisation name is required'),
+  name: z.string().min(1, 'Please enter your name'),
+  orgName: z.string().min(1, 'Please enter your organisation name'),
 });
+
+const errorMap: Record<string, string> = {
+  UNAUTHORIZED: 'Please sign in to continue.',
+  VALIDATION_ERROR: 'Something went wrong — please try again.',
+  ALREADY_SETUP: 'Your workspace is already set up.',
+  ORG_TAKEN: 'That organisation name is already taken — please choose another.',
+  INTERNAL_ERROR: 'Something went wrong — please try again.',
+};
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ message: errorMap['UNAUTHORIZED'] }, { status: 401 });
     }
 
     const body = await request.json().catch(() => null);
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'VALIDATION_ERROR', message: parsed.error.errors.map((e) => e.message).join(', ') },
+        { message: errorMap['VALIDATION_ERROR'] },
         { status: 400 }
       );
     }
@@ -31,14 +39,14 @@ export async function POST(request: NextRequest) {
     const { name, orgName } = parsed.data;
 
     if (!db) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
+      return NextResponse.json({ message: 'Our system is temporarily unavailable — please try again shortly.' }, { status: 503 });
     }
 
     const existing = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.clerk_id, userId),
     });
     if (existing) {
-      return NextResponse.json({ error: 'ALREADY_SETUP' }, { status: 400 });
+      return NextResponse.json({ message: errorMap['ALREADY_SETUP'] }, { status: 400 });
     }
 
     const tenantRows = await db
@@ -48,7 +56,7 @@ export async function POST(request: NextRequest) {
       .limit(1);
     if (tenantRows[0]) {
       return NextResponse.json(
-        { error: 'ORG_TAKEN', message: 'That organisation name is taken, try another' },
+        { message: errorMap['ORG_TAKEN'] },
         { status: 409 }
       );
     }
@@ -83,6 +91,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[Onboarding Error]', error);
     const message = error instanceof Error ? error.message : 'Something went wrong.';
-    return NextResponse.json({ error: 'INTERNAL_ERROR', message }, { status: 500 });
+    return NextResponse.json({ message: errorMap['INTERNAL_ERROR'], details: message }, { status: 500 });
   }
 }

@@ -26,7 +26,7 @@ export default function OnboardingForm() {
 
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Something went wrong.');
+        setError(data.message || data.error || 'Something went wrong. Please try again.');
         setLoading(false);
         return;
       }

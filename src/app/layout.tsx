@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import ClientLayout from '@/components/layout/ClientLayout';
 import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
 import './globals.css';
 
 const inter = Inter({
@@ -31,12 +32,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   let identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null = null;
+  let userId: string | null = null;
 
   try {
-    const { userId } = await (await import('@clerk/nextjs/server')).auth();
+    const authResult = await (await import('@clerk/nextjs/server')).auth();
+    userId = authResult.userId;
     if (userId && db) {
       const user = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.clerk_id, userId),
+        where: (users, { eq }) => eq(users.clerk_id, userId as string),
       });
 
       if (user) {
@@ -52,10 +55,16 @@ export default async function RootLayout({
             userName: user.name || '',
           };
         }
+      } else if (userId) {
+        identity = { tenantName: '', plan: 'Starter', userEmail: '', userName: '' };
       }
     }
   } catch {
     // ignore auth lookup errors
+  }
+
+  if (identity && identity.tenantName === '' && userId) {
+    redirect('/onboarding');
   }
 
   return (

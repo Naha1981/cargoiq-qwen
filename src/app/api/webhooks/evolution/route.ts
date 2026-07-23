@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { whatsappCheckInSchema } from '@/modules/driver-checkin/schema';
 import { processDriverCheckIn, resolveDriverAndTenant } from '@/modules/driver-checkin/service';
 import { normalizePhoneNumber } from '@/lib/utils';
+import { sendEvolutionText } from '@/lib/integrations/evolution/client';
 
 const processedMessages = new Set<string>();
 
@@ -72,9 +73,32 @@ export async function POST(req: NextRequest) {
         timestamp: eventDate,
       });
 
+      let replyText = result.message;
+
+      if (result.success && result.data) {
+        if (command === 'ARRIVED') {
+          const time = eventDate.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+          replyText = `✅ Arrival logged for ${reference} at ${time}. I'll bill detention after the 2-hour free window.`;
+        } else if (command === 'DEPARTED') {
+          const totalMinutes = result.data.totalMinutes || 0;
+          const billableMinutes = result.data.billableMinutes || 0;
+          const billableAmount = parseFloat(result.data.billableAmountZar || '0').toFixed(2);
+
+          if (billableMinutes > 0) {
+            replyText = `⏱ ${reference}: ${billableMinutes} billable min after the 2h free window = R${billableAmount} at R1100/hr. Invoice ready.`;
+          } else {
+            replyText = `✅ ${reference} departed. ${totalMinutes} min total — within the 2h free window, no charge.`;
+          }
+        }
+
+        sendEvolutionText(normalizedSource, replyText).catch((sendError) => {
+          console.error('[Evolution Webhook]: send reply failed', sendError);
+        });
+      }
+
       return NextResponse.json({
         status: result.success ? 'ok' : 'error',
-        reply: result.message,
+        reply: replyText,
         data: result.data,
       }, { status: 200 });
     }

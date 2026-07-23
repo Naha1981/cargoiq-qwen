@@ -59,61 +59,60 @@ const plans = [
 
 export function Pricing() {
   return (
-    <section className="bg-[#F1F4F8] py-24">
+    <section id="pricing" className="bg-cargoiq-navy py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-[#1A2332] mb-4">
+          <p className="text-xs font-semibold text-cargoiq-gold uppercase tracking-[0.2em] mb-3">Pricing</p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-cargoiq-fg mb-4">
             Simple, transparent pricing
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-cargoiq-muted max-w-2xl mx-auto">
             Start free. Scale when you are ready.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-cargoiq-subtle max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <div
               key={index}
               className={cn(
-                'relative bg-white rounded-2xl p-8 border-2 flex flex-col',
-                plan.featured
-                  ? 'border-[#B8860B] shadow-xl scale-105'
-                  : 'border-gray-100 shadow-sm'
+                'relative bg-cargoiq-panel p-8 flex flex-col',
+                plan.featured && 'bg-cargoiq-deep'
               )}
             >
               {plan.featured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-[#B8860B] text-white text-sm font-semibold px-4 py-1 rounded-full">
+                <div className="mb-6">
+                  <span className="text-xs font-semibold text-cargoiq-gold uppercase tracking-[0.15em]">
                     Most Popular
                   </span>
                 </div>
               )}
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-[#1A2332] mb-2">
+                <h3 className="text-lg font-bold text-cargoiq-fg uppercase tracking-wider">
                   {plan.name}
                 </h3>
-                <p className="text-gray-600 text-sm">{plan.description}</p>
+                <p className="text-cargoiq-muted text-sm mt-1">{plan.description}</p>
               </div>
               <div className="mb-8">
-                <span className="text-4xl font-bold text-[#1A2332]">
+                <span className="font-mono text-4xl font-bold text-cargoiq-fg">
                   {plan.price}
                 </span>
-                <span className="text-gray-500">{plan.period}</span>
+                <span className="text-cargoiq-muted text-sm">{plan.period}</span>
               </div>
-              <ul className="space-y-4 mb-8 flex-grow">
+              <ul className="space-y-3 mb-8 flex-grow">
                 {plan.features.map((feature, fIndex) => (
                   <li key={fIndex} className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-[#B8860B] mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700 text-sm">{feature}</span>
+                    <Check className="w-4 h-4 text-cargoiq-gold mt-0.5 flex-shrink-0" />
+                    <span className="text-sm text-cargoiq-muted">{feature}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href={plan.cta === 'Contact Sales' ? '/login' : '/signup'}
                 className={cn(
-                  'block w-full text-center py-3 rounded-full font-semibold transition-colors',
+                  'block w-full text-center py-3 text-sm font-semibold uppercase tracking-wider transition-colors border',
                   plan.featured
-                    ? 'bg-[#B8860B] text-white hover:bg-[#D4922B]'
-                    : 'bg-[#1A2332] text-white hover:bg-[#1A2332]/90'
+                    ? 'bg-cargoiq-gold text-cargoiq-deep border-cargoiq-gold hover:bg-cargoiq-goldHover'
+                    : 'bg-transparent text-cargoiq-fg border-cargoiq-subtle hover:border-cargoiq-muted'
                 )}
               >
                 {plan.cta}

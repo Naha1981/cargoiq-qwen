@@ -63,29 +63,31 @@ const features = [
 
 export function FeaturesGrid() {
   return (
-    <section className="bg-white py-24">
+    <section id="features" className="bg-cargoiq-navy py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-[#1A2332] mb-4">
+          <p className="text-xs font-semibold text-cargoiq-gold uppercase tracking-[0.2em] mb-3">Features</p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-cargoiq-fg">
             Built for Freight Operations
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-cargoiq-muted max-w-2xl mx-auto mt-4">
             Nine modules. One platform. Complete control over compliance and costs.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-cargoiq-subtle">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-gray-50 rounded-xl p-6 border border-gray-100 hover:border-[#B8860B]/30 hover:shadow-md transition-all"
+              className="bg-cargoiq-deep p-6 md:p-8 group hover:bg-cargoiq-panel transition-colors"
             >
-              <div className="w-12 h-12 mb-4 bg-[#B8860B]/10 rounded-xl flex items-center justify-center">
-                <feature.icon className="w-6 h-6 text-[#B8860B]" />
-              </div>
-              <h3 className="text-lg font-semibold text-[#1A2332] mb-2">
+              <span className="font-mono text-xs text-cargoiq-gold/40 mb-4 block">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <feature.icon className="w-5 h-5 text-cargoiq-gold mb-4" />
+              <h3 className="text-sm font-semibold text-cargoiq-fg mb-2 uppercase tracking-wider">
                 {feature.name}
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-xs text-cargoiq-muted leading-relaxed">
                 {feature.description}
               </p>
             </div>

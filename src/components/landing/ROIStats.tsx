@@ -26,32 +26,31 @@ const stats = [
 
 export function ROIStats() {
   return (
-    <section className="bg-[#F1F4F8] py-24">
+    <section className="bg-cargoiq-deep border-y border-cargoiq-subtle py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-[#1A2332] mb-4">
+          <p className="text-xs font-semibold text-cargoiq-gold uppercase tracking-[0.2em] mb-3">Proof</p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-cargoiq-fg mb-4">
             The numbers speak for themselves
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-cargoiq-muted max-w-2xl mx-auto">
             Real results from real freight operations.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-cargoiq-subtle">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center hover:shadow-md transition-shadow"
+              className="bg-cargoiq-panel p-8 md:p-10 text-center"
             >
-              <div className="w-14 h-14 mx-auto mb-6 bg-[#B8860B]/10 rounded-2xl flex items-center justify-center">
-                <stat.icon className="w-7 h-7 text-[#B8860B]" />
-              </div>
-              <p className="font-mono text-5xl md:text-6xl font-bold text-[#1A2332] mb-4">
+              <stat.icon className="w-5 h-5 text-cargoiq-gold mx-auto mb-6" />
+              <p className="font-mono text-5xl md:text-6xl font-bold text-cargoiq-fg mb-4 tracking-tight">
                 {stat.value}
               </p>
-              <h3 className="text-xl font-semibold text-[#1A2332] mb-2">
+              <h3 className="text-sm font-semibold text-cargoiq-muted uppercase tracking-wider mb-2">
                 {stat.label}
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-xs text-cargoiq-muted/70">
                 {stat.description}
               </p>
             </div>

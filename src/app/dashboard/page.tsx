@@ -1,6 +1,23 @@
 import { CheckCircle2, Circle, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DashboardShell from "@/components/layout/DashboardShell";
+import { auth } from '@clerk/nextjs/server';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
+
+async function ensureTenant() {
+  const { userId } = await auth();
+  if (!userId) return redirect('/login');
+  if (!db) return redirect('/login');
+
+  const user = await db.query.users.findFirst({
+    where: (users, { eq }) => eq(users.clerk_id, userId),
+  });
+
+  if (!user) return redirect('/onboarding');
+}
 
 const volumeData = Array.from({ length: 30 }, () => Math.floor(Math.random() * 80) + 20);
 
@@ -12,7 +29,9 @@ const onboardingItems = [
   { title: "Invite your team", done: false },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  await ensureTenant();
+
   return (
     <DashboardShell>
       <div className="mx-auto max-w-7xl px-6 py-8">

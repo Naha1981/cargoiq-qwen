@@ -1,3 +1,4 @@
+// DEPRECATED — replaced by Clerk. Do not use.
 import crypto from 'crypto';
 
 export function hashPassword(password: string): string {

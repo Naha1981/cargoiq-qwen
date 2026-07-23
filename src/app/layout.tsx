@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
 import ClientLayout from '@/components/layout/ClientLayout';
 import './globals.css';
 
@@ -30,7 +31,29 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
-        <ClientLayout>{children}</ClientLayout>
+        <ClerkProvider
+          appearance={{
+            variables: {
+              colorPrimary: '#B8860B',
+              colorForeground: '#F1F4F8',
+              colorBackground: '#1A2332',
+              colorInput: '#243044',
+              colorInputForeground: '#F1F4F8',
+              borderRadius: '0.5rem',
+            },
+            elements: {
+              formButtonPrimary: 'bg-[#B8860B] hover:bg-[#9a7209]',
+              cardBox: 'bg-[#1A2332] border border-white/10',
+              headerTitle: 'text-[#F1F4F8]',
+              headerSubtitle: 'text-gray-400',
+              formFieldLabel: 'text-gray-300',
+              formFieldInput: 'bg-[#243044] text-[#F1F4F8] border-white/10',
+              footerActionLink: 'text-[#B8860B]',
+            },
+          }}
+        >
+          <ClientLayout>{children}</ClientLayout>
+        </ClerkProvider>
       </body>
     </html>
   );

@@ -1,3 +1,4 @@
+// DEPRECATED — replaced by Clerk. Do not use.
 import { db } from "@/lib/db";
 import { sessions, users } from "@/lib/db/schema";
 import { cookies } from "next/headers";

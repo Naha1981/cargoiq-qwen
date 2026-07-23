@@ -1,3 +1,4 @@
+// DEPRECATED — replaced by Clerk. Do not use.
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { users, sessions } from "@/lib/db/schema";

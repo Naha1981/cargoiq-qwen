@@ -9,11 +9,11 @@ test.describe('Public onboarding surface — no login required', () => {
     expect(hasClerk).toBeTruthy();
   });
 
-  test('onboarding bounces to sign-in when unauthenticated', async ({ page }) => {
+test('onboarding bounces to sign-in when unauthenticated', async ({ page }) => {
     const response = await page.goto('/onboarding');
     expect(response?.status() ?? 200).toBeLessThan(400);
     const url = page.url();
-    expect(url).toContain('/login');
+    expect(url).toContain('/sign-in');
   });
 
   test('/proof/demo returns 200 with a Rand figure', async ({ page, request }) => {
@@ -30,6 +30,6 @@ test.describe('Public onboarding surface — no login required', () => {
     const response = await page.goto('/shadow-audit');
     expect(response?.status() ?? 200).toBeLessThan(400);
     const url = page.url();
-    expect(url).toContain('/login');
+    expect(url).toContain('/sign-in');
   });
 });

@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
 import { tenants, users } from '@/lib/db/schema';
 import { generateId } from '@/lib/utils';
 import { z } from 'zod';
-import { sql } from 'drizzle-orm';
+import { sql, eq } from 'drizzle-orm';
 
 const schema = z.object({
   name: z.string().min(1, 'Please enter your name'),
@@ -21,6 +21,11 @@ function isPostgresUniqueViolation(err: unknown): boolean {
 
 function onboardCode(): string {
   return 'ONBOARD_' + Math.random().toString(36).slice(2, 6).toUpperCase();
+}
+
+async function tenantHasUsers(tenantId: string): Promise<boolean> {
+  const rows = await db.select().from(users).where(eq(users.tenantId, tenantId)).limit(1);
+  return rows.length > 0;
 }
 
 export async function POST(request: NextRequest) {
@@ -49,25 +54,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const existing = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.clerk_id, userId),
-    });
-    if (existing) {
-      return NextResponse.json({ message: 'Your workspace is already set up.' }, { status: 400 });
-    }
-
-    const tenantRows = await db
-      .select()
-      .from(tenants)
-      .where(sql`LOWER(${tenants.name}) = ${orgName.toLowerCase().trim()}`)
-      .limit(1);
-    if (tenantRows[0]) {
-      return NextResponse.json(
-        { message: 'That organisation name is already taken — please choose another.' },
-        { status: 409 }
-      );
-    }
-
     let email = '';
     try {
       const client = await clerkClient();
@@ -77,47 +63,184 @@ export async function POST(request: NextRequest) {
       // ignore and fallback below
     }
     if (!email) {
-      email = `${userId}@clerk.placeholder`;
+      email = userId + '@clerk.placeholder';
     }
 
-    const tenantId = generateId();
+    // Unified lookup: by clerk_id (normal) OR by email (legacy rows)
+    const existingByClerkId = await db.query.users.findFirst({
+      where: (u, { eq }) => eq(u.clerk_id, userId),
+    });
 
-    try {
-      await db.insert(tenants).values({
-        id: tenantId,
-        name: orgName,
-        plan: 'trial',
-        status: 'active',
-      });
-    } catch (err) {
-      console.error('[Onboarding] tenant insert failed', err);
-      if (isPostgresUniqueViolation(err)) {
+    const existing = existingByClerkId ?? await db.query.users.findFirst({
+      where: (u, { sql }) => sql`LOWER(${u.email}) = LOWER(${email})`,
+    });
+
+    if (existing) {
+      // CLAIM path — finish the existing row instead of inserting a duplicate
+      let tenantId = existing.tenantId;
+
+      if (!tenantId) {
+        // No tenant yet — find or create one
+        const tenantRows = await db
+          .select()
+          .from(tenants)
+          .where(sql`LOWER(${tenants.name}) = ${orgName.toLowerCase().trim()}`)
+          .limit(1);
+
+        if (tenantRows[0]) {
+          if (await tenantHasUsers(tenantRows[0].id)) {
+            return NextResponse.json(
+              { message: 'That organisation name is already taken — please choose another.' },
+              { status: 409 }
+            );
+          }
+          tenantId = tenantRows[0].id;
+        } else {
+          tenantId = generateId();
+          try {
+            await db.insert(tenants).values({
+              id: tenantId,
+              name: orgName,
+              plan: 'trial',
+              status: 'active',
+            });
+          } catch (err) {
+            if (isPostgresUniqueViolation(err)) {
+              const takenTenant = await db.query.tenants.findFirst({
+                where: (t, { sql }) => sql`LOWER(${t.name}) = ${orgName.toLowerCase().trim()}`,
+              });
+              if (takenTenant && await tenantHasUsers(takenTenant.id)) {
+                return NextResponse.json(
+                  { message: 'That organisation name is already taken — please choose another.' },
+                  { status: 409 }
+                );
+              }
+              tenantId = takenTenant!.id;
+            } else {
+              const code = onboardCode();
+              console.error(`[Onboarding Error ${code}] tenant insert`, err);
+              return NextResponse.json(
+                { message: `We couldn't create your workspace just now (error ${code}). Please try once more; if it persists, share this code with support.` },
+                { status: 500 }
+              );
+            }
+          }
+        }
+      }
+
+      try {
+        await db.update(users).set({
+          clerk_id: userId,
+          tenantId: tenantId,
+          name: name,
+          email: email.toLowerCase().trim(),
+        }).where(eq(users.id, existing.id));
+      } catch (err) {
+        if (isPostgresUniqueViolation(err)) {
+          const otherUser = await db.query.users.findFirst({
+            where: (u, { eq }) => eq(u.clerk_id, userId),
+          });
+          if (otherUser && otherUser.tenantId) {
+            const tenant = await db.query.tenants.findFirst({
+              where: (t, { eq }) => eq(t.id, otherUser.tenantId),
+            });
+            if (tenant) {
+              return NextResponse.json({ ok: true });
+            }
+          }
+          return NextResponse.json(
+            { message: 'An account is already set up — try signing in.' },
+            { status: 409 }
+          );
+        }
+        const code = onboardCode();
+        console.error(`[Onboarding Error ${code}] user update`, err);
         return NextResponse.json(
-          { message: 'That organisation name is already taken — please choose another.' },
-          { status: 409 }
+          { message: `We couldn't finish your setup just now (error ${code}). Please try once more; if it persists, share this code with support.` },
+          { status: 500 }
         );
       }
-      const code = onboardCode();
-      console.error(`[Onboarding Error ${code}] tenant insert`, err);
+
+      return NextResponse.json({ ok: true });
+    }
+
+    // CREATE path — no existing user row found
+    const tenantRows = await db
+      .select()
+      .from(tenants)
+      .where(sql`LOWER(${tenants.name}) = ${orgName.toLowerCase().trim()}`)
+      .limit(1);
+    if (tenantRows[0] && await tenantHasUsers(tenantRows[0].id)) {
       return NextResponse.json(
-        { message: `We couldn't create your workspace just now (error ${code}). Please try once more; if it persists, share this code with support.` },
-        { status: 500 }
+        { message: 'That organisation name is already taken — please choose another.' },
+        { status: 409 }
       );
+    }
+
+    const tenantId = tenantRows[0] ? tenantRows[0].id : generateId();
+
+    if (!tenantRows[0]) {
+      try {
+        await db.insert(tenants).values({
+          id: tenantId,
+          name: orgName,
+          plan: 'trial',
+          status: 'active',
+        });
+      } catch (err) {
+        if (isPostgresUniqueViolation(err)) {
+          const takenTenant = await db.query.tenants.findFirst({
+            where: (t, { sql }) => sql`LOWER(${t.name}) = ${orgName.toLowerCase().trim()}`,
+          });
+          if (takenTenant) {
+            return NextResponse.json(
+              { message: 'That organisation name is already taken — please choose another.' },
+              { status: 409 }
+            );
+          }
+          const code = onboardCode();
+          console.error(`[Onboarding Error ${code}] tenant race`, err);
+          return NextResponse.json(
+            { message: `We couldn't create your workspace just now (error ${code}). Please try once more; if it persists, share this code with support.` },
+            { status: 500 }
+          );
+        }
+        const code = onboardCode();
+        console.error(`[Onboarding Error ${code}] tenant insert`, err);
+        return NextResponse.json(
+          { message: `We couldn't create your workspace just now (error ${code}). Please try once more; if it persists, share this code with support.` },
+          { status: 500 }
+        );
+      }
     }
 
     try {
       await db.insert(users).values({
         id: generateId(),
-        tenantId,
+        tenantId: tenantId,
         clerk_id: userId,
-        email: email.toLowerCase(),
+        email: email.toLowerCase().trim(),
         name,
         role: 'owner',
       });
     } catch (err) {
-      console.error('[Onboarding] user insert failed', err);
       if (isPostgresUniqueViolation(err)) {
-        return NextResponse.json({ message: 'An account is already set up — try signing in.' }, { status: 409 });
+        // Email collision — claim the existing row instead of failing
+        const existingByEmail = await db.query.users.findFirst({
+          where: (u, { sql }) => sql`LOWER(${u.email}) = LOWER(${email})`,
+        });
+        if (existingByEmail) {
+          await db.update(users).set({
+            clerk_id: userId,
+            tenantId: tenantId,
+            name: name,
+          }).where(eq(users.id, existingByEmail.id));
+          return NextResponse.json({ ok: true });
+        }
+        return NextResponse.json(
+          { message: 'An account is already set up — try signing in.' },
+          { status: 409 }
+        );
       }
       const code = onboardCode();
       console.error(`[Onboarding Error ${code}] user insert`, err);

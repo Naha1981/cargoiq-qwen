@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import ClientLayout from '@/components/layout/ClientLayout';
 import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
+import { redirect } from 'next/navigation';
 
 import './globals.css';
 
@@ -33,36 +34,46 @@ export default async function RootLayout({
 }>) {
   let identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null = null;
   let userId: string | null = null;
+  let dbReachable = false;
 
   try {
     const authResult = await (await import('@clerk/nextjs/server')).auth();
     userId = authResult.userId;
-    if (userId && db) {
-      const user = await db.query.users.findFirst({
+    if (!userId) {
+      redirect('/login');
+    }
+    if (!db) {
+      // db not configured — render without redirect to avoid loops
+    } else {
+      dbReachable = true;
+
+      // Try clerk_id match first (normal path)
+      const existingUser = await db.query.users.findFirst({
         where: (users, { eq }) => eq(users.clerk_id, userId as string),
       });
 
-      if (user) {
+      if (existingUser && existingUser.tenantId) {
         const tenant = await db.query.tenants.findFirst({
-          where: (tenants, { eq }) => eq(tenants.id, user.tenantId),
+          where: (tenants, { eq }) => eq(tenants.id, existingUser.tenantId),
         });
-
         if (tenant) {
           identity = {
             tenantName: tenant.name,
             plan: tenant.plan || 'Starter',
-            userEmail: user.email,
-            userName: user.name || '',
+            userEmail: existingUser.email,
+            userName: existingUser.name || '',
           };
         }
-      } else if (userId) {
-        identity = { tenantName: '', plan: 'Starter', userEmail: '', userName: '' };
       }
     }
   } catch {
     // ignore auth lookup errors
   }
 
+  // redirect unonboarded users (has userId but no tenant identity)
+  if (userId && dbReachable && !identity) {
+    redirect('/onboarding');
+  }
 
   return (
     <html lang="en">

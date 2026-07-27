@@ -1,29 +1,22 @@
-import { auth } from "@/lib/auth";
+﻿import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
-function notReady() {
-  return NextResponse.json({ error: "SERVICE_UNAVAILABLE", message: "Auth not configured." }, { status: 503 });
-}
-
 export async function GET(request: NextRequest) {
-  if (!auth) return notReady();
-  return auth.handler(request);
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+  }
+  return NextResponse.json({ userId });
 }
 
 export async function POST(request: NextRequest) {
-  if (!auth) return notReady();
-  return auth.handler(request);
+  return GET(request);
 }
 
 export async function PUT(request: NextRequest) {
-  if (!auth) return notReady();
-  return auth.handler(request);
+  return GET(request);
 }
 
 export async function DELETE(request: NextRequest) {
-  if (!auth) return notReady();
-  return auth.handler(request);
+  return GET(request);
 }

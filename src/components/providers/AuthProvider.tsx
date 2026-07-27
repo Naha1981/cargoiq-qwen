@@ -1,11 +1,7 @@
-'use client';
+﻿'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createAuthClient } from 'better-auth/client';
-
-const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-});
+import React, { createContext, useContext, useState } from 'react';
+import { useAuth as useClerkAuth } from '@clerk/nextjs';
 
 interface AuthContextValue {
   user: { email: string; name: string } | null;
@@ -20,36 +16,19 @@ const AuthContext = createContext<AuthContextValue>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthContextValue['user']>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { userId, user } = useClerkAuth();
 
-  useEffect(() => {
-    let active = true;
-
-    (async () => {
-      try {
-        const { data: session } = await authClient.getSession();
-        if (!active) return;
-        if (session?.user) {
-          setUser({ email: session.user.email, name: session.user.name });
-        }
-      } catch {
-        // ignore session fetch errors
-      } finally {
-        if (active) setIsLoading(false);
-      }
-    })();
-
-    return () => { active = false; };
-  }, []);
+  const resolvedUser = userId && user
+    ? { email: user.emailAddresses[0]?.emailAddress || '', name: user.fullName || user.firstName || '' }
+    : null;
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading }}>
+    <AuthContext.Provider value={{ user: resolvedUser, isAuthenticated: !!userId, isLoading: true }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+export function useAuthContext() {
   return useContext(AuthContext);
 }

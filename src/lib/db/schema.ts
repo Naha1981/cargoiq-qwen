@@ -1,4 +1,4 @@
-import { pgTable, varchar, timestamp, integer, decimal, boolean, text } from 'drizzle-orm/pg-core';
+import { pgTable, varchar, timestamp, integer, decimal, boolean, text, index } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
 // ─── TENANTS (Organizations) ───────────────────────────────
@@ -32,7 +32,9 @@ export const drivers = pgTable('drivers', {
   phoneNumber: varchar('phone_number', { length: 20 }).notNull().unique(),
   active: boolean('active').default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_drivers_tenant_id').on(table.tenantId),
+]);
 
 // ─── WAITING TIME FINDINGS ─────────────────────────────────
 export const waitingTimeFindings = pgTable('waiting_time_findings', {
@@ -52,7 +54,10 @@ export const waitingTimeFindings = pgTable('waiting_time_findings', {
   invoiceNumber: varchar('invoice_number', { length: 50 }),
   status: varchar('status', { length: 50 }).default('open').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_findings_tenant_id').on(table.tenantId),
+  index('idx_findings_driver_id').on(table.driverId),
+]);
 
 // ─── SHIPMENTS ─────────────────────────────────────────────
 export const shipments = pgTable('shipments', {
@@ -66,7 +71,9 @@ export const shipments = pgTable('shipments', {
   riskScore: integer('risk_score').default(0),
   status: varchar('status', { length: 50 }).default('pending').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_shipments_tenant_id').on(table.tenantId),
+]);
 
 // ─── COMPLIANCE SHIELD RESULTS ─────────────────────────────
 export const complianceResults = pgTable('compliance_results', {
@@ -78,7 +85,10 @@ export const complianceResults = pgTable('compliance_results', {
   message: text('message'),
   exposureZar: decimal('exposure_zar', { precision: 12, scale: 2 }).default('0.00'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_compliance_tenant_id').on(table.tenantId),
+  index('idx_compliance_shipment_id').on(table.shipmentId),
+]);
 
 // ─── EVENTS (Domain Event Log) ──────────────────────────────
 export const events = pgTable('events', {
@@ -87,7 +97,9 @@ export const events = pgTable('events', {
   type: varchar('type', { length: 100 }).notNull(),
   payload: text('payload'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_events_tenant_id').on(table.tenantId),
+]);
 
 // ─── SESSIONS ───────────────────────────────────────────────
 export const sessions = pgTable('sessions', {
@@ -97,7 +109,10 @@ export const sessions = pgTable('sessions', {
   token: varchar('token', { length: 255 }).notNull().unique(),
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  index('idx_sessions_user_id').on(table.userId),
+  index('idx_sessions_tenant_id').on(table.tenantId),
+]);
 
 // ─── RELATIONS ─────────────────────────────────────────────
 export const tenantsRelations = relations(tenants, ({ many }) => ({

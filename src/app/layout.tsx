@@ -4,7 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import ClientLayout from '@/components/layout/ClientLayout';
 import { db } from '@/lib/db';
 import { eq } from 'drizzle-orm';
-import { redirect } from 'next/navigation';
+
 import './globals.css';
 
 const inter = Inter({
@@ -63,9 +63,6 @@ export default async function RootLayout({
     // ignore auth lookup errors
   }
 
-  if (identity && identity.tenantName === '' && userId) {
-    redirect('/onboarding');
-  }
 
   return (
     <html lang="en">

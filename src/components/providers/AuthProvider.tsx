@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { useAuth as useClerkAuth } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 
 interface AuthContextValue {
   user: { email: string; name: string } | null;
@@ -16,7 +17,8 @@ const AuthContext = createContext<AuthContextValue>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { userId, user } = useClerkAuth();
+  const { userId } = useClerkAuth();
+  const { user } = useUser();
 
   const resolvedUser = userId && user
     ? { email: user.emailAddresses[0]?.emailAddress || '', name: user.fullName || user.firstName || '' }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { drivers, tenants, users } from "@/lib/db/schema";
 import { generateId } from "@/lib/utils";
@@ -24,11 +24,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
-
-    if (!session?.user) {
+    const { userId } = await auth();
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -46,7 +43,7 @@ export async function POST(request: NextRequest) {
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
 
     const appUser = await db.query.users.findFirst({
-      where: eq(users.email, session.user.email),
+      where: eq(users.clerk_id, userId as string),
     });
 
     if (!appUser) {

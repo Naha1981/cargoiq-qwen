@@ -12,26 +12,29 @@ const schema = z.object({
   orgName: z.string().min(1, 'Please enter your organisation name'),
 });
 
-const errorMap: Record<string, string> = {
-  UNAUTHORIZED: 'Please sign in to continue.',
-  VALIDATION_ERROR: 'Something went wrong — please try again.',
-  ALREADY_SETUP: 'Your workspace is already set up.',
-  ORG_TAKEN: 'That organisation name is already taken — please choose another.',
-  INTERNAL_ERROR: 'Something went wrong — please try again.',
-};
+function isPostgresUniqueViolation(err: unknown): boolean {
+  if (err instanceof Error && 'code' in err) {
+    return (err as Error & { code?: string }).code === '23505';
+  }
+  return false;
+}
+
+function onboardCode(): string {
+  return 'ONBOARD_' + Math.random().toString(36).slice(2, 6).toUpperCase();
+}
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ message: errorMap['UNAUTHORIZED'] }, { status: 401 });
+      return NextResponse.json({ message: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const body = await request.json().catch(() => null);
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { message: errorMap['VALIDATION_ERROR'] },
+        { message: 'Please check your inputs and try again.' },
         { status: 400 }
       );
     }
@@ -39,14 +42,18 @@ export async function POST(request: NextRequest) {
     const { name, orgName } = parsed.data;
 
     if (!db) {
-      return NextResponse.json({ message: 'Our system is temporarily unavailable — please try again shortly.' }, { status: 503 });
+      console.error('[Onboarding] db handle is null — DATABASE_URL missing or invalid at module init');
+      return NextResponse.json(
+        { message: "CargoIQ's database isn't connected on the live server yet (the DATABASE_URL setting is missing). This is a one-time setup step — please tell the founder to add it." },
+        { status: 503 }
+      );
     }
 
     const existing = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.clerk_id, userId),
     });
     if (existing) {
-      return NextResponse.json({ message: errorMap['ALREADY_SETUP'] }, { status: 400 });
+      return NextResponse.json({ message: 'Your workspace is already set up.' }, { status: 400 });
     }
 
     const tenantRows = await db
@@ -56,41 +63,78 @@ export async function POST(request: NextRequest) {
       .limit(1);
     if (tenantRows[0]) {
       return NextResponse.json(
-        { message: errorMap['ORG_TAKEN'] },
+        { message: 'That organisation name is already taken — please choose another.' },
         { status: 409 }
       );
     }
 
-    let email = `${userId}@clerk.local`;
+    let email = '';
     try {
       const client = await clerkClient();
       const clerkUser = await client.users.getUser(userId);
-      email = clerkUser.primaryEmailAddress?.emailAddress || email;
+      email = clerkUser.emailAddresses?.[0]?.emailAddress?.trim() || '';
     } catch {
-      // fallback email
+      // ignore and fallback below
+    }
+    if (!email) {
+      email = `${userId}@clerk.placeholder`;
     }
 
     const tenantId = generateId();
-    await db.insert(tenants).values({
-      id: tenantId,
-      name: orgName,
-      plan: 'trial',
-      status: 'active',
-    });
 
-    await db.insert(users).values({
-      id: generateId(),
-      tenantId,
-      clerk_id: userId,
-      email: email.toLowerCase().trim(),
-      name,
-      role: 'owner',
-    });
+    try {
+      await db.insert(tenants).values({
+        id: tenantId,
+        name: orgName,
+        plan: 'trial',
+        status: 'active',
+      });
+    } catch (err) {
+      console.error('[Onboarding] tenant insert failed', err);
+      if (isPostgresUniqueViolation(err)) {
+        return NextResponse.json(
+          { message: 'That organisation name is already taken — please choose another.' },
+          { status: 409 }
+        );
+      }
+      const code = onboardCode();
+      console.error(`[Onboarding Error ${code}] tenant insert`, err);
+      return NextResponse.json(
+        { message: `We couldn't create your workspace just now (error ${code}). Please try once more; if it persists, share this code with support.` },
+        { status: 500 }
+      );
+    }
+
+    try {
+      await db.insert(users).values({
+        id: generateId(),
+        tenantId,
+        clerk_id: userId,
+        email: email.toLowerCase(),
+        name,
+        role: 'owner',
+      });
+    } catch (err) {
+      console.error('[Onboarding] user insert failed', err);
+      if (isPostgresUniqueViolation(err)) {
+        return NextResponse.json({ message: 'An account is already set up — try signing in.' }, { status: 409 });
+      }
+      const code = onboardCode();
+      console.error(`[Onboarding Error ${code}] user insert`, err);
+      return NextResponse.json(
+        { message: `We couldn't create your workspace just now (error ${code}). Please try once more; if it persists, share this code with support.` },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ ok: true });
-  } catch (error) {
-    console.error('[Onboarding Error]', error);
-    const message = error instanceof Error ? error.message : 'Something went wrong.';
-    return NextResponse.json({ message: errorMap['INTERNAL_ERROR'], details: message }, { status: 500 });
+  } catch (err) {
+    console.error('[Onboarding Fatal]', err);
+    const code = onboardCode();
+    console.error(`[Onboarding Error ${code}] fatal catch`, err);
+    return NextResponse.json(
+      { message: `We couldn't create your workspace just now (error ${code}). Please try once more; if it persists, share this code with support.` },
+      { status: 500 }
+    );
   }
 }

@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 interface DashboardShellProps {
   children: React.ReactNode;
-  identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null;
+  identity: { tenantName: string | null; plan: string | null; userEmail: string; userName: string } | null;
 }
 
 export default function DashboardShell({ children, identity }: DashboardShellProps) {

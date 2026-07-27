@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import ClientLayout from '@/components/layout/ClientLayout';
-import { db } from '@/lib/db';
-import { eq } from 'drizzle-orm';
+import { ensureTenant } from '@/lib/tenant/ensure';
 import { redirect } from 'next/navigation';
 
 import './globals.css';
@@ -32,47 +31,43 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null = null;
-  let userId: string | null = null;
-  let dbReachable = false;
+  let identity: { tenantName: string | null; plan: string | null; userEmail: string; userName: string } | null = null;
 
   try {
     const authResult = await (await import('@clerk/nextjs/server')).auth();
-    userId = authResult.userId;
+    const userId = authResult.userId;
+
     if (!userId) {
       redirect('/login');
     }
-    if (!db) {
-      // db not configured — render without redirect to avoid loops
+
+    const ident = await ensureTenant(userId);
+
+    if (ident) {
+      identity = {
+        tenantName: ident.tenant.name,
+        plan: ident.tenant.plan || null,
+        userEmail: ident.user.email,
+        userName: ident.user.name || '',
+      };
     } else {
-      dbReachable = true;
-
-      // Try clerk_id match first (normal path)
-      const existingUser = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.clerk_id, userId as string),
-      });
-
-      if (existingUser && existingUser.tenantId) {
-        const tenant = await db.query.tenants.findFirst({
-          where: (tenants, { eq }) => eq(tenants.id, existingUser.tenantId),
-        });
-        if (tenant) {
-          identity = {
-            tenantName: tenant.name,
-            plan: tenant.plan || 'Starter',
-            userEmail: existingUser.email,
-            userName: existingUser.name || '',
-          };
-        }
+      let fallbackEmail = '';
+      try {
+        const client = await (await import('@clerk/nextjs/server')).clerkClient();
+        const clerkUser = await client.users.getUser(userId);
+        fallbackEmail = clerkUser.emailAddresses?.[0]?.emailAddress?.trim() || '';
+      } catch {
+        // ignore
       }
+      identity = {
+        tenantName: null,
+        plan: null,
+        userEmail: fallbackEmail,
+        userName: '',
+      };
     }
   } catch {
     // ignore auth lookup errors
-  }
-
-  // redirect unonboarded users (has userId but no tenant identity)
-  if (userId && dbReachable && !identity) {
-    redirect('/onboarding');
   }
 
   return (

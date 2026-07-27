@@ -28,7 +28,7 @@ const navItems = [
 ];
 
 interface SidebarProps {
-  identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null;
+  identity: { tenantName: string | null; plan: string | null; userEmail: string; userName: string } | null
 }
 
 export default function Sidebar({ identity }: SidebarProps) {
@@ -42,12 +42,12 @@ export default function Sidebar({ identity }: SidebarProps) {
             <span className="text-white">Cargo</span>
             <span className="text-[#B8860B]">IQ</span>
           </div>
-          <p className="mt-1 truncate text-xs text-white">
-            {identity?.tenantName || 'CargoIQ'}
+          <p className="mt-1 truncate text-xs text-white/60">
+            {identity?.tenantName || '—'}
           </p>
         </div>
         <span className="inline-flex w-fit rounded-full bg-[#B8860B]/20 px-2 py-0.5 text-[10px] font-medium text-[#B8860B]">
-          {identity?.plan || 'Starter'}
+          {identity?.plan || '—'}
         </span>
       </div>
 

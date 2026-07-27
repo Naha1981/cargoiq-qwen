@@ -13,7 +13,7 @@ export default function LoginPage() {
         routing="path"
         path="/login"
         signUpUrl="/signup"
-        fallbackRedirectUrl="/onboarding"
+        fallbackRedirectUrl="/dashboard"
       />
     </div>
   );

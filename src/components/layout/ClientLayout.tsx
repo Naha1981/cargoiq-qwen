@@ -19,7 +19,7 @@ const dashboardRoutes = [
 
 interface ClientLayoutProps {
   children: React.ReactNode;
-  identity: { tenantName: string; plan: string; userEmail: string; userName: string } | null;
+  identity: { tenantName: string | null; plan: string | null; userEmail: string; userName: string } | null;
 }
 
 export default function ClientLayout({ children, identity }: ClientLayoutProps) {

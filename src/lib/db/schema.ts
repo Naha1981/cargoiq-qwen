@@ -146,3 +146,26 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
   tenant: one(tenants, { fields: [sessions.tenantId], references: [tenants.id] }),
 }));
+
+// ââââ Rate Cards (tenant-scoped carrier rate reference) âââââââââââââââââââââââââââââââââââââââââââ
+export const rateCards = pgTable('rate_cards', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  tenantId: varchar('tenant_id', { length: 36 }).notNull().references(() => tenants.id),
+  carrier: varchar('carrier', { length: 100 }).notNull(),
+  chargeType: varchar('charge_type', { length: 100 }).notNull(),
+  route: varchar('route', { length: 255 }).notNull(),
+  mode: varchar('mode', { length: 50 }).notNull().default('per_container'),
+  ratePerKg: decimal('rate_per_kg', { precision: 12, scale: 2 }),
+  ratePerContainer: decimal('rate_per_container', { precision: 12, scale: 2 }),
+  currency: varchar('currency', { length: 3 }).notNull().default('USD'),
+  validFrom: timestamp('valid_from').notNull(),
+  validTo: timestamp('valid_to'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('idx_rate_cards_tenant_id').on(table.tenantId),
+]);
+
+export const rateCardsRelations = relations(rateCards, ({ one }) => ({
+  tenant: one(tenants, { fields: [rateCards.tenantId], references: [tenants.id] }),
+}));

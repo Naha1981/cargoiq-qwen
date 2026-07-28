@@ -1,27 +1,43 @@
 'use client';
 
-import { useState } from 'react';
-import { Upload, Plus, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Upload, Plus, FileText, Trash2, Edit2, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ParsingState = 'idle' | 'uploading' | 'processing' | 'done' | 'configured' | 'warn' | 'error';
 
-const rateCards = [
-  { carrier: 'Maersk', chargeType: 'Ocean Freight', lane: 'Shanghai - Durban', rate: 1850, currency: 'USD', validFrom: '2025-01-01', validTo: '2025-12-31' },
-  { carrier: 'MSC', chargeType: 'FSC', lane: 'Rotterdam - Cape Town', rate: 420, currency: 'USD', validFrom: '2025-01-01', validTo: '2025-06-30' },
-  { carrier: 'CMA CGM', chargeType: 'Origin THC', lane: 'Singapore - Gqeberha', rate: 650, currency: 'ZAR', validFrom: '2025-03-01', validTo: '2025-03-31' },
+interface RateCard {
+  id: string;
+  carrier: string;
+  chargeType: string;
+  route: string;
+  mode: string;
+  ratePerKg: string | null;
+  ratePerContainer: string | null;
+  currency: string;
+  validFrom: string;
+  validTo: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const demoRateCards: RateCard[] = [
+  { id: 'demo-1', carrier: 'Maersk', chargeType: 'Ocean Freight', route: 'Shanghai - Durban', mode: 'per_container', ratePerKg: null, ratePerContainer: '1850', currency: 'USD', validFrom: '2025-01-01', validTo: '2025-12-31', createdAt: '', updatedAt: '' },
+  { id: 'demo-2', carrier: 'MSC', chargeType: 'FSC', route: 'Rotterdam - Cape Town', mode: 'per_container', ratePerKg: null, ratePerContainer: '420', currency: 'USD', validFrom: '2025-01-01', validTo: '2025-06-30', createdAt: '', updatedAt: '' },
+  { id: 'demo-3', carrier: 'CMA CGM', chargeType: 'Origin THC', route: 'Singapore - Gqeberha', mode: 'per_container', ratePerKg: null, ratePerContainer: '650', currency: 'ZAR', validFrom: '2025-03-01', validTo: '2025-03-31', createdAt: '', updatedAt: '' },
 ];
 
 const demoAuditItems = [
-  { charge: 'Ocean Freight', billed: 18500, rateCard: 17200, variance: 1300, status: 'overcharge' },
-  { charge: 'FSC', billed: 4200, rateCard: 3800, variance: 400, status: 'overcharge' },
-  { charge: 'Origin THC', billed: 2100, rateCard: 2100, variance: 0, status: 'ok' },
-  { charge: 'Destination THC', billed: 3800, rateCard: 3500, variance: 300, status: 'overcharge' },
-  { charge: 'Documentation', billed: 1200, rateCard: 1200, variance: 0, status: 'ok' },
+  { charge: 'Ocean Freight', billed: 18500, rateCard: 17200, variance: 1300, status: 'overcharge' as const },
+  { charge: 'FSC', billed: 4200, rateCard: 3800, variance: 400, status: 'overcharge' as const },
+  { charge: 'Origin THC', billed: 2100, rateCard: 2100, variance: 0, status: 'ok' as const },
+  { charge: 'Destination THC', billed: 3800, rateCard: 3500, variance: 300, status: 'overcharge' as const },
+  { charge: 'Documentation', billed: 1200, rateCard: 1200, variance: 0, status: 'ok' as const },
 ];
 
 const carriers = ['Maersk', 'MSC', 'CMA CGM', 'Hapag-Lloyd', 'OOCL'];
 const regions = ['Global', 'Africa', 'Asia', 'Europe', 'Americas'];
+const modes = ['per_kg', 'per_container', 'per_unit'];
 
 export default function CarrierAuditPage() {
   const [activeTab, setActiveTab] = useState<'rate-cards' | 'upload-audit' | 'fsc-checker'>('rate-cards');
@@ -34,48 +50,121 @@ export default function CarrierAuditPage() {
   const [fscRate, setFscRate] = useState('');
   const [fscRegion, setFscRegion] = useState('Global');
 
+  // Rate Cards state
+  const [rateCards, setRateCards] = useState<RateCard[]>([]);
+  const [rateCardsLoading, setRateCardsLoading] = useState(false);
+  const [showRateCardForm, setShowRateCardForm] = useState(false);
+  const [editingRateCard, setEditingRateCard] = useState<RateCard | null>(null);
+  const [rateCardForm, setRateCardForm] = useState({
+    carrier: '', chargeType: '', route: '', mode: 'per_container',
+    ratePerKg: '', ratePerContainer: '', currency: 'USD',
+    validFrom: '', validTo: '',
+  });
+
   const totalOvercharge = auditItems.reduce((sum, item) => item.status === 'overcharge' ? sum + item.variance : sum, 0);
   const overchargeItems = auditItems.filter((item) => item.status === 'overcharge');
+
+  useEffect(() => {
+    if (activeTab === 'rate-cards') {
+      fetchRateCards();
+    }
+  }, [activeTab]);
+
+  const fetchRateCards = async () => {
+    setRateCardsLoading(true);
+    try {
+      const res = await fetch('/api/v1/rate-cards');
+      if (!res.ok) throw new Error('Failed to fetch');
+      const data = await res.json();
+      setRateCards(data.data || []);
+    } catch (err) {
+      console.error('[Rate Cards Fetch Error]:', err);
+      if (!useDemo) {
+        setRateCards([]);
+      }
+    } finally {
+      setRateCardsLoading(false);
+    }
+  };
+
+  const handleRateCardSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const existing = editingRateCard;
+      const res = await fetch('/api/v1/rate-cards', {
+        method: existing ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: existing?.id,
+          carrier: rateCardForm.carrier,
+          chargeType: rateCardForm.chargeType,
+          route: rateCardForm.route,
+          mode: rateCardForm.mode,
+          ratePerKg: rateCardForm.ratePerKg ? parseFloat(rateCardForm.ratePerKg) : undefined,
+          ratePerContainer: rateCardForm.ratePerContainer ? parseFloat(rateCardForm.ratePerContainer) : undefined,
+          currency: rateCardForm.currency,
+          validFrom: rateCardForm.validFrom,
+          validTo: rateCardForm.validTo || null,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+      setShowRateCardForm(false);
+      setEditingRateCard(null);
+      setRateCardForm({ carrier: '', chargeType: '', route: '', mode: 'per_container', ratePerKg: '', ratePerContainer: '', currency: 'USD', validFrom: '', validTo: '' });
+      await fetchRateCards();
+    } catch (err) {
+      console.error('[Rate Card Save Error]:', err);
+    }
+  };
+
+  const handleRateCardEdit = (card: RateCard) => {
+    setEditingRateCard(card);
+    setRateCardForm({
+      carrier: card.carrier,
+      chargeType: card.chargeType,
+      route: card.route,
+      mode: card.mode,
+      ratePerKg: card.ratePerKg || '',
+      ratePerContainer: card.ratePerContainer || '',
+      currency: card.currency,
+      validFrom: card.validFrom ? card.validFrom.split('T')[0] : '',
+      validTo: card.validTo ? card.validTo.split('T')[0] : '',
+    });
+    setShowRateCardForm(true);
+  };
+
+  const handleRateCardDelete = async (id: string) => {
+    if (!confirm('Delete this rate card?')) return;
+    try {
+      const res = await fetch(`/api/v1/rate-cards?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete');
+      await fetchRateCards();
+    } catch (err) {
+      console.error('[Rate Card Delete Error]:', err);
+    }
+  };
 
   const handleFileUpload = async (file: File) => {
     setParsingState('uploading');
     setParsedResult(null);
-
     try {
       const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
       if (!apiKey || apiKey === 'PASTE_YOUR_GEMINI_KEY_HERE') {
         setParsingState('configured');
         return;
       }
-
       const formData = new FormData();
       formData.append('file', file);
-
       const res = await fetch('/api/parse', { method: 'POST', body: formData });
       const data = await res.json();
-
-      if (data.configured === false) {
-        setParsingState('configured');
-        return;
-      }
-
-      if (data.error) {
-        setParsingState('error');
-        return;
-      }
-
-      if (data.couldNotRead) {
-        setParsedResult(data);
-        setParsingState('warn');
-        return;
-      }
-
+      if (data.configured === false) { setParsingState('configured'); return; }
+      if (data.error) { setParsingState('error'); return; }
+      if (data.couldNotRead) { setParsedResult(data); setParsingState('warn'); return; }
       if (data.report) {
         const { report } = data;
         setParsedResult(data);
-        setParsingState('done');
-
-        const newItems = [];
+setParsingState('done');
+        const newItems: { charge: string; billed: number; rateCard: number; variance: number; status: 'overcharge' | 'ok' }[] = [];
         if (report.totalExposureZar && report.totalExposureZar > 0) {
           newItems.push({ charge: 'AI Compliance Finding', billed: report.totalExposureZar, rateCard: 0, variance: report.totalExposureZar, status: 'overcharge' });
         }
@@ -98,16 +187,8 @@ export default function CarrierAuditPage() {
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) handleFileUpload(file);
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleFileUpload(file);
-  };
+  const handleDrop = (e: React.DragEvent) => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file) handleFileUpload(file); };
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => { const file = e.target.files?.[0]; if (file) handleFileUpload(file); };
 
   const handleFscCheck = () => {
     setParsingState('processing');
@@ -145,41 +226,116 @@ export default function CarrierAuditPage() {
         {activeTab === 'rate-cards' && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <button className="inline-flex items-center gap-2 bg-[#D97706] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#B45309] transition-colors">
+              <button
+                onClick={() => { setEditingRateCard(null); setRateCardForm({ carrier: '', chargeType: '', route: '', mode: 'per_container', ratePerKg: '', ratePerContainer: '', currency: 'USD', validFrom: '', validTo: '' }); setShowRateCardForm(true); }}
+                className="inline-flex items-center gap-2 bg-[#D97706] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#B45309] transition-colors"
+              >
                 <Plus className="h-4 w-4" />
                 Add Rate Card
               </button>
             </div>
-            <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-[#F1F4F8] text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      <th className="px-4 py-3">Carrier</th>
-                      <th className="px-4 py-3">Charge Type</th>
-                      <th className="px-4 py-3">Lane</th>
-                      <th className="px-4 py-3 text-right">Rate</th>
-                      <th className="px-4 py-3">Currency</th>
-                      <th className="px-4 py-3">Valid From</th>
-                      <th className="px-4 py-3">Valid To</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E2E8F0]">
-                    {rateCards.map((row) => (
-                      <tr key={row.lane} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3 font-medium">{row.carrier}</td>
-                        <td className="px-4 py-3 text-gray-600">{row.chargeType}</td>
-                        <td className="px-4 py-3 text-gray-600">{row.lane}</td>
-                        <td className="px-4 py-3 text-right font-mono">{row.rate.toLocaleString()}</td>
-                        <td className="px-4 py-3">{row.currency}</td>
-                        <td className="px-4 py-3 text-gray-500">{row.validFrom}</td>
-                        <td className="px-4 py-3 text-gray-500">{row.validTo}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+
+            {showRateCardForm && (
+              <div className="bg-white rounded-lg border border-[#E2E8F0] p-6 space-y-4">
+                <h3 className="text-sm font-semibold text-[#1A2332]">{editingRateCard ? 'Edit Rate Card' : 'New Rate Card'}</h3>
+                <form onSubmit={handleRateCardSubmit} className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Carrier</label>
+                      <input type="text" value={rateCardForm.carrier} onChange={(e) => setRateCardForm({ ...rateCardForm, carrier: e.target.value })} required className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Charge Type</label>
+                      <input type="text" value={rateCardForm.chargeType} onChange={(e) => setRateCardForm({ ...rateCardForm, chargeType: e.target.value })} required className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Route</label>
+                      <input type="text" value={rateCardForm.route} onChange={(e) => setRateCardForm({ ...rateCardForm, route: e.target.value })} required className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Mode</label>
+                      <select value={rateCardForm.mode} onChange={(e) => setRateCardForm({ ...rateCardForm, mode: e.target.value })} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm bg-white">
+                        {modes.map((m) => <option key={m} value={m}>{m.replace('_', ' ')}</option>)}
+                      </select>
+                    </div>
+                    {rateCardForm.mode === 'per_kg' && (
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Rate per KG (ZAR)</label>
+                        <input type="number" step="0.01" value={rateCardForm.ratePerKg} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerKg: e.target.value })} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                      </div>
+                    )}
+                    {rateCardForm.mode === 'per_container' && (
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Rate per Container (ZAR)</label>
+                        <input type="number" step="0.01" value={rateCardForm.ratePerContainer} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerContainer: e.target.value })} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Currency</label>
+                      <input type="text" value={rateCardForm.currency} onChange={(e) => setRateCardForm({ ...rateCardForm, currency: e.target.value })} maxLength={3} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Valid From</label>
+                      <input type="date" value={rateCardForm.validFrom} onChange={(e) => setRateCardForm({ ...rateCardForm, validFrom: e.target.value })} required className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Valid To (optional)</label>
+                      <input type="date" value={rateCardForm.validTo} onChange={(e) => setRateCardForm({ ...rateCardForm, validTo: e.target.value })} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button type="submit" className="bg-[#D97706] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#B45309]">Save</button>
+                    <button type="button" onClick={() => { setShowRateCardForm(false); setEditingRateCard(null); }} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300">Cancel</button>
+                  </div>
+                </form>
               </div>
-            </div>
+            )}
+
+            {rateCardsLoading ? (
+              <div className="text-sm text-gray-500">Loading rate cards...</div>
+            ) : rateCards.length === 0 && !useDemo ? (
+              <div className="text-sm text-gray-500">No rate cards yet. Add your first one above.</div>
+            ) : (
+              <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-[#F1F4F8] text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <th className="px-4 py-3">Carrier</th>
+                        <th className="px-4 py-3">Charge Type</th>
+                        <th className="px-4 py-3">Route</th>
+                        <th className="px-4 py-3">Mode</th>
+                        <th className="px-4 py-3 text-right">Rate</th>
+                        <th className="px-4 py-3">Currency</th>
+                        <th className="px-4 py-3">Valid From</th>
+                        <th className="px-4 py-3">Valid To</th>
+                        <th className="px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#E2E8F0]">
+                      {(rateCards.length > 0 || useDemo ? rateCards : demoRateCards).map((row) => (
+                        <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3 font-medium">{row.carrier}</td>
+                          <td className="px-4 py-3 text-gray-600">{row.chargeType}</td>
+                          <td className="px-4 py-3 text-gray-600">{row.route}</td>
+                          <td className="px-4 py-3 text-gray-600">{row.mode.replace('_', ' ')}</td>
+                          <td className="px-4 py-3 text-right font-mono">{(row.ratePerContainer || row.ratePerKg || '—')}</td>
+                          <td className="px-4 py-3">{row.currency}</td>
+                          <td className="px-4 py-3 text-gray-500">{row.validFrom ? row.validFrom.split('T')[0] : '—'}</td>
+                          <td className="px-4 py-3 text-gray-500">{row.validTo ? row.validTo.split('T')[0] : '—'}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => handleRateCardEdit(row)} className="p-1 hover:bg-gray-200 rounded" title="Edit"><Edit2 className="h-3.5 w-3.5 text-gray-600" /></button>
+                              <button onClick={() => handleRateCardDelete(row.id)} className="p-1 hover:bg-red-100 rounded" title="Delete"><Trash2 className="h-3.5 w-3.5 text-red-600" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

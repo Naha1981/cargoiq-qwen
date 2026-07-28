@@ -8,9 +8,9 @@ interface DashboardShellProps {
 
 export default function DashboardShell({ children, identity }: DashboardShellProps) {
   return (
-    <div className="flex min-h-screen bg-[#F1F4F8]">
+    <div className="flex min-h-screen bg-surface-container-lowest">
       <Sidebar identity={identity} />
-      <main className={cn("ml-60 flex-1")}>{children}</main>
+      <main className={cn("ml-[260px] flex-1")}>{children}</main>
     </div>
   );
 }

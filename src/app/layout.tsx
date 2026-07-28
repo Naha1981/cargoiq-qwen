@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Space_Grotesk, IBM_Plex_Sans } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import ClientLayout from '@/components/layout/ClientLayout';
 import { ensureTenant } from '@/lib/tenant/ensure';
@@ -18,6 +18,20 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   weight: ['400', '600'],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-display-lg',
+  display: 'swap',
+});
+
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-body-md',
   display: 'swap',
 });
 
@@ -72,7 +86,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+      <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+      </head>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${ibmPlexSans.variable} font-sans antialiased`}>
         <ClerkProvider
           appearance={{
             variables: {

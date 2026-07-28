@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { X, TrendingDown, TrendingUp, Shield } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatZar } from '@/lib/utils';
 
 const mockEvents = [
   { id: 1, text: 'Demurrage waived on MSC ANITA', type: 'green' },
@@ -90,29 +90,29 @@ export default function SentinelPage() {
         </button>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="w-full max-w-full overflow-x-hidden p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5">
+          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 min-w-0">
             <span className="text-xs font-semibold tracking-widest text-red-400 mb-2">
               ACTIVE REVENUE AT RISK
             </span>
-            <span className="font-mono text-5xl md:text-[80px] font-bold text-[#EF4444] leading-none">
-              {activeRisk.toLocaleString('en-ZA', { style: 'currency', currency: 'ZAR' })}
+            <span className="font-mono text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#EF4444] leading-tight min-w-0 overflow-hidden text-ellipsis">
+              {formatZar(activeRisk)}
             </span>
             <TrendingDown className="h-6 w-6 text-red-400 mt-4" />
           </div>
 
-          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5">
+          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 min-w-0">
             <span className="text-xs font-semibold tracking-widest text-green-400 mb-2">
               VALUE DELIVERED
             </span>
-            <span className="font-mono text-5xl md:text-[80px] font-bold text-[#22C55E] leading-none">
-              {valueDelivered.toLocaleString('en-ZA', { style: 'currency', currency: 'ZAR' })}
+            <span className="font-mono text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#22C55E] leading-tight min-w-0 overflow-hidden text-ellipsis">
+              {formatZar(valueDelivered)}
             </span>
             <TrendingUp className="h-6 w-6 text-green-400 mt-4" />
           </div>
 
-          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5">
+          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 min-w-0">
             <span className="text-xs font-semibold tracking-widest text-blue-400 mb-4">
               COMPLIANCE PASS RATE
             </span>
@@ -170,7 +170,7 @@ export default function SentinelPage() {
                         </span>
                       </td>
                       <td className="py-3 text-right font-mono text-xs">
-                        {row.exposure.toLocaleString('en-ZA')}
+                        {formatZar(row.exposure)}
                       </td>
                     </tr>
                   ))}
@@ -199,7 +199,7 @@ export default function SentinelPage() {
                       <td className="py-3 text-gray-400">{row.location}</td>
                       <td className="py-3">{row.hours.toFixed(1)}</td>
                       <td className="py-3 text-right font-mono text-xs">
-                        {row.value.toLocaleString('en-ZA')}
+                        {formatZar(row.value)}
                       </td>
                       <td className="py-3 text-right">
                         <button className="rounded-md bg-[#B8860B] px-3 py-1 text-xs font-medium text-white hover:bg-[#9a7209] transition-colors">

@@ -144,7 +144,13 @@ export default function SentinelPage() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <h2 className="text-sm font-semibold text-gray-300 mb-4">Containers at Risk</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full table-fixed text-sm">
+                <colgroup>
+                  <col style={{ width: '30%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '20%' }} />
+                  <col style={{ width: '35%' }} />
+                </colgroup>
                 <thead>
                   <tr className="text-left text-gray-500 border-b border-white/10">
                     <th className="pb-2 font-medium">Container</th>
@@ -162,7 +168,7 @@ export default function SentinelPage() {
                         row.exposure > 40000 ? 'bg-red-500/10' : ''
                       )}
                     >
-                      <td className="py-3 font-mono text-xs">{row.id}</td>
+                      <td className="py-3 font-mono text-xs truncate" title={row.id}>{row.id}</td>
                       <td className="py-3">{row.line}</td>
                       <td className="py-3">
                         <span className="inline-flex items-center rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-300">
@@ -182,7 +188,14 @@ export default function SentinelPage() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <h2 className="text-sm font-semibold text-gray-300 mb-4">Unbilled Waiting Time</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full table-fixed text-sm">
+                <colgroup>
+                  <col style={{ width: '25%' }} />
+                  <col style={{ width: '20%' }} />
+                  <col style={{ width: '15%' }} />
+                  <col style={{ width: '20%' }} />
+                  <col style={{ width: '20%' }} />
+                </colgroup>
                 <thead>
                   <tr className="text-left text-gray-500 border-b border-white/10">
                     <th className="pb-2 font-medium">Driver</th>
@@ -195,15 +208,19 @@ export default function SentinelPage() {
                 <tbody>
                   {unbilledDrivers.map((row) => (
                     <tr key={row.driver} className="border-b border-white/5">
-                      <td className="py-3">{row.driver}</td>
+                      <td className="py-3 truncate" title={row.driver}>{row.driver}</td>
                       <td className="py-3 text-gray-400">{row.location}</td>
                       <td className="py-3">{row.hours.toFixed(1)}</td>
                       <td className="py-3 text-right font-mono text-xs">
                         {formatZar(row.value)}
                       </td>
                       <td className="py-3 text-right">
-                        <button className="rounded-md bg-[#B8860B] px-3 py-1 text-xs font-medium text-white hover:bg-[#9a7209] transition-colors">
-                          Generate Invoice
+                        <button
+                          disabled
+                          className="rounded-md bg-gray-600 px-3 py-1 text-xs font-medium text-gray-300 cursor-not-allowed"
+                          title="Coming soon"
+                        >
+                          Coming soon
                         </button>
                       </td>
                     </tr>

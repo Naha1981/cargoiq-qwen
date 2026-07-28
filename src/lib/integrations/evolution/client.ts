@@ -2,6 +2,10 @@ const EVOLUTION_API_URL = process.env.EVOLUTION_API_URL;
 const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY;
 const EVOLUTION_INSTANCE_NAME = process.env.EVOLUTION_INSTANCE_NAME;
 
+export function hasWhatsAppConfig(): boolean {
+  return Boolean(EVOLUTION_API_URL && EVOLUTION_API_KEY && EVOLUTION_INSTANCE_NAME);
+}
+
 export async function sendEvolutionText(number: string, text: string): Promise<void> {
   if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY || !EVOLUTION_INSTANCE_NAME) {
     console.error('[Evolution Client]: Missing env vars — send skipped');

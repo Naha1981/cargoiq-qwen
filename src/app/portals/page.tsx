@@ -8,11 +8,11 @@ export default function PortalsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          { name: 'SARS eFiling', status: 'connected', lastSync: '2 min ago' },
-          { name: 'Maersk Spot', status: 'connected', lastSync: '15 min ago' },
-          { name: 'DCT Durban', status: 'disconnected', lastSync: 'Never' },
-          { name: 'NetSuite', status: 'connected', lastSync: '1 hour ago' },
-          { name: 'Sweef', status: 'pending', lastSync: '—' },
+          { name: 'SARS eFiling', status: 'not-connected' as const },
+          { name: 'Maersk Spot', status: 'not-connected' as const },
+          { name: 'DCT Durban', status: 'not-connected' as const },
+          { name: 'NetSuite', status: 'not-connected' as const },
+          { name: 'Sweef', status: 'not-connected' as const },
         ].map((portal, i) => (
           <div key={i} className="rounded-xl border border-[#E2E8F0] bg-white p-5 shadow-sm">
             <div className="flex items-start justify-between mb-4">
@@ -22,14 +22,18 @@ export default function PortalsPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-[#0D1B2A]">{portal.name}</h3>
-                  <p className="text-xs text-[#4A5568]">Last sync: {portal.lastSync}</p>
+                  <p className="text-xs text-[#4A5568]">Not connected — coming soon</p>
                 </div>
               </div>
-              <div className={`w-2 h-2 rounded-full ${portal.status === 'connected' ? 'bg-[#16A34A]' : portal.status === 'pending' ? 'bg-[#D97706]' : 'bg-[#DC2626]'}`} />
+              <div className="w-2 h-2 rounded-full bg-gray-400" />
             </div>
             <div className="flex gap-2">
-              <button className="text-xs font-medium text-[#B8860B] hover:underline">Test Connection</button>
-              <button className="text-xs font-medium text-[#4A5568] hover:underline">Configure</button>
+              <button className="text-xs font-medium text-gray-400 cursor-not-allowed" disabled title="Coming soon">
+                Test Connection
+              </button>
+              <button className="text-xs font-medium text-gray-400 cursor-not-allowed" disabled title="Coming soon">
+                Configure
+              </button>
             </div>
           </div>
         ))}

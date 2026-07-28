@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Search, Eye, Check, X } from 'lucide-react';
+import { Search, Eye, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const riskColor = (score: number) => {
@@ -50,15 +50,10 @@ const tabCounts: Record<Tab, number> = {
   'In CargoWise': shipments.filter((s) => s.status === 'In CargoWise').length,
 };
 
-type ModalState = 'idle' | 'uploading' | 'extracting' | 'compliance' | 'done';
-
 export default function QueuePage() {
   const [activeTab, setActiveTab] = useState<Tab>('All');
   const [search, setSearch] = useState('');
   const [importer, setImporter] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [modalState, setModalState] = useState<ModalState>('idle');
-  const [dragOver, setDragOver] = useState(false);
 
   const filtered = shipments.filter((s) => {
     if (activeTab !== 'All' && s.status !== activeTab) return false;
@@ -67,30 +62,18 @@ export default function QueuePage() {
     return true;
   });
 
-  const handleUpload = () => {
-    setShowModal(true);
-    setModalState('uploading');
-    setTimeout(() => setModalState('extracting'), 1500);
-    setTimeout(() => setModalState('compliance'), 3000);
-    setTimeout(() => setModalState('done'), 4500);
-  };
-
-  const resetModal = () => {
-    setShowModal(false);
-    setModalState('idle');
-  };
-
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-[#1A2332]">Shipment Queue</h1>
           <button
-            onClick={handleUpload}
-            className="flex items-center gap-2 bg-[#D97706] hover:bg-[#B45309] text-white px-4 py-2 rounded-full text-sm font-medium transition-colors"
+            disabled
+            className="flex items-center gap-2 bg-gray-300 cursor-not-allowed text-gray-500 px-4 py-2 rounded-full text-sm font-medium"
+            title="Coming soon"
           >
-            <Upload className="w-4 h-4" />
-            Upload Document
+            <Search className="w-4 h-4" />
+            Document upload — coming soon
           </button>
         </div>
 
@@ -163,13 +146,13 @@ export default function QueuePage() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button className="p-1 hover:bg-gray-200 rounded" title="View">
+                    <button className="p-1 hover:bg-gray-200 rounded cursor-not-allowed opacity-50" title="Coming soon" disabled>
                       <Eye className="w-4 h-4 text-gray-600" />
                     </button>
-                    <button className="p-1 hover:bg-green-100 rounded" title="Approve">
+                    <button className="p-1 hover:bg-green-100 rounded cursor-not-allowed opacity-50" title="Coming soon" disabled>
                       <Check className="w-4 h-4 text-green-600" />
                     </button>
-                    <button className="p-1 hover:bg-red-100 rounded" title="Reject">
+                    <button className="p-1 hover:bg-red-100 rounded cursor-not-allowed opacity-50" title="Coming soon" disabled>
                       <X className="w-4 h-4 text-red-600" />
                     </button>
                   </div>
@@ -179,66 +162,6 @@ export default function QueuePage() {
           </div>
         </div>
       </div>
-
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-            <h2 className="text-lg font-bold text-[#1A2332] mb-1">Upload Document</h2>
-            <p className="text-sm text-gray-500 mb-4">Drop your PDF, CSV, or Excel file below</p>
-
-            <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={(e) => { e.preventDefault(); setDragOver(false); }}
-              className={cn(
-                'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors',
-                dragOver ? 'border-[#D97706] bg-amber-50' : 'border-gray-300 bg-gray-50'
-              )}
-            >
-              <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-              <p className="text-sm text-gray-600">Drag & drop files here, or click to browse</p>
-              <p className="text-xs text-gray-400 mt-1">PDF, CSV, XLSX up to 25MB</p>
-            </div>
-
-            <div className="mt-6 text-center">
-              {modalState === 'uploading' && (
-                <div className="space-y-2">
-                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                    <div className="bg-[#D97706] h-2 rounded-full animate-pulse" style={{ width: '60%' }} />
-                  </div>
-                  <p className="text-sm text-gray-600">Uploading...</p>
-                </div>
-              )}
-              {modalState === 'extracting' && (
-                <p className="text-sm text-gray-600">Extracting shipment data...</p>
-              )}
-              {modalState === 'compliance' && (
-                <p className="text-sm text-gray-600">Running Compliance Shield...</p>
-              )}
-              {modalState === 'done' && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-center gap-2 text-green-600">
-                    <Check className="w-5 h-5" />
-                    <span className="text-sm font-medium">Upload complete</span>
-                  </div>
-                  <button
-                    onClick={resetModal}
-                    className="bg-[#D97706] hover:bg-[#B45309] text-white px-4 py-2 rounded text-sm font-medium"
-                  >
-                    Close
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {modalState === 'idle' && (
-              <div className="mt-6 flex justify-end">
-                <button onClick={resetModal} className="text-sm text-gray-500 hover:text-gray-700">Cancel</button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

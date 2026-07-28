@@ -56,9 +56,9 @@ export default function CarrierAuditPage() {
         {activeTab === 'rate-cards' && (
           <div className="space-y-4">
             <div className="flex justify-end">
-              <button className="inline-flex items-center gap-2 bg-[#B8860B] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#9a7209] transition-colors">
+              <button className="inline-flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-md text-sm font-medium cursor-not-allowed" disabled title="Coming soon">
                 <Plus className="h-4 w-4" />
-                Add Rate Card
+                Add Rate Card — coming soon
               </button>
             </div>
             <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
@@ -96,10 +96,10 @@ export default function CarrierAuditPage() {
 
         {activeTab === 'upload-audit' && (
           <div className="space-y-4">
-            <div className="rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white p-8 text-center">
+            <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center opacity-60">
               <Upload className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-              <p className="text-sm text-gray-600 mb-1">Drag and drop invoice PDFs here</p>
-              <p className="text-xs text-gray-400">or click to browse</p>
+              <p className="text-sm text-gray-500 mb-1">Document upload — coming soon</p>
+              <p className="text-xs text-gray-400">Real parsing and audit will be available in a future release.</p>
             </div>
 
             <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
@@ -141,9 +141,9 @@ export default function CarrierAuditPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           {row.status === 'overcharge' && (
-                            <button className="inline-flex items-center gap-1 rounded-md border border-[#B8860B] text-[#B8860B] px-3 py-1 text-xs font-medium hover:bg-[#B8860B] hover:text-white transition-colors">
+                            <button className="inline-flex items-center gap-1 rounded-md border border-gray-300 text-gray-400 px-3 py-1 text-xs font-medium cursor-not-allowed" disabled title="Coming soon">
                               <FileText className="h-3 w-3" />
-                              Generate Dispute Notice
+                              Generate Dispute Notice — coming soon
                             </button>
                           )}
                         </td>
@@ -228,9 +228,9 @@ export default function CarrierAuditPage() {
                   <span className="text-lg font-mono font-bold text-red-600">R2,300.00</span>
                 </div>
               </div>
-              <button className="w-full inline-flex items-center justify-center gap-2 bg-[#B8860B] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#9a7209] transition-colors">
+              <button className="w-full inline-flex items-center justify-center gap-2 bg-gray-400 text-white px-4 py-3 rounded-md text-sm font-medium cursor-not-allowed" disabled title="Coming soon">
                 <FileText className="h-4 w-4" />
-                Generate FSC Dispute Notice
+                Generate FSC Dispute Notice — coming soon
               </button>
             </div>
           </div>

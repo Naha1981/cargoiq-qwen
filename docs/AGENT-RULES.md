@@ -9,3 +9,5 @@
 8. REPO IS TRUTH. A stale live view or stale crawl is NOT the repo. Never edit correct source to match a stale snapshot.
 9. DEPS & SECRETS. When adding a dependency, commit package-lock.json too (or Vercel install breaks). Never commit .env. Stage explicitly.
 10. AUTHORITY OF EYES. For anything behind login or any downloaded/generated artifact, the founder's eyes on the live result are the authority; say "founder must verify by clicking/opening", never claim it works headlessly.
+
+11. NO FAKE STATES. A control not backed by real working logic MUST be rendered disabled with a visible "Coming soon" label/tooltip, OR hidden — NEVER a live-looking button that does nothing or fakes a result. Connection/status badges (email, WhatsApp, portals, sync times) MUST reflect real state derived from config/DB; NEVER hardcode "Connected", "Last synced X ago", or a success state. NO control may animate a fake success (uploading/processing/complete) without performing real work on a real input. NO hardcoded external URLs/domains (webhooks, hosts) in UI — derive from env/config or hide the line.

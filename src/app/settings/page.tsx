@@ -19,6 +19,8 @@ import {
   Plus,
 } from 'lucide-react';
 
+import { hasWhatsAppConfig } from '@/lib/integrations/evolution/client';
+
 const tabs = [
   { id: 'org', label: 'Org', icon: Building2 },
   { id: 'email', label: 'Email', icon: Mail },
@@ -105,30 +107,14 @@ export default function SettingsPage() {
                     <p className="text-sm text-gray-500">Connect a Gmail account for sending and parsing emails.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-gray-500">AUTO</span>
-                      <button
-                        className={cn(
-                          'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                          true ? 'bg-amber-500' : 'bg-gray-200'
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            'inline-block h-4 w-4 rounded-full bg-white transition-transform',
-                            true ? 'translate-x-6' : 'translate-x-1'
-                          )}
-                        />
-                      </button>
-                      <span className="text-xs font-medium text-gray-500">MANUAL</span>
-                    </div>
-                    <Badge variant="success">Connected</Badge>
+                    <Badge variant="neutral">Not connected</Badge>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <Button variant="outline">Connect</Button>
-                  <Button variant="ghost" className="text-red-600 hover:text-red-700">Disconnect</Button>
+                  <Button variant="outline" disabled>Connect</Button>
+                  <Button variant="ghost" className="text-red-600 hover:text-red-700" disabled>Disconnect</Button>
                 </div>
+                <p className="text-xs text-gray-400"> Coming soon</p>
               </div>
             </Card>
           )}
@@ -146,9 +132,9 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="text-sm font-semibold text-gray-900">SAPS ECS</h4>
-                        <p className="text-xs text-gray-500">Last synced 2 minutes ago</p>
+                        <p className="text-xs text-gray-500">Not connected</p>
                       </div>
-                      <Button size="sm" variant="outline" className="gap-2">
+                      <Button size="sm" variant="outline" className="gap-2" disabled>
                         <RefreshCw className="h-4 w-4" />
                         Test Connection
                       </Button>
@@ -158,9 +144,9 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="text-sm font-semibold text-gray-900">SARS eFiling</h4>
-                        <p className="text-xs text-gray-500">Last synced 15 minutes ago</p>
+                        <p className="text-xs text-gray-500">Not connected</p>
                       </div>
-                      <Button size="sm" variant="outline" className="gap-2">
+                      <Button size="sm" variant="outline" className="gap-2" disabled>
                         <RefreshCw className="h-4 w-4" />
                         Test Connection
                       </Button>
@@ -172,7 +158,7 @@ export default function SettingsPage() {
                     <Input label="Portal" placeholder="e.g. SARS eFiling" />
                     <Input label="Username" placeholder="Enter username" />
                     <Input label="Password" type="password" placeholder="Enter password" />
-                    <Button className="gap-2">
+                    <Button className="gap-2" disabled>
                       <Plus className="h-4 w-4" />
                       Save credentials
                     </Button>
@@ -187,24 +173,24 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full bg-green-500" />
-                    <span className="text-sm font-medium text-gray-900">Connected</span>
+                    <div className={`h-2 w-2 rounded-full ${hasWhatsAppConfig() ? 'bg-green-500' : 'bg-gray-400'}`} />
+                    <span className="text-sm font-medium text-gray-900">
+                      {hasWhatsAppConfig() ? 'Configured (verify on Evolution)' : 'Not configured'}
+                    </span>
                   </div>
-                  <Button size="sm" variant="outline">Disconnect</Button>
+                  <Button size="sm" variant="outline" disabled>Disconnect</Button>
                 </div>
 
-                <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">Webhook URL</label>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-                      https://api.cargoiq.io/webhooks/evolution
-                    </code>
-                    <Button size="sm" variant="ghost" className="gap-2" onClick={() => copyToClipboard('https://api.cargoiq.io/webhooks/evolution')}>
-                      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      {copied ? 'Copied' : 'Copy'}
-                    </Button>
+                {hasWhatsAppConfig() && (
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-gray-700">Webhook URL</label>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                        Set the webhook in Evolution after connecting
+                      </code>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div>
                   <h4 className="text-sm font-semibold text-gray-900">Driver check-in feed</h4>

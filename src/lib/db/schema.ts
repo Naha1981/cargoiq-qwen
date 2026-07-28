@@ -168,4 +168,23 @@ export const rateCards = pgTable('rate_cards', {
 
 export const rateCardsRelations = relations(rateCards, ({ one }) => ({
   tenant: one(tenants, { fields: [rateCards.tenantId], references: [tenants.id] }),
+});
+
+// ââââ Invoices âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+export const invoices = pgTable('invoices', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  tenantId: varchar('tenant_id', { length: 36 }).notNull().references(() => tenants.id),
+  reference: varchar('reference', { length: 255 }).notNull(),
+  tenantName: varchar('tenant_name', { length: 255 }).notNull(),
+  lineItems: text('line_items').notNull(),
+  totalAmountZar: decimal('total_amount_zar', { precision: 14, scale: 2 }).notNull(),
+  dueDate: timestamp('due_date').notNull(),
+  status: varchar('status', { length: 20 }).default('draft').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('idx_invoices_tenant_id').on(table.tenantId),
+]);
+
+export const invoicesRelations = relations(invoices, ({ one }) => ({
+  tenant: one(tenants, { fields: [invoices.tenantId], references: [tenants.id] }),
 }));

@@ -111,6 +111,8 @@ export default function QueuePage() {
     if (file) handleFileUpload(file);
   };
 
+  const allTabs: ('All' | 'Pending' | 'Review Required' | 'Approved' | 'In CargoWise')[] = ['All', 'Pending', 'Review Required', 'Approved', 'In CargoWise'];
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <div className="p-6">
@@ -213,7 +215,7 @@ export default function QueuePage() {
         <div className="bg-white rounded-lg border border-gray-200 mb-4">
           <div className="flex items-center gap-4 p-4 border-b border-gray-100">
             <div className="flex gap-1">
-              {(Object.keys({ All: true, Pending: true, 'Review Required': true, Approved: true, 'In CargoWise': true }) as const).map((tab) => (
+            {allTabs.map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}

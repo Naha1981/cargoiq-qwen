@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, TrendingDown, TrendingUp, Shield } from 'lucide-react';
+import jsPDF from 'jspdf';
 import { cn, formatZar } from '@/lib/utils';
 
 const mockEvents = [
@@ -29,11 +30,50 @@ const unbilledDrivers = [
 
 export default function SentinelPage() {
   const [events, setEvents] = useState(mockEvents);
+  const [invoiceGenerating, setInvoiceGenerating] = useState<string | null>(null);
   const [activeRisk] = useState(231500);
   const [valueDelivered] = useState(1842500);
 
   const handleExit = useCallback(() => {
     window.location.href = '/dashboard';
+  }, []);
+
+  const generateInvoice = useCallback(async (driver: { driver: string; value: number; location: string }) => {
+    setInvoiceGenerating(driver.driver);
+    try {
+      const tenantName = 'CargoIQ Tenant';
+      const lineItems = [{ description: 'Unbilled waiting time - ' + driver.driver + ' at ' + driver.location, hours: '5.0', rate: '1,100.00', amount: driver.value }];
+      const totalAmountZar = driver.value;
+      const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      const res = await fetch('/api/v1/invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantName, lineItems, totalAmountZar, dueDate }),
+      });
+      if (!res.ok) throw new Error('Failed to create invoice');
+      const data = await res.json();
+
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text('Invoice', 14, 22);
+      doc.setFontSize(10);
+      doc.text('Reference: ' + (data.invoice?.reference || 'N/A'), 14, 32);
+      doc.text('Tenant: ' + tenantName, 14, 40);
+      doc.text('Date: ' + new Date().toLocaleDateString(), 14, 48);
+      doc.text('Due Date: ' + new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString(), 14, 56);
+      doc.setFontSize(12);
+      doc.text('Line Items:', 14, 70);
+      doc.setFontSize(10);
+      doc.text(driver.driver + ' - Unbilled waiting time at ' + driver.location + ' - R' + driver.value.toLocaleString(), 14, 80);
+      doc.setFontSize(12);
+      doc.text('Total: R' + driver.value.toLocaleString(), 14, 98);
+      doc.save('invoice-' + (data.invoice?.reference || 'draft') + '.pdf');
+    } catch (err) {
+      console.error('[Invoice Generation Error]:', err);
+    } finally {
+      setInvoiceGenerating(null);
+    }
   }, []);
 
   useEffect(() => {
@@ -216,11 +256,11 @@ export default function SentinelPage() {
                       </td>
                       <td className="py-3 text-right">
                         <button
-                          disabled
-                          className="rounded-md bg-gray-600 px-3 py-1 text-xs font-medium text-gray-300 cursor-not-allowed"
-                          title="Coming soon"
+                          onClick={() => generateInvoice(row)}
+                          className="rounded-md bg-[#D97706] px-3 py-1 text-xs font-medium text-white hover:bg-[#B45309] transition-colors"
+                          disabled={invoiceGenerating === row.driver}
                         >
-                          Coming soon
+                          {invoiceGenerating === row.driver ? 'Generating...' : 'Generate Invoice'}
                         </button>
                       </td>
                     </tr>

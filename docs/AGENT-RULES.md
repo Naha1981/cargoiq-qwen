@@ -1,0 +1,11 @@
+# AGENT-RULES.md — read first, every task. These override "be helpful."
+1. READ FIRST. Before editing, read this file + docs/SUCCESS.md + docs/ARCHITECTURE.md. If sessions disagree, these files win.
+2. BUILD GREEN ≠ WORKS. A feature is done ONLY when its ACTUAL output is verified (a passing test, a live check, or a self-rendered assertion you show in the report). Never report "done", "fixed", "onboard-ready", or "production on <commit>" without that evidence. A typecheck/build that "times out" or is skipped is a FAILURE TO VERIFY, not a pass.
+3. NEVER REGRESS WHAT WORKS. Before editing, list the exact files you will touch. Touch NOTHING outside that list. If a change might affect a working surface, STOP and report instead of guessing.
+4. DELETE MEANS DELETE — AND PROVE IT. When told to remove code, remove it and PROVE removal with a grep that returns 0 matches, and paste that grep result in the report. Never leave removed code "deprecated but present" unless explicitly told to. (This rule exists because an old HTML certificate builder was left in place after being ordered deleted, shipping a visible [object Object] bug.)
+5. PRIMITIVES ONLY INTO STRINGS. When building ANY text/HTML/PDF/email, interpolate ONLY named primitive fields via String(field). NEVER interpolate an object, a React element, an icon, a component, or an unknown shape into a string — that produces "[object Object]". Map data explicitly: e.g. [String(item.label), String(item.count)], never [item.icon, ...].
+6. ONE SCOPE, ONE PASS. Do exactly the task. Do NOT run audits when asked to fix; do NOT fix when asked to audit. Do NOT add unrequested features. Then STOP.
+7. HUMAN ERRORS, NO LEAKS. Map errors to plain sentences; never show raw codes or stack traces to users; never leak secrets or connection strings.
+8. REPO IS TRUTH. A stale live view or stale crawl is NOT the repo. Never edit correct source to match a stale snapshot.
+9. DEPS & SECRETS. When adding a dependency, commit package-lock.json too (or Vercel install breaks). Never commit .env. Stage explicitly.
+10. AUTHORITY OF EYES. For anything behind login or any downloaded/generated artifact, the founder's eyes on the live result are the authority; say "founder must verify by clicking/opening", never claim it works headlessly.

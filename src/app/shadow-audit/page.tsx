@@ -79,24 +79,72 @@ export default function ShadowAuditPage() {
     });
   };
 
-  const handleDownloadCertificate = () => {
+  const handleDownloadCertificate = async () => {
+    setDownloadMsg('');
     try {
-      setDownloadMsg(null);
+      const { jsPDF } = await import('jspdf');
+      const autoTable = (await import('jspdf-autotable')).default;
+      const doc = new (jsPDF as any)({ unit: 'pt', format: 'a4' });
+      const W = doc.internal.pageSize.getWidth();
       const today = new Date().toISOString().slice(0, 10);
-      const rows = currentFindings.map((f) => `<tr><td style="padding:8px;border-bottom:1px solid #e2e8f0;font-family:monospace;font-size:13px;">${f.shipment}</td><td style="padding:8px;border-bottom:1px solid #e2e8f0;font-size:13px;">${f.finding}</td><td style="padding:8px;border-bottom:1px solid #e2e8f0;text-align:right;font-family:monospace;font-size:13px;">${f.amount > 0 ? 'R' + f.amount.toLocaleString('en-ZA') : '—'}</td><td style="padding:8px;border-bottom:1px solid #e2e8f0;font-size:13px;">${f.status === 'open' ? 'Open' : 'Info'}</td></tr>`).join('');
-      const cardRows = findings.map((c) => `<div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;background:${c.color.includes('red') ? '#fef2f2' : c.color.includes('amber') ? '#fffbeb' : c.color.includes('blue') ? '#eff6ff' : '#f0fdf4'};"><span style="font-size:18px;">${c.icon}</span><div><div style="font-size:12px;color:#64748b;">${c.label}</div><div style="font-size:20px;font-weight:bold;">${c.count}</div></div></div>`).join('');
-      const html = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>CargoIQ — Savings Certificate</title><style>@media print{body{margin:0;padding:20px;font-family:sans-serif;color:#0d1b2a;background:#fff}@media print{.no-print{display:none!important}}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:800px;margin:0 auto;padding:40px;background:#f1f4f8;color:#0d1b2a}h1{font-size:24px;font-weight:700;margin-bottom:4px}h2{font-size:18px;font-weight:600;margin:24px 0 12px}h3{font-size:14px;font-weight:600;margin:16px 0 8px;color:#64748b}.badge{display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600}.badge-red{background:#fef2f2;color:#dc2626}.badge-amber{background:#fffbeb;color:#d97706}.badge-blue{background:#eff6ff;color:#2563eb}.badge-green{background:#f0fdf4;color:#16a34a}.card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:16px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}@media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}table{width:100%;border-collapse:collapse;font-size:13px}.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;border:none}.btn-print{background:#b8860b;color:#fff}.btn-print:hover{background:#9a7209}.text-center{text-align:center}.mt-2{margin-top:8px}.text-sm{font-size:14px}.text-xs{font-size:12px}.text-red-700{color:#b91c1c}.text-amber-700{color:#b45309}.text-blue-700{color:#1d4ed8}.text-green-700{color:#15803d}.bg-red-50{background:#fef2f2;border:1px solid #fecaca}.bg-amber-50{background:#fffbeb;border:1px solid #fde68a}.bg-blue-50{background:#eff6ff;border:1px solid #bfdbfe}.bg-green-50{background:#f0fdf4;border:1px solid #bbf7d0}.rounded-lg{border-radius:8px}.p-4{padding:16px}.mb-4{margin-bottom:16px}.flex{display:flex}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.gap-2{gap:8px}.gap-3{gap:12px}.justify-between{justify-content:space-between}.w-full{width:100%}.text-right{text-align:right}.font-mono{font-family:monospace}.font-bold{font-weight:700}.font-semibold{font-weight:600}.font-medium{font-weight:500}.opacity-80{opacity:.80}.text-gray-500{color:#6b7280}.text-gray-600{color:#4b5563}.text-gray-400{color:#9ca3af}.text-[#1a2332]{color:#1a2332}.text-[#b8860b]{color:#b8860b}.bg-[#b8860b]{background-color:#b8860b}.bg-[#b8860b]\\/20{background-color:rgba(184,134,11,.2)}.border{border:1px solid #e2e8f0}.border-t{border-top:1px solid #e2e8f0}.divide-y>div{border-bottom:1px solid #e2e8f0}.hover\\:bg-gray-50:hover{background:#f9fafb}.transition-colors{transition:color .15s}.text-xs{font-size:12px}.text-sm{font-size:14px}.text-lg{font-size:18px}.text-2xl{font-size:24px}.text-3xl{font-size:30px}.leading-tight{line-height:1.25}.tracking-wider{letter-spacing:.05em}.uppercase{text-transform:uppercase}.inline-flex{display:inline-flex}.rounded-full{border-radius:9999px}.px-2{padding-left:8px;padding-right:8px}.py-0\\.5{padding-top:2px;padding-bottom:2px}.ml-auto{margin-left:auto}.h-4{height:1rem}.h-5{height:1.25rem}.h-10{height:2.5rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-10{width:2.5rem}.shrink-0{flex-shrink:0}.flex-1{flex:1}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.space-y-6>*+*{margin-top:24px}.space-y-4>*+*{margin-top:16px}.space-y-5>*+*{margin-top:20px}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.mb-6{margin-bottom:24px}.mt-1{margin-top:4px}.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mt-6{margin-top:24px}.pt-4{padding-top:16px}.pb-4{padding-bottom:16px}.px-3{padding-left:12px;padding-right:12px}.px-4{padding-left:16px;padding-right:16px}.py-2\\.5{padding-top:10px;padding-bottom:10px}.py-3{padding-top:12px;padding-bottom:12px}.bg-white{background:#fff}.bg-[#f1f4f8]{background:#f1f4f8}.bg-red-50{background:#fef2f2}.border-red-100{border-color:#fecaca}.text-red-700{color:#b91c1c}.text-red-600{color:#dc2626}.bg-amber-50{background:#fffbeb}.text-amber-600{color:#d97706}.bg-blue-50{background:#eff6ff}.text-blue-600{color:#2563eb}.bg-green-50{background:#f0fdf4}.text-green-600{color:#16a34a}.text-gray-400{color:#9ca3af}.text-gray-600{color:#4b5563}.text-gray-700{color:#374151}.text-[#94a3b8]{color:#94a3b8}.hover\\:text-white:hover{color:#fff}.hover\\:bg-\\[\\#9a7209\\]:hover{background:#9a7209}.disabled\\:opacity-50:disabled{opacity:.50}.disabled\\:cursor-not-allowed:disabled{cursor:not-allowed}</style></head><body><div class="no-print" style="display:flex;justify-content:flex-end;margin-bottom:16px;"><button onclick="window.print()" class="btn btn-print">Print / Save as PDF</button></div><div class="card" style="text-align:center;border:2px solid #b8860b;"><h1 style="font-size:28px;font-weight:700;color:#1a2332;">CargoIQ — Savings Certificate</h1><p style="font-size:14px;font-weight:600;color:#dc2626;margin-top:8px;">SAMPLE / DEMO CERTIFICATE</p><p style="font-size:14px;color:#64748b;margin-top:4px;">Company: Your operation</p><p style="font-size:14px;color:#64748b;">Audit Date: ${today}</p></div><div class="card"><h2>Total Exposure Identified</h2><p style="font-size:24px;font-weight:700;color:#dc2626;">R${currentExposure.toLocaleString('en-ZA')}</p></div><div class="card"><h3>Category Tallies</h3><div class="grid">${cardRows}</div></div><div class="card"><h3>Findings Detail</h3><table><thead><tr style="background:#f1f4f8;text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;"><th style="padding:8px;">Shipment</th><th style="padding:8px;">Finding</th><th style="padding:8px;text-align:right;">Amount (ZAR)</th><th style="padding:8px;">Status</th></tr></thead><tbody>${rows}</tbody></table></div><div style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:12px;color:#9ca3af;text-align:center;">Generated by CargoIQ — South Africa's AI-powered customs compliance platform. This is a sample certificate from a demo audit; run a Shadow Audit on your own documents for your verified certificate.</div></body></html>`;
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `CargoIQ-Savings-Certificate-${today}.html`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      setDownloadMsg("Couldn't generate the certificate just now — please try again.");
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.text('CargoIQ — Savings Certificate', W / 2, 50, { align: 'center' });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(200, 30, 30);
+      doc.text('SAMPLE / DEMO CERTIFICATE', W / 2, 72, { align: 'center' });
+      doc.setTextColor(40, 40, 40);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text('Company: Your operation', W / 2, 92, { align: 'center' });
+      doc.text('Audit Date: ' + today, W / 2, 108, { align: 'center' });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(20, 20, 20);
+      doc.text('Total Exposure Identified', 48, 150);
+      doc.setFontSize(22);
+      doc.setTextColor(200, 30, 30);
+      doc.text('R' + Number(currentExposure).toLocaleString('en-ZA').replace(/,/g, ' '), 48, 178);
+      doc.setTextColor(20, 20, 20);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Category Tallies', 48, 212);
+      autoTable(doc, {
+        startY: 222,
+        head: [['Category', 'Count']],
+        body: findings.map(t => [String(t.label), String(t.count)]),
+        theme: 'grid',
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [26, 35, 50] },
+        columnStyles: { 0: { cellWidth: 120 } },
+        margin: { left: 48, right: 48 },
+      });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(20, 20, 20);
+      const fy = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 24 : 320;
+      doc.text('Findings Detail', 48, fy);
+      autoTable(doc, {
+        startY: fy + 8,
+        head: [['Shipment', 'Finding', 'Amount (ZAR)', 'Status']],
+        body: currentFindings.map(f => [String(f.shipment), String(f.finding), 'R' + Number(f.amount).toLocaleString('en-ZA').replace(/,/g, ' '), String(f.status)]),
+        theme: 'grid',
+        styles: { fontSize: 9, cellPadding: 4 },
+        headStyles: { fillColor: [26, 35, 50] },
+        columnStyles: { 1: { cellWidth: 'auto' }, 2: { halign: 'right', cellWidth: 80 }, 3: { cellWidth: 50 } },
+        margin: { left: 48, right: 48 },
+      });
+      const footY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 24 : 720;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(120, 120, 120);
+      doc.text('Generated by CargoIQ — South Africa\'s AI-powered customs compliance platform.', W / 2, footY, { align: 'center' });
+      doc.text('This is a sample certificate from a demo audit; run a Shadow Audit on your own documents for your verified certificate.', W / 2, footY + 12, { align: 'center' });
+      doc.save('CargoIQ-Savings-Certificate-' + today + '.pdf');
+    } catch (e) {
+      console.error(e);
+      setDownloadMsg('Couldn\'t generate the PDF just now — please try again.');
     }
   };
 

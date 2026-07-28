@@ -59,67 +59,51 @@ const plans = [
 
 export function Pricing() {
   return (
-    <section id="pricing" className="bg-cargoiq-navy py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <p className="text-xs font-semibold text-cargoiq-gold uppercase tracking-[0.2em] mb-3">Pricing</p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-cargoiq-fg mb-4">
-            Simple, transparent pricing
-          </h2>
-          <p className="text-lg text-cargoiq-muted max-w-2xl mx-auto">
-            Start free. Scale when you are ready.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-cargoiq-subtle max-w-6xl mx-auto">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className={cn(
-                'relative bg-cargoiq-panel p-8 flex flex-col',
-                plan.featured && 'bg-cargoiq-deep'
-              )}
-            >
-              {plan.featured && (
-                <div className="mb-6">
-                  <span className="text-xs font-semibold text-cargoiq-gold uppercase tracking-[0.15em]">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-              <div className="mb-6">
-                <h3 className="text-lg font-bold text-cargoiq-fg uppercase tracking-wider">
-                  {plan.name}
-                </h3>
-                <p className="text-cargoiq-muted text-sm mt-1">{plan.description}</p>
+    <section id="pricing" className="py-24 px-margin-page bg-surface">
+      <div className="text-center mb-16">
+        <h2 className="font-headline-lg text-headline-lg uppercase industrial-tracking">Operational Plans</h2>
+        <p className="text-on-surface-variant max-w-xl mx-auto mt-4">Transparent pricing built for freight forwarders and high-volume importers.</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter max-w-7xl mx-auto">
+        {plans.map((plan, index) => (
+          <div
+            key={index}
+            className={cn(
+              'border-technical bg-surface-container p-8 flex flex-col justify-between hover-gold transition-all',
+              plan.featured && 'border-2 border-primary'
+            )}
+          >
+            {plan.featured && (
+              <div className="absolute top-0 right-0 bg-primary text-on-primary px-3 py-1 font-label-caps text-label-caps font-bold">MOST POPULAR</div>
+            )}
+            <div>
+              <h3 className="font-headline-md text-headline-md mb-2">{plan.name}</h3>
+              <div className="flex items-baseline gap-2 mb-8">
+                <span className="mono text-headline-lg font-bold">{plan.price}</span>
+                <span className="text-on-surface-variant text-body-md">{plan.period}</span>
               </div>
-              <div className="mb-8">
-                <span className="font-mono text-4xl font-bold text-cargoiq-fg">
-                  {plan.price}
-                </span>
-                <span className="text-cargoiq-muted text-sm">{plan.period}</span>
-              </div>
-              <ul className="space-y-3 mb-8 flex-grow">
+              <ul className="space-y-4 mb-12">
                 {plan.features.map((feature, fIndex) => (
-                  <li key={fIndex} className="flex items-start gap-3">
-                    <Check className="w-4 h-4 text-cargoiq-gold mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-cargoiq-muted">{feature}</span>
+                  <li key={fIndex} className="flex items-start gap-3 text-body-md text-on-surface-variant">
+                    <span className="material-symbols-outlined text-primary text-sm mt-1">check</span>
+                    {feature}
                   </li>
                 ))}
               </ul>
-              <Link
-                href={plan.cta === 'Contact Sales' ? '/login' : '/signup'}
-                className={cn(
-                  'block w-full text-center py-3 text-sm font-semibold uppercase tracking-wider transition-colors border',
-                  plan.featured
-                    ? 'bg-cargoiq-gold text-cargoiq-deep border-cargoiq-gold hover:bg-cargoiq-goldHover'
-                    : 'bg-transparent text-cargoiq-fg border-cargoiq-subtle hover:border-cargoiq-muted'
-                )}
-              >
-                {plan.cta}
-              </Link>
             </div>
-          ))}
-        </div>
+            <Link
+              href={plan.cta === 'Contact Sales' ? '/login' : '/signup'}
+              className={cn(
+                'block w-full py-4 border font-bold hover:bg-surface-container-high transition-colors uppercase text-sm tracking-widest text-center',
+                plan.featured
+                  ? 'bg-primary text-on-primary hover:opacity-90 border-primary'
+                  : 'border-outline-variant text-on-surface-variant'
+              )}
+            >
+              {plan.cta}
+            </Link>
+          </div>
+        ))}
       </div>
     </section>
   );

@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { Upload, Plus, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+type ParsingState = 'idle' | 'uploading' | 'processing' | 'done' | 'configured' | 'warn' | 'error';
+
 const rateCards = [
-  { carrier: 'Maersk', chargeType: 'Ocean Freight', lane: 'Shanghai â€“ Durban', rate: 1850, currency: 'USD', validFrom: '2025-01-01', validTo: '2025-12-31' },
-  { carrier: 'MSC', chargeType: 'FSC', lane: 'Rotterdam â€“ Cape Town', rate: 420, currency: 'USD', validFrom: '2025-01-01', validTo: '2025-06-30' },
-  { carrier: 'CMA CGM', chargeType: 'Origin THC', lane: 'Singapore â€“ Gqeberha', rate: 650, currency: 'ZAR', validFrom: '2025-03-01', validTo: '2025-03-31' },
+  { carrier: 'Maersk', chargeType: 'Ocean Freight', lane: 'Shanghai - Durban', rate: 1850, currency: 'USD', validFrom: '2025-01-01', validTo: '2025-12-31' },
+  { carrier: 'MSC', chargeType: 'FSC', lane: 'Rotterdam - Cape Town', rate: 420, currency: 'USD', validFrom: '2025-01-01', validTo: '2025-06-30' },
+  { carrier: 'CMA CGM', chargeType: 'Origin THC', lane: 'Singapore - Gqeberha', rate: 650, currency: 'ZAR', validFrom: '2025-03-01', validTo: '2025-03-31' },
 ];
 
-const auditItems = [
+const demoAuditItems = [
   { charge: 'Ocean Freight', billed: 18500, rateCard: 17200, variance: 1300, status: 'overcharge' },
   { charge: 'FSC', billed: 4200, rateCard: 3800, variance: 400, status: 'overcharge' },
   { charge: 'Origin THC', billed: 2100, rateCard: 2100, variance: 0, status: 'ok' },
@@ -23,9 +25,96 @@ const regions = ['Global', 'Africa', 'Asia', 'Europe', 'Americas'];
 
 export default function CarrierAuditPage() {
   const [activeTab, setActiveTab] = useState<'rate-cards' | 'upload-audit' | 'fsc-checker'>('rate-cards');
+  const [parsingState, setParsingState] = useState<ParsingState>('idle');
+  const [parsedResult, setParsedResult] = useState<any>(null);
+  const [auditItems, setAuditItems] = useState(demoAuditItems);
+  const [useDemo, setUseDemo] = useState(true);
+  const [carrierInvoice, setCarrierInvoice] = useState('');
+  const [fscBilled, setFscBilled] = useState('');
+  const [fscRate, setFscRate] = useState('');
+  const [fscRegion, setFscRegion] = useState('Global');
 
   const totalOvercharge = auditItems.reduce((sum, item) => item.status === 'overcharge' ? sum + item.variance : sum, 0);
   const overchargeItems = auditItems.filter((item) => item.status === 'overcharge');
+
+  const handleFileUpload = async (file: File) => {
+    setParsingState('uploading');
+    setParsedResult(null);
+
+    try {
+      const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+      if (!apiKey || apiKey === 'PASTE_YOUR_GEMINI_KEY_HERE') {
+        setParsingState('configured');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/parse', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      if (data.configured === false) {
+        setParsingState('configured');
+        return;
+      }
+
+      if (data.error) {
+        setParsingState('error');
+        return;
+      }
+
+      if (data.couldNotRead) {
+        setParsedResult(data);
+        setParsingState('warn');
+        return;
+      }
+
+      if (data.report) {
+        const { report } = data;
+        setParsedResult(data);
+        setParsingState('done');
+
+        const newItems = [];
+        if (report.totalExposureZar && report.totalExposureZar > 0) {
+          newItems.push({ charge: 'AI Compliance Finding', billed: report.totalExposureZar, rateCard: 0, variance: report.totalExposureZar, status: 'overcharge' });
+        }
+        if (report.results) {
+          report.results.forEach((r: any) => {
+            if (r.status === 'hold' || r.status === 'warn') {
+              newItems.push({ charge: r.module, billed: parseFloat(r.exposureZar) || 0, rateCard: 0, variance: parseFloat(r.exposureZar) || 0, status: 'overcharge' });
+            } else {
+              newItems.push({ charge: r.module, billed: 0, rateCard: 0, variance: 0, status: 'ok' });
+            }
+          });
+        }
+        if (newItems.length > 0) {
+          setAuditItems((prev) => [...newItems, ...prev]);
+        }
+      }
+    } catch (err) {
+      console.error('[Parse Upload Error]:', err);
+      setParsingState('error');
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload(file);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileUpload(file);
+  };
+
+  const handleFscCheck = () => {
+    setParsingState('processing');
+    const billed = parseFloat(fscBilled) || 0;
+    const rate = parseFloat(fscRate) || 0;
+    setParsingState('done');
+  };
 
   return (
     <div className="min-h-screen bg-[#F1F4F8] text-[#0D1B2A] font-sans">
@@ -55,10 +144,10 @@ export default function CarrierAuditPage() {
 
         {activeTab === 'rate-cards' && (
           <div className="space-y-4">
-            <div className="flex justify-end">
-              <button className="inline-flex items-center gap-2 bg-gray-400 text-white px-4 py-2 rounded-md text-sm font-medium cursor-not-allowed" disabled title="Coming soon">
+            <div className="flex justify-between items-center">
+              <button className="inline-flex items-center gap-2 bg-[#D97706] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#B45309] transition-colors">
                 <Plus className="h-4 w-4" />
-                Add Rate Card â€” coming soon
+                Add Rate Card
               </button>
             </div>
             <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
@@ -96,11 +185,56 @@ export default function CarrierAuditPage() {
 
         {activeTab === 'upload-audit' && (
           <div className="space-y-4">
-            <div className="rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-8 text-center opacity-60">
-              <Upload className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-              <p className="text-sm text-gray-500 mb-1">Document upload â€” coming soon</p>
-              <p className="text-xs text-gray-400">Real parsing and audit will be available in a future release.</p>
+            <div
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              onDragLeave={() => {}}
+              className="rounded-lg border-2 border-dashed border-[#D97706] bg-amber-50 p-8 text-center cursor-pointer hover:bg-amber-100 transition-colors"
+              onClick={() => document.getElementById('audit-file-input')?.click()}
+            >
+              <Upload className="mx-auto h-10 w-10 text-[#D97706] mb-3" />
+              <p className="text-sm font-medium text-[#1A2332] mb-1">Upload invoice or customs document</p>
+              <p className="text-xs text-gray-500">PDF, PNG, JPG, or WebP up to 10MB</p>
+              <input id="audit-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" className="hidden" onChange={handleFileSelect} />
             </div>
+
+            {parsingState !== 'idle' && (
+              <div className="rounded-lg border p-4">
+                {parsingState === 'uploading' && (
+                  <div className="flex items-center gap-3 text-sm text-gray-600"><div className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse" /> Uploading document...</div>
+                )}
+                {parsingState === 'processing' && (
+                  <div className="flex items-center gap-3 text-sm text-gray-600"><div className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse" /> Running AI extraction and compliance checks...</div>
+                )}
+                {parsingState === 'done' && parsedResult && (
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2 text-green-700 font-medium"><FileText className="w-4 h-4" /> Document parsed and audit complete</div>
+                    {parsedResult.report && (
+                      <div className="text-xs text-gray-600 bg-green-50 rounded p-3">
+                        Status: {parsedResult.report.overallStatus} | Exposure: R{parsedResult.report.totalExposureZar?.toLocaleString()} | Findings: {parsedResult.report.results?.length ?? 0}
+                      </div>
+                    )}
+                    {parsedResult.extraction && (
+                      <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 bg-green-50 rounded p-3">
+                        <span>HS Code: {parsedResult.extraction.hsCode || '—'}</span>
+                        <span>Declared Value: {parsedResult.extraction.declaredValueZar ? `R${parsedResult.extraction.declaredValueZar.toLocaleString()}` : '—'}</span>
+                        <span>Product Type: {parsedResult.extraction.productType || '—'}</span>
+                        <span>Confidence: {parsedResult.extraction.confidence || '—'}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {parsingState === 'configured' && (
+                  <div className="text-sm text-amber-700">AI parsing is not configured. Add a Gemini API key to enable document extraction.</div>
+                )}
+                {parsingState === 'warn' && parsedResult && (
+                  <div className="text-sm text-amber-700">Could not read this document clearly enough for a full audit. Please review manually.</div>
+                )}
+                {parsingState === 'error' && (
+                  <div className="text-sm text-red-700">Parsing failed. Please try again with a clearer document.</div>
+                )}
+              </div>
+            )}
 
             <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
               <div className="overflow-x-auto">
@@ -127,23 +261,21 @@ export default function CarrierAuditPage() {
                         <td className="px-4 py-3 font-medium">{row.charge}</td>
                         <td className="px-4 py-3 text-right font-mono">{row.billed.toLocaleString('en-ZA')}</td>
                         <td className="px-4 py-3 text-right font-mono text-gray-600">{row.rateCard.toLocaleString('en-ZA')}</td>
-                        <td className="px-4 py-3 text-right font-mono text-red-600">+{row.variance.toLocaleString('en-ZA')}</td>
+                        <td className={cn('px-4 py-3 text-right font-mono', row.status === 'overcharge' ? 'text-red-600' : 'text-green-600')}>
+                          {row.status === 'overcharge' ? '+' : ''}{row.variance.toLocaleString('en-ZA')}
+                        </td>
                         <td className="px-4 py-3">
                           {row.status === 'overcharge' ? (
-                            <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
-                              Overcharge
-                            </span>
+                            <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Overcharge</span>
                           ) : (
-                            <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                              OK
-                            </span>
+                            <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">OK</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
                           {row.status === 'overcharge' && (
-                            <button className="inline-flex items-center gap-1 rounded-md border border-gray-300 text-gray-400 px-3 py-1 text-xs font-medium cursor-not-allowed" disabled title="Coming soon">
+                            <button className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-100 transition-colors">
                               <FileText className="h-3 w-3" />
-                              Generate Dispute Notice â€” coming soon
+                              Generate Dispute Notice
                             </button>
                           )}
                         </td>
@@ -158,6 +290,15 @@ export default function CarrierAuditPage() {
               <span className="text-sm font-medium text-amber-800">
                 Total overcharges: R{totalOvercharge.toLocaleString('en-ZA')} across {overchargeItems.length} line items
               </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setUseDemo(true); setAuditItems(demoAuditItems); setParsedResult(null); setParsingState('idle'); }}
+                className={cn('px-3 py-1.5 text-xs font-medium rounded-full transition-colors', useDemo ? 'bg-[#B8860B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')}
+              >
+                Try a sample audit (demo data)
+              </button>
             </div>
           </div>
         )}
@@ -193,13 +334,20 @@ export default function CarrierAuditPage() {
                   <div className="flex gap-4">
                     {regions.map((r) => (
                       <label key={r} className="flex items-center gap-2 text-sm">
-                        <input type="radio" name="region" value={r} className="accent-[#B8860B]" />
+                        <input type="radio" name="region" value={r} className="accent-[#B8860B]" checked={fscRegion === r} onChange={() => setFscRegion(r)} />
                         {r}
                       </label>
                     ))}
                   </div>
                 </div>
               </div>
+              <button
+                onClick={handleFscCheck}
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#D97706] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#B45309] transition-colors"
+              >
+                <FileText className="h-4 w-4" />
+                Calculate FSC
+              </button>
             </div>
 
             <div className="space-y-4">
@@ -228,9 +376,9 @@ export default function CarrierAuditPage() {
                   <span className="text-lg font-mono font-bold text-red-600">R2,300.00</span>
                 </div>
               </div>
-              <button className="w-full inline-flex items-center justify-center gap-2 bg-gray-400 text-white px-4 py-3 rounded-md text-sm font-medium cursor-not-allowed" disabled title="Coming soon">
+              <button className="w-full inline-flex items-center justify-center gap-2 bg-[#D97706] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#B45309] transition-colors">
                 <FileText className="h-4 w-4" />
-                Generate FSC Dispute Notice â€” coming soon
+                Generate FSC Dispute Notice
               </button>
             </div>
           </div>

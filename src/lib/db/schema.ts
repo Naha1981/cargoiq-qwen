@@ -166,9 +166,9 @@ export const rateCards = pgTable('rate_cards', {
   index('idx_rate_cards_tenant_id').on(table.tenantId),
 ]);
 
-export const rateCardsRelations = relations(rateCards, ({ one }) => ({
-  tenant: one(tenants, { fields: [rateCards.tenantId], references: [tenants.id] }),
-});
+export const rateCardsRelations = relations(rateCards, (helpers) => ({
+  tenant: helpers.one(tenants, { fields: [rateCards.tenantId], references: [tenants.id] }),
+}));
 
 // ââââ Invoices âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 export const invoices = pgTable('invoices', {

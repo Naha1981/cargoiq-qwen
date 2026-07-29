@@ -69,8 +69,8 @@ export async function POST(req: NextRequest) {
     const prompt = "Extract ONLY the following fields from this document. If a field is not clearly visible or legible, set it to null and set confidence to low. Do NOT guess or infer any value. Be precise and factual. Extract only what is literally on the document.";
 
     const { object } = await generateObject({
-      model: google("gemini-2.0-flash"),
-      schema: ExtractionSchema,
+      model: google("gemini-2.0-flash") as any,
+      schema: ExtractionSchema as any,
       prompt,
       messages: [
         {
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
     const extracted = ExtractionSchema.parse(object);
 
     if (!extracted.confidence || extracted.confidence === "low" || !extracted.hsCode || !extracted.declaredValueZar) {
-      const appUser = await db.query.users.findFirst({
+      const appUser = await db!.query.users.findFirst({
         where: (users, { eq }) => eq(users.clerk_id, userId as string),
       });
 
@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
       invoiceTotal: extracted.declaredValueZar,
       currency: "ZAR",
       originCountry: extracted.origin === "SACU" ? "ZA" : extracted.origin === "non-SACU" ? "XX" : undefined,
+      destinationCountry: "ZA",
       isSacuOrigin: extracted.origin === "SACU",
       customsValueZar: extracted.declaredValueZar,
       cargoDescription: extracted.productType,
@@ -124,7 +125,7 @@ export async function POST(req: NextRequest) {
       invoiceNumber: extracted.shipmentRef,
     };
 
-    const appUser = await db.query.users.findFirst({
+    const appUser = await db!.query.users.findFirst({
       where: (users, { eq }) => eq(users.clerk_id, userId as string),
     });
 
@@ -138,7 +139,7 @@ export async function POST(req: NextRequest) {
     const { results, overallStatus, totalExposureZar } = runComplianceShield(doc);
 
     for (const result of results) {
-      await db.insert(complianceResults).values({
+      await db!.insert(complianceResults).values({
         id: generateId(),
         tenantId,
         shipmentId,
@@ -150,7 +151,7 @@ export async function POST(req: NextRequest) {
     }
 
     const riskScore = overallStatus === "hold" ? 5 : overallStatus === "warn" ? 3 : 1;
-    await db.insert(shipments).values({
+    await db!.insert(shipments).values({
       id: shipmentId,
       tenantId,
       reference: extracted.shipmentRef ?? `PARSED-${Date.now()}`,
@@ -159,9 +160,9 @@ export async function POST(req: NextRequest) {
       customsValueZar: extracted.declaredValueZar,
       riskScore,
       status: overallStatus === "hold" ? "held" : overallStatus === "warn" ? "review" : "cleared",
-    });
+    } as any);
 
-    await db.insert(events).values({
+    await db!.insert(events).values({
       id: generateId(),
       tenantId,
       type: "ComplianceShieldCompleted",

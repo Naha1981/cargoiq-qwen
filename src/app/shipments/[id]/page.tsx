@@ -35,21 +35,21 @@ const overallStatus = complianceModules.some((m) => m.status === 'hold')
     : 'pass';
 
 const statusBadge = (status: string) => {
-  if (status === 'pass') return 'bg-success/20 text-green-700 border-green-200';
+  if (status === 'pass') return 'bg-success/20 text-success border-success/30';
   if (status === 'warn') return 'bg-amber-100 text-primary-container border-amber-200';
-  return 'bg-red-100 text-risk-red border-red-200';
+  return 'bg-risk-red/10 text-risk-red border-risk-red';
 };
 
 const statusIcon = (status: string) => {
   if (status === 'pass') return <CheckCircle2 className="w-5 h-5 text-success" />;
   if (status === 'warn') return <AlertTriangle className="w-5 h-5 text-amber-500" />;
-  return <XCircle className="w-5 h-5 text-red-600" />;
+  return <XCircle className="w-5 h-5 text-risk-red" />;
 };
 
 const penaltyBadge = (exposure: number) => {
   if (exposure === 0) return null;
-  return (
-    <span className="text-xs font-mono text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">
+    return (
+      <span className="text-xs font-mono text-risk-red bg-risk-red/10 border border-risk-red px-1.5 py-0.5 rounded">
       R{exposure.toLocaleString()}
     </span>
   );
@@ -164,7 +164,7 @@ export default function ShipmentDetailPage() {
                   Classify
                 </button>
                 {hsResult && (
-                  <div className={cn('flex items-center gap-2 text-sm', hsResult === 'pass' ? 'text-success' : 'text-red-600')}>
+                  <div className={cn('flex items-center gap-2 text-sm', hsResult === 'pass' ? 'text-success' : 'text-risk-red')}>
                     {hsResult === 'pass' ? <Check className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
                     {hsResult === 'pass'
                       ? 'HS code validated - no restrictions detected.'

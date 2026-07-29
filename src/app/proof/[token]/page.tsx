@@ -12,10 +12,10 @@ const demoFindings = [
 ];
 
 const categories = [
-  { icon: 'AlertTriangle', label: 'Overcharges', count: 7, color: 'text-red-600 bg-risk-red/10' },
-  { icon: 'Clock', label: 'Demurrage', count: 3, color: 'text-amber-600 bg-primary-container/10' },
-  { icon: 'FileSearch', label: 'Missing Docs', count: 2, color: 'text-blue-600 bg-blue-50' },
-  { icon: 'CheckCircle2', label: 'Verified', count: 6, color: 'text-green-600 bg-green-50' },
+  { icon: 'AlertTriangle', label: 'Overcharges', count: 7, color: 'text-risk-red bg-risk-red/10' },
+  { icon: 'Clock', label: 'Demurrage', count: 3, color: 'text-primary-container bg-primary-container/10' },
+  { icon: 'FileSearch', label: 'Missing Docs', count: 2, color: 'text-tertiary bg-tertiary/10' },
+  { icon: 'CheckCircle2', label: 'Verified', count: 6, color: 'text-success bg-success/10' },
 ];
 
 function getAuditData(token: string) {

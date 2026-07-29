@@ -319,14 +319,14 @@ setParsingState('done');
                           <td className="px-4 py-3 text-on-surface-variant">{row.chargeType}</td>
                           <td className="px-4 py-3 text-on-surface-variant">{row.route}</td>
                           <td className="px-4 py-3 text-on-surface-variant">{row.mode.replace('_', ' ')}</td>
-                          <td className="px-4 py-3 text-right font-mono">{(row.ratePerContainer || row.ratePerKg || '—')}</td>
+                          <td className="px-4 py-3 text-right font-mono">{(row.ratePerContainer || row.ratePerKg || ' ')}</td>
                           <td className="px-4 py-3">{row.currency}</td>
-                          <td className="px-4 py-3 text-on-surface-variant">{row.validFrom ? row.validFrom.split('T')[0] : '—'}</td>
-                          <td className="px-4 py-3 text-on-surface-variant">{row.validTo ? row.validTo.split('T')[0] : '—'}</td>
+                          <td className="px-4 py-3 text-on-surface-variant">{row.validFrom ? row.validFrom.split('T')[0] : ' '}</td>
+                          <td className="px-4 py-3 text-on-surface-variant">{row.validTo ? row.validTo.split('T')[0] : ' '}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
-                              <button onClick={() => handleRateCardEdit(row)} className="p-1 hover:bg-gray-200 rounded" title="Edit"><Edit2 className="h-3.5 w-3.5 text-on-surface-variant" /></button>
-                              <button onClick={() => handleRateCardDelete(row.id)} className="p-1 hover:bg-red-100 rounded" title="Delete"><Trash2 className="h-3.5 w-3.5 text-red-600" /></button>
+                              <button onClick={() => handleRateCardEdit(row)} className="p-1 hover:bg-surface-container-high rounded" title="Edit"><Edit2 className="h-3.5 w-3.5 text-on-surface-variant" /></button>
+                              <button onClick={() => handleRateCardDelete(row.id)} className="p-1 hover:bg-risk-red/10 rounded" title="Delete"><Trash2 className="h-3.5 w-3.5 text-risk-red" /></button>
                             </div>
                           </td>
                         </tr>
@@ -364,18 +364,18 @@ setParsingState('done');
                 )}
                 {parsingState === 'done' && parsedResult && (
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-green-700 font-medium"><FileText className="w-4 h-4" /> Document parsed and audit complete</div>
+                    <div className="flex items-center gap-2 text-success text-sm font-medium"><FileText className="w-4 h-4" /> Document parsed and audit complete</div>
                     {parsedResult.report && (
-                      <div className="text-xs text-on-surface-variant bg-green-50 rounded p-3">
+                      <div className="text-xs text-on-surface-variant bg-success/10 rounded p-3">
                         Status: {parsedResult.report.overallStatus} | Exposure: R{parsedResult.report.totalExposureZar?.toLocaleString()} | Findings: {parsedResult.report.results?.length ?? 0}
                       </div>
                     )}
                     {parsedResult.extraction && (
-                      <div className="grid grid-cols-2 gap-2 text-xs text-on-surface-variant bg-green-50 rounded p-3">
-                        <span>HS Code: {parsedResult.extraction.hsCode || '—'}</span>
-                        <span>Declared Value: {parsedResult.extraction.declaredValueZar ? `R${parsedResult.extraction.declaredValueZar.toLocaleString()}` : '—'}</span>
-                        <span>Product Type: {parsedResult.extraction.productType || '—'}</span>
-                        <span>Confidence: {parsedResult.extraction.confidence || '—'}</span>
+                      <div className="grid grid-cols-2 gap-2 text-xs text-on-surface-variant bg-success/10 rounded p-3">
+                        <span>HS Code: {parsedResult.extraction.hsCode || ' '}</span>
+                        <span>Declared Value: {parsedResult.extraction.declaredValueZar ? `R${parsedResult.extraction.declaredValueZar.toLocaleString()}` : ' '}</span>
+                        <span>Product Type: {parsedResult.extraction.productType || ' '}</span>
+                        <span>Confidence: {parsedResult.extraction.confidence || ' '}</span>
                       </div>
                     )}
                   </div>
@@ -417,14 +417,14 @@ setParsingState('done');
                         <td className="px-4 py-3 font-medium">{row.charge}</td>
                         <td className="px-4 py-3 text-right font-mono">{row.billed.toLocaleString('en-ZA')}</td>
                         <td className="px-4 py-3 text-right font-mono text-on-surface-variant">{row.rateCard.toLocaleString('en-ZA')}</td>
-                        <td className={cn('px-4 py-3 text-right font-mono', row.status === 'overcharge' ? 'text-red-600' : 'text-green-600')}>
+                        <td className={cn('px-4 py-3 text-right font-mono', row.status === 'overcharge' ? 'text-risk-red' : 'text-success')}>
                           {row.status === 'overcharge' ? '+' : ''}{row.variance.toLocaleString('en-ZA')}
                         </td>
                         <td className="px-4 py-3">
                           {row.status === 'overcharge' ? (
                             <span className="inline-flex items-center rounded-full bg-primary-container/20 px-2 py-0.5 text-xs font-medium text-primary-container">Overcharge</span>
                           ) : (
-                            <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">OK</span>
+                            <span className="inline-flex items-center rounded-full bg-success/20 px-2 py-0.5 text-xs font-medium text-success">OK</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -451,7 +451,7 @@ setParsingState('done');
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { setUseDemo(true); setAuditItems(demoAuditItems); setParsedResult(null); setParsingState('idle'); }}
-                className={cn('px-3 py-1.5 text-xs font-medium rounded-full transition-colors', useDemo ? 'bg-primary-container text-white' : 'bg-surface-container text-on-surface-variant hover:bg-gray-200')}
+                className={cn('px-3 py-1.5 text-xs font-medium rounded-full transition-colors', useDemo ? 'bg-primary-container text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high')}
               >
                 Try a sample audit (demo data)
               </button>
@@ -520,16 +520,16 @@ setParsingState('done');
                   </div>
                   <div>
                     <p className="text-xs text-on-surface-variant">Correct Amount (ZAR)</p>
-                    <p className="text-lg font-mono font-semibold text-green-600">16,200.00</p>
+                    <p className="text-lg font-mono font-semibold text-success">16,200.00</p>
                   </div>
                   <div>
                     <p className="text-xs text-on-surface-variant">Charged Amount (ZAR)</p>
-                    <p className="text-lg font-mono font-semibold text-red-600">18,500.00</p>
+                    <p className="text-lg font-mono font-semibold text-risk-red">18,500.00</p>
                   </div>
                 </div>
-                <div className="mt-4 rounded bg-red-50 border border-red-100 p-3 flex items-center justify-between">
-                  <span className="text-sm font-medium text-red-700">Overcharge Difference</span>
-                  <span className="text-lg font-mono font-bold text-red-600">R2,300.00</span>
+                  <div className="mt-4 rounded bg-risk-red/10 border border-risk-red/30 p-3 flex items-center justify-between">
+                    <span className="text-sm font-medium text-risk-red">Overcharge Difference</span>
+                    <span className="text-lg font-mono font-bold text-risk-red">R2,300.00</span>
                 </div>
               </div>
               <button className="w-full inline-flex items-center justify-center gap-2 bg-primary-container text-white px-4 py-3 rounded text-sm font-medium hover:bg-primary transition-colors">

@@ -275,7 +275,7 @@ isActive
               </Card>
 
               <div className="flex justify-end">
-                <Button variant="outline" className="border-red-300 text-risk-red hover:bg-red-50">
+                <Button variant="outline" className="border-risk-red text-risk-red hover:bg-risk-red/10">
                   Sign out all devices
                 </Button>
               </div>

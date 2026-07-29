@@ -58,8 +58,8 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-5xl">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage your organisation, integrations and security.</p>
+        <h1 className="text-2xl font-bold text-on-surface">Settings</h1>
+        <p className="mt-1 text-sm text-on-surface-variant">Manage your organisation, integrations and security.</p>
 
         <div className="mt-6 flex gap-2 border-b border-gray-200">
           {tabs.map((tab) => {
@@ -73,7 +73,7 @@ export default function SettingsPage() {
                   'flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors',
                   isActive
                     ? 'border-amber-500 text-amber-700'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    : 'border-transparent text-on-surface-variant hover:text-on-surface'
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -89,7 +89,7 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <Input label="Organisation name" defaultValue="CargoIQ Demo Pty Ltd" />
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-700">Plan status</span>
+                  <span className="text-sm font-medium text-on-surface">Plan status</span>
                   <Badge variant="warning">Growth</Badge>
                 </div>
                 <Input label="Billing contact email" type="email" defaultValue="billing@cargoiq.io" />
@@ -103,8 +103,8 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-900">Gmail OAuth</h4>
-                    <p className="text-sm text-gray-500">Connect a Gmail account for sending and parsing emails.</p>
+                    <h4 className="text-sm font-semibold text-on-surface">Gmail OAuth</h4>
+                    <p className="text-sm text-on-surface-variant">Connect a Gmail account for sending and parsing emails.</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge variant="neutral">Not connected</Badge>
@@ -114,7 +114,7 @@ export default function SettingsPage() {
                   <Button variant="outline" disabled>Connect</Button>
                   <Button variant="ghost" className="text-red-600 hover:text-red-700" disabled>Disconnect</Button>
                 </div>
-                <p className="text-xs text-gray-400"> Coming soon</p>
+                <p className="text-xs text-on-surface-variant"> Coming soon</p>
               </div>
             </Card>
           )}
@@ -131,8 +131,8 @@ export default function SettingsPage() {
                   <div className="rounded-lg border border-gray-200 p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-900">SAPS ECS</h4>
-                        <p className="text-xs text-gray-500">Not connected</p>
+                        <h4 className="text-sm font-semibold text-on-surface">SAPS ECS</h4>
+                        <p className="text-xs text-on-surface-variant">Not connected</p>
                       </div>
                       <Button size="sm" variant="outline" className="gap-2" disabled>
                         <RefreshCw className="h-4 w-4" />
@@ -143,8 +143,8 @@ export default function SettingsPage() {
                   <div className="rounded-lg border border-gray-200 p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-900">SARS eFiling</h4>
-                        <p className="text-xs text-gray-500">Not connected</p>
+                        <h4 className="text-sm font-semibold text-on-surface">SARS eFiling</h4>
+                        <p className="text-xs text-on-surface-variant">Not connected</p>
                       </div>
                       <Button size="sm" variant="outline" className="gap-2" disabled>
                         <RefreshCw className="h-4 w-4" />
@@ -174,7 +174,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
                   <div className="flex items-center gap-3">
                     <div className={`h-2 w-2 rounded-full ${hasWhatsAppConfig() ? 'bg-green-500' : 'bg-gray-400'}`} />
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-on-surface">
                       {hasWhatsAppConfig() ? 'Configured (verify on Evolution)' : 'Not configured'}
                     </span>
                   </div>
@@ -183,7 +183,7 @@ export default function SettingsPage() {
 
                 {hasWhatsAppConfig() && (
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">Webhook URL</label>
+                    <label className="mb-1 block text-sm font-medium text-on-surface">Webhook URL</label>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-600">
                         Set the webhook in Evolution after connecting
@@ -193,27 +193,27 @@ export default function SettingsPage() {
                 )}
 
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900">Driver check-in feed</h4>
-                  <p className="text-xs text-gray-500">Last 10 check-ins received via WhatsApp.</p>
+                  <h4 className="text-sm font-semibold text-on-surface">Driver check-in feed</h4>
+                  <p className="text-xs text-on-surface-variant">Last 10 check-ins received via WhatsApp.</p>
                   <div className="mt-3 space-y-2">
                     {mockCheckins.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-3">
+                      <div key={item.id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-surface-container px-4 py-3">
                         <div className="flex items-center gap-3">
                           <Badge variant="info" className="font-mono text-xs">{item.status}</Badge>
                           <div>
-                            <p className="text-sm font-medium text-gray-900">{item.driver}</p>
-                            <p className="text-xs text-gray-500">{item.location}</p>
+                            <p className="text-sm font-medium text-on-surface">{item.driver}</p>
+                            <p className="text-xs text-on-surface-variant">{item.location}</p>
                           </div>
                         </div>
-                        <span className="text-xs text-gray-400">{item.time}</span>
+                        <span className="text-xs text-on-surface-variant">{item.time}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-900">Command reference</h4>
-                  <p className="text-xs text-gray-500">Available WhatsApp commands for drivers.</p>
+                  <h4 className="text-sm font-semibold text-on-surface">Command reference</h4>
+                  <p className="text-xs text-on-surface-variant">Available WhatsApp commands for drivers.</p>
                   <div className="mt-3 rounded-lg border border-gray-200 bg-gray-900 p-4 font-mono text-xs text-green-400">
                     <p>ARRIVED — Check in at destination</p>
                     <p>DEPARTED — Confirm departure</p>
@@ -230,11 +230,11 @@ export default function SettingsPage() {
             <Card>
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Truck className="h-12 w-12 text-gray-300" />
-                <h3 className="mt-4 text-lg font-semibold text-gray-900">WiseLayer integration</h3>
-                <p className="mt-2 text-sm text-gray-500">
+                <h3 className="mt-4 text-lg font-semibold text-on-surface">WiseLayer integration</h3>
+                <p className="mt-2 text-sm text-on-surface-variant">
                   CargoWise connectivity is planned for Phase 2.
                 </p>
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-on-surface-variant">
                   We are evaluating API availability and data-mapping requirements.
                 </p>
               </div>
@@ -259,10 +259,10 @@ export default function SettingsPage() {
                     { device: 'Safari on iPhone', location: 'Cape Town, ZA', current: false },
                     { device: 'Firefox on macOS', location: 'Durban, ZA', current: false },
                   ].map((session, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded-lg border border-gray-100 bg-white px-4 py-3">
+                    <div key={idx} className="flex items-center justify-between rounded-lg border border-gray-100 bg-surface-container px-4 py-3">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{session.device}</p>
-                        <p className="text-xs text-gray-500">{session.location}</p>
+                        <p className="text-sm font-medium text-on-surface">{session.device}</p>
+                        <p className="text-xs text-on-surface-variant">{session.location}</p>
                       </div>
                       {session.current ? (
                         <Badge variant="success">Current</Badge>

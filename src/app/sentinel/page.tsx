@@ -111,20 +111,20 @@ export default function SentinelPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const colors: Record<string, string> = {
-    green: 'bg-success/10 text-success border-emerald-500/30',
-    amber: 'bg-primary-container/10 text-primary-container border-amber-500/30',
-    blue: 'bg-tertiary/10 text-tertiary border-blue-500/30',
-    red: 'bg-risk-red/20 text-risk-red border-red-500/30',
+const colors: Record<string, string> = {
+    green: 'bg-success/10 text-success border-success/30',
+    amber: 'bg-primary-container/10 text-primary-container border-primary-container/30',
+    blue: 'bg-tertiary/10 text-tertiary border-tertiary/30',
+    red: 'bg-risk-red/20 text-risk-red border-risk-red/30',
   };
 
   return (
-    <div className="min-h-screen bg-surface-container-lowest text-on-surface font-sans">
+    <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body-md">
       <div className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-outline-variant bg-surface-container-lowest/90 backdrop-blur">
         <h1 className="text-lg font-semibold tracking-wide">SENTINEL LIVE</h1>
         <button
           onClick={handleExit}
-          className="p-2 rounded-full hover:bg-white/10 transition-colors"
+          className="p-2 rounded-full hover:bg-surface-container-lowest/30 transition-colors"
         >
           <X className="h-5 w-5" />
         </button>
@@ -167,7 +167,7 @@ export default function SentinelPage() {
                 <path
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none"
-                  stroke="#3B82F6"
+                  stroke="var(--color-primary)"
                   strokeWidth="3"
                   strokeDasharray="97, 100"
                 />
@@ -257,7 +257,7 @@ export default function SentinelPage() {
                       <td className="py-3 text-right">
                         <button
                           onClick={() => generateInvoice(row)}
-                          className="rounded-md bg-primary-container px-3 py-1 text-xs font-medium text-on-surface hover:bg-[#B45309] transition-colors"
+                          className="rounded-md bg-primary-container px-3 py-1 text-xs font-medium text-on-surface hover:bg-primary transition-colors"
                           disabled={invoiceGenerating === row.driver}
                         >
                           {invoiceGenerating === row.driver ? 'Generating...' : 'Generate Invoice'}

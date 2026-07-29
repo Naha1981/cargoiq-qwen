@@ -3,7 +3,7 @@ import { Globe } from 'lucide-react';
 export default function PortalsPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-8">
-      <h1 className="text-2xl font-bold text-[#0D1B2A] font-body-md mb-2">Portals</h1>
+      <h1 className="text-2xl font-bold text-on-surface font-body-md mb-2">Portals</h1>
       <p className="text-sm text-on-surface-variant mb-8">Connected customs and carrier portals.</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -21,7 +21,7 @@ export default function PortalsPage() {
                   <Globe className="h-5 w-5 text-on-surface" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-[#0D1B2A]">{portal.name}</h3>
+                  <h3 className="text-sm font-semibold text-on-surface">{portal.name}</h3>
                   <p className="text-xs text-on-surface-variant">Not connected — coming soon</p>
                 </div>
               </div>

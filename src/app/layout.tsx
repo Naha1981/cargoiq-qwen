@@ -89,25 +89,25 @@ export default async function RootLayout({
       <head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
       </head>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${ibmPlexSans.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${ibmPlexSans.variable} font-body-md antialiased`}>
         <ClerkProvider
           appearance={{
             variables: {
-              colorPrimary: '#B8860B',
-              colorForeground: '#F1F4F8',
-              colorBackground: '#1A2332',
-              colorInput: '#243044',
-              colorInputForeground: '#F1F4F8',
-              borderRadius: '0.5rem',
+              colorPrimary: '#E8B84B',
+              colorForeground: '#e0e2ea',
+              colorBackground: '#0a0e13',
+              colorInput: '#1c2025',
+              colorInputForeground: '#e0e2ea',
+              borderRadius: '0.125rem',
             },
             elements: {
-              formButtonPrimary: 'bg-[#B8860B] hover:bg-[#9a7209]',
-              cardBox: 'bg-[#1A2332] border border-white/10',
-              headerTitle: 'text-[#F1F4F8]',
-              headerSubtitle: 'text-gray-400',
-              formFieldLabel: 'text-gray-300',
-              formFieldInput: 'bg-[#243044] text-[#F1F4F8] border-white/10',
-              footerActionLink: 'text-[#B8860B]',
+              formButtonPrimary: 'bg-primary-container hover:bg-primary',
+              cardBox: 'bg-surface-container-lowest border border-outline-variant',
+              headerTitle: 'text-on-surface',
+              headerSubtitle: 'text-on-surface-variant',
+              formFieldLabel: 'text-on-surface-variant',
+              formFieldInput: 'bg-surface-container text-on-surface border-outline-variant',
+              footerActionLink: 'text-primary-container',
             },
           }}
         >

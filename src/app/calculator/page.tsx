@@ -34,27 +34,27 @@ export default function CalculatorPage() {
   }, [containers, hasFleet, hasSADC, isHighValue]);
 
   return (
-    <div className="min-h-screen bg-[#020817] text-white">
+    <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body-md">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-[#B8860B]/20 text-[#B8860B] px-4 py-2 rounded-full text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 bg-primary-container/10 text-primary-container px-4 py-2 rounded-full font-label-caps text-label-caps mb-6">
             <Calculator className="w-4 h-4" />
             Freight Leakage Calculator
           </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
             How much is your freight operation leaking?
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+          <p className="text-xl text-on-surface-variant max-w-2xl mx-auto">
             Adjust the inputs below to estimate your monthly revenue leakage.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="bg-[#0F172A] rounded-2xl p-8 border border-gray-800">
+          <div className="bg-elevated rounded border border-outline-variant p-6">
             <h2 className="text-2xl font-semibold mb-8">Your Operation</h2>
 
             <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-300 mb-4">
+              <label className="block text-sm font-medium text-on-surface-variant mb-4">
                 Monthly Container Throughput
               </label>
               <input
@@ -63,11 +63,11 @@ export default function CalculatorPage() {
                 max="100"
                 value={containers}
                 onChange={(e) => setContainers(Number(e.target.value))}
-                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[#B8860B]"
+                className="w-full h-2 bg-surface-container-high rounded appearance-none cursor-pointer accent-primary-container"
               />
-              <div className="flex justify-between mt-2 text-sm text-gray-400">
+              <div className="flex justify-between mt-2 text-xs text-on-surface-variant">
                 <span>5</span>
-                <span className="font-mono text-[#B8860B] text-lg">{containers} containers</span>
+                <span className="font-mono text-primary-container text-lg">{containers} containers</span>
                 <span>100</span>
               </div>
             </div>
@@ -78,9 +78,9 @@ export default function CalculatorPage() {
                   type="checkbox"
                   checked={hasFleet}
                   onChange={(e) => setHasFleet(e.target.checked)}
-                  className="w-5 h-5 rounded bg-gray-700 border-gray-600 text-[#B8860B] focus:ring-[#B8860B] focus:ring-offset-0"
+                  className="w-5 h-5 rounded bg-surface-container-high border-outline-variant text-primary-container focus:ring-primary-container focus:ring-offset-0"
                 />
-                <span className="text-gray-300 group-hover:text-white transition-colors">
+                <span className="text-on-surface-variant group-hover:text-on-surface transition-colors">
                   I operate a dedicated fleet
                 </span>
               </label>
@@ -89,9 +89,9 @@ export default function CalculatorPage() {
                   type="checkbox"
                   checked={hasSADC}
                   onChange={(e) => setHasSADC(e.target.checked)}
-                  className="w-5 h-5 rounded bg-gray-700 border-gray-600 text-[#B8860B] focus:ring-[#B8860B] focus:ring-offset-0"
+                  className="w-5 h-5 rounded bg-surface-container-high border-outline-variant text-primary-container focus:ring-primary-container focus:ring-offset-0"
                 />
-                <span className="text-gray-300 group-hover:text-white transition-colors">
+                <span className="text-on-surface-variant group-hover:text-on-surface transition-colors">
                   I handle SADC cross-border freight
                 </span>
               </label>
@@ -100,9 +100,9 @@ export default function CalculatorPage() {
                   type="checkbox"
                   checked={isHighValue}
                   onChange={(e) => setIsHighValue(e.target.checked)}
-                  className="w-5 h-5 rounded bg-gray-700 border-gray-600 text-[#B8860B] focus:ring-[#B8860B] focus:ring-offset-0"
+                  className="w-5 h-5 rounded bg-surface-container-high border-outline-variant text-primary-container focus:ring-primary-container focus:ring-offset-0"
                 />
-                <span className="text-gray-300 group-hover:text-white transition-colors">
+                <span className="text-on-surface-variant group-hover:text-on-surface transition-colors">
                   Monthly cargo value exceeds R500k
                 </span>
               </label>
@@ -110,31 +110,31 @@ export default function CalculatorPage() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-[#0F172A] rounded-2xl p-8 border border-gray-800">
-              <h2 className="text-2xl font-semibold mb-6">Estimated Monthly Leakage</h2>
+            <div className="bg-elevated rounded border border-outline-variant p-6">
+              <h2 className="text-headline-md font-semibold mb-4 text-on-surface">Estimated Monthly Leakage</h2>
               <div className="flex items-baseline gap-2 mb-2">
-                <span className="text-sm text-gray-400">R</span>
-                <span className="font-mono text-5xl md:text-6xl font-bold text-[#EF4444]">
+                <span className="text-xs text-on-surface-variant">R</span>
+                <span className="font-mono text-5xl md:text-6xl font-bold text-risk-red">
                   {Math.round(results.monthlyLeakage).toLocaleString('en-ZA')}
                 </span>
               </div>
-              <p className="text-gray-400 text-sm">per month in unmonitored losses</p>
+              <p className="text-on-surface-variant text-sm">per month in unmonitored losses</p>
             </div>
 
-            <div className="bg-[#0F172A] rounded-2xl p-8 border border-gray-800">
+            <div className="bg-elevated rounded border border-outline-variant p-6">
               <h3 className="text-lg font-semibold mb-4">Breakdown</h3>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-gray-400 border-b border-gray-800">
+                  <tr className="text-on-surface-variant border-b border-outline-variant">
                     <th className="text-left pb-3 font-medium">Category</th>
                     <th className="text-right pb-3 font-medium">Est. Amount</th>
                   </tr>
                 </thead>
-                <tbody className="text-gray-300">
+                <tbody className="text-on-surface-variant">
                   {results.categories.map((cat, i) => (
-                    <tr key={i} className="border-b border-gray-800/50">
+                    <tr key={i} className="border-b border-outline-variant/50">
                       <td className="py-3">{cat.name}</td>
-                      <td className="text-right font-mono text-[#EF4444]">
+                      <td className="text-right font-mono text-risk-red">
                         R{Math.round(cat.amount).toLocaleString('en-ZA')}
                       </td>
                     </tr>
@@ -143,25 +143,25 @@ export default function CalculatorPage() {
               </table>
             </div>
 
-            <div className="bg-[#B8860B]/10 border border-[#B8860B]/30 rounded-2xl p-8">
-              <h3 className="text-xl font-semibold mb-2 text-white">
+            <div className="bg-primary-container/10 border border-primary-container/30 rounded p-6">
+              <h3 className="text-xl font-semibold mb-2 text-on-surface">
                 With CargoIQ Growth Plan
               </h3>
-              <p className="text-gray-300 mb-4">
+              <p className="text-on-surface-variant mb-4">
                 Based on 35% average recovery rate:
               </p>
               <div className="flex items-baseline gap-2 mb-4">
-                <span className="font-mono text-3xl font-bold text-[#B8860B]">
+                <span className="font-mono text-3xl font-bold text-primary-container">
                   {results.roi.toFixed(1)}x
                 </span>
-                <span className="text-gray-400">ROI</span>
+                <span className="text-on-surface-variant">ROI</span>
               </div>
-              <p className="text-gray-300 text-sm mb-6">
+              <p className="text-on-surface-variant text-sm mb-6">
                 R{Math.round(results.annualRecovery).toLocaleString('en-ZA')} recovered annually against R180,000 annual cost.
               </p>
               <a
                 href="/signup"
-                className="inline-flex items-center gap-2 bg-[#B8860B] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#D4922B] transition-colors"
+                className="inline-flex items-center gap-2 bg-primary-container text-on-primary px-6 py-3 rounded font-label-caps font-medium hover:bg-primary transition-colors transition-colors"
               >
                 Start Free Trial
                 <ArrowRight className="w-4 h-4" />

@@ -4,7 +4,7 @@ export default function InboxPage() {
       <h1 className="text-2xl font-bold text-on-surface font-body-md mb-2">Inbox</h1>
       <p className="text-sm text-on-surface-variant mb-8">AI-flagged emails from carriers, SARS, and importers.</p>
 
-      <div className="rounded-xl border border-outline-variant bg-surface-container shadow-sm divide-y divide-[#E2E8F0]">
+      <div className="rounded-xl border border-outline-variant bg-surface-container shadow-sm divide-y divide-outline-variant">
         {[
           { from: 'Maersk Line', subject: 'Invoice INV-MAEU-2026-1847 — R127,500', time: '2 hours ago', unread: true },
           { from: 'SARS eFiling', subject: 'SAD500 submission confirmed — ZA1234567890', time: '5 hours ago', unread: true },

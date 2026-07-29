@@ -56,12 +56,12 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-surface-container-lowest p-6">
       <div className="mx-auto max-w-5xl">
         <h1 className="text-2xl font-bold text-on-surface">Settings</h1>
         <p className="mt-1 text-sm text-on-surface-variant">Manage your organisation, integrations and security.</p>
 
-        <div className="mt-6 flex gap-2 border-b border-gray-200">
+        <div className="mt-6 flex gap-2 border-b border-outline-variant">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -71,9 +71,9 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
                   'flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'border-amber-500 text-amber-700'
-                    : 'border-transparent text-on-surface-variant hover:text-on-surface'
+isActive
+                      ? 'border-primary-container text-primary-container'
+                      : 'border-transparent text-on-surface-variant hover:text-on-surface'
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -112,7 +112,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex gap-3">
                   <Button variant="outline" disabled>Connect</Button>
-                  <Button variant="ghost" className="text-red-600 hover:text-red-700" disabled>Disconnect</Button>
+                  <Button variant="ghost" className="text-risk-red hover:text-risk-red" disabled>Disconnect</Button>
                 </div>
                 <p className="text-xs text-on-surface-variant"> Coming soon</p>
               </div>
@@ -122,13 +122,13 @@ export default function SettingsPage() {
           {activeTab === 'portals' && (
             <Card title="Portals" subtitle="Manage customs portal credentials for automated submissions.">
               <div className="space-y-6">
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-sm text-amber-800">
+                <div className="rounded-lg border border-outline-variant bg-surface-container-high p-4">
+                  <p className="text-sm text-success">
                     <strong>Credential vault</strong> — Stored encrypted with ENCRYPTION_KEY.
                   </p>
                 </div>
                 <div className="grid gap-4">
-                  <div className="rounded-lg border border-gray-200 p-4">
+                  <div className="rounded-lg border border-outline-variant p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="text-sm font-semibold text-on-surface">SAPS ECS</h4>
@@ -140,7 +140,7 @@ export default function SettingsPage() {
                       </Button>
                     </div>
                   </div>
-                  <div className="rounded-lg border border-gray-200 p-4">
+                  <div className="rounded-lg border border-outline-variant p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="text-sm font-semibold text-on-surface">SARS eFiling</h4>
@@ -173,7 +173,7 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
                   <div className="flex items-center gap-3">
-                    <div className={`h-2 w-2 rounded-full ${hasWhatsAppConfig() ? 'bg-green-500' : 'bg-gray-400'}`} />
+                    <div className={`h-2 w-2 rounded-full ${hasWhatsAppConfig() ? 'bg-success' : 'bg-on-surface-variant'}`} />
                     <span className="text-sm font-medium text-on-surface">
                       {hasWhatsAppConfig() ? 'Configured (verify on Evolution)' : 'Not configured'}
                     </span>
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                   <div>
                     <label className="mb-1 block text-sm font-medium text-on-surface">Webhook URL</label>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+                      <code className="flex-1 rounded-lg border border-outline-variant bg-surface-container px-3 py-2 text-xs text-on-surface-variant">
                         Set the webhook in Evolution after connecting
                       </code>
                     </div>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                   <p className="text-xs text-on-surface-variant">Last 10 check-ins received via WhatsApp.</p>
                   <div className="mt-3 space-y-2">
                     {mockCheckins.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-surface-container px-4 py-3">
+                      <div key={item.id} className="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container px-4 py-3">
                         <div className="flex items-center gap-3">
                           <Badge variant="info" className="font-mono text-xs">{item.status}</Badge>
                           <div>
@@ -214,7 +214,7 @@ export default function SettingsPage() {
                 <div>
                   <h4 className="text-sm font-semibold text-on-surface">Command reference</h4>
                   <p className="text-xs text-on-surface-variant">Available WhatsApp commands for drivers.</p>
-                  <div className="mt-3 rounded-lg border border-gray-200 bg-gray-900 p-4 font-mono text-xs text-green-400">
+                  <div className="mt-3 rounded-lg border border-outline-variant bg-surface-container p-4 font-mono text-xs text-success">
                     <p>ARRIVED — Check in at destination</p>
                     <p>DEPARTED — Confirm departure</p>
                     <p>STATUS — Request current status</p>
@@ -229,7 +229,7 @@ export default function SettingsPage() {
           {activeTab === 'cargowise' && (
             <Card>
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Truck className="h-12 w-12 text-gray-300" />
+                <Truck className="h-12 w-12 text-on-surface-variant" />
                 <h3 className="mt-4 text-lg font-semibold text-on-surface">WiseLayer integration</h3>
                 <p className="mt-2 text-sm text-on-surface-variant">
                   CargoWise connectivity is planned for Phase 2.
@@ -259,7 +259,7 @@ export default function SettingsPage() {
                     { device: 'Safari on iPhone', location: 'Cape Town, ZA', current: false },
                     { device: 'Firefox on macOS', location: 'Durban, ZA', current: false },
                   ].map((session, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded-lg border border-gray-100 bg-surface-container px-4 py-3">
+                    <div key={idx} className="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container px-4 py-3">
                       <div>
                         <p className="text-sm font-medium text-on-surface">{session.device}</p>
                         <p className="text-xs text-on-surface-variant">{session.location}</p>
@@ -267,7 +267,7 @@ export default function SettingsPage() {
                       {session.current ? (
                         <Badge variant="success">Current</Badge>
                       ) : (
-                        <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700">Sign out</Button>
+                        <Button size="sm" variant="ghost" className="text-risk-red hover:text-risk-red">Sign out</Button>
                       )}
                     </div>
                   ))}
@@ -275,7 +275,7 @@ export default function SettingsPage() {
               </Card>
 
               <div className="flex justify-end">
-                <Button variant="outline" className="border-red-300 text-red-700 hover:bg-red-50">
+                <Button variant="outline" className="border-red-300 text-risk-red hover:bg-red-50">
                   Sign out all devices
                 </Button>
               </div>

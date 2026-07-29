@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -6,10 +6,10 @@ import { Upload, Share2, Download, ChevronRight, AlertTriangle, CheckCircle2, Cl
 import { cn } from '@/lib/utils';
 
 const findings = [
-  { icon: AlertTriangle, label: 'Overcharges', count: 7, color: 'text-red-600 bg-red-50' },
-  { icon: Clock, label: 'Demurrage', count: 3, color: 'text-amber-600 bg-amber-50' },
-  { icon: FileSearch, label: 'Missing Docs', count: 2, color: 'text-blue-600 bg-blue-50' },
-  { icon: CheckCircle2, label: 'Verified', count: 6, color: 'text-green-600 bg-green-50' },
+  { icon: AlertTriangle, label: 'Overcharges', count: 7, color: 'text-error bg-error-container/20' },
+  { icon: Clock, label: 'Demurrage', count: 3, color: 'text-primary-container bg-primary-container/10' },
+  { icon: FileSearch, label: 'Missing Docs', count: 2, color: 'text-tertiary bg-tertiary/10' },
+  { icon: CheckCircle2, label: 'Verified', count: 6, color: 'text-success bg-success/10' },
 ];
 
 const findingsDetail = [
@@ -152,14 +152,14 @@ export default function ShadowAuditPage() {
   const currentExposure = showDemo ? demoExposure : 94500;
 
   return (
-    <div className="min-h-screen bg-[#F1F4F8] text-[#0D1B2A] font-sans">
-      <div className="mx-auto max-w-6xl p-6 space-y-6">
-        <h1 className="text-3xl font-bold text-[#1A2332]">Shadow Audit</h1>
+    <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body-md">
+      <div className="mx-auto max-w-6xl p-margin-page space-y-gutter">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface uppercase industrial-tracking">Shadow Audit</h1>
 
         {!isRunning && progress < 100 && !showDemo && (
-          <div className="bg-white rounded-lg border border-[#E2E8F0] p-6">
-            <h2 className="text-lg font-semibold text-[#1A2332] mb-4">Run Shadow Audit</h2>
-            <div className="rounded-lg border-2 border-dashed border-[#E2E8F0] bg-[#F1F4F8] p-8 text-center cursor-pointer hover:border-[#B8860B] transition-colors relative">
+          <div className="bg-surface border border-outline-variant p-6">
+            <h2 className="font-headline-md text-headline-md text-on-surface mb-4">Run Shadow Audit</h2>
+            <div className="rounded-lg border-2 border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center cursor-pointer hover:border-primary-container transition-colors relative">
               <input
                 type="file"
                 accept=".pdf"
@@ -167,39 +167,39 @@ export default function ShadowAuditPage() {
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 onChange={(e) => setFiles(e.target.files)}
               />
-              <Upload className="mx-auto h-10 w-10 text-gray-400 mb-3" />
-              <p className="text-sm text-gray-600 mb-1">Click to upload PDF invoices</p>
-              <p className="text-xs text-gray-400">Multiple files accepted</p>
+              <Upload className="mx-auto h-10 w-10 text-on-surface-variant mb-3" />
+              <p className="font-body-md text-on-surface-variant mb-1">Click to upload PDF invoices</p>
+              <p className="font-label-caps text-label-caps text-on-surface-variant">Multiple files accepted</p>
               {files && files.length > 0 && (
-                <p className="text-sm text-[#B8860B] mt-2 font-medium">{files.length} file(s) selected</p>
+                <p className="font-label-caps text-label-caps text-primary-container mt-2 font-bold">{files.length} file(s) selected</p>
               )}
             </div>
 
             <div className="mt-4">
               <button
                 onClick={handleDemoAudit}
-                className="inline-flex items-center gap-2 border border-[#B8860B] text-[#B8860B] px-6 py-2.5 rounded-md text-sm font-medium hover:bg-[#B8860B] hover:text-white transition-colors"
+                className="inline-flex items-center gap-2 border border-primary-container text-primary-container px-6 py-2.5 rounded text-sm font-medium hover:bg-primary-container hover:text-on-primary-container transition-colors"
               >
                 ▶ Run Demo Audit (sample data — no upload needed)
               </button>
             </div>
 
             <details className="mt-4">
-              <summary className="cursor-pointer text-sm font-medium text-gray-600 hover:text-[#1A2332]">
+              <summary className="cursor-pointer text-sm font-medium text-on-surface-variant hover:text-on-surface">
                 Optional Settings
               </summary>
-              <div className="mt-3 grid grid-cols-2 gap-4">
+              <div className="mt-3 grid grid-cols-2 gap-gutter">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Carrier Filter</label>
-                  <select className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm bg-white">
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-1">Carrier Filter</label>
+                  <select className="w-full rounded border border-outline-variant px-3 py-2 text-sm bg-surface-container-lowest text-on-surface">
                     <option>All carriers</option>
                     <option>Maersk</option>
                     <option>MSC</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Date Range</label>
-                  <select className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm bg-white">
+                  <label className="block font-label-caps text-label-caps text-on-surface-variant mb-1">Date Range</label>
+                  <select className="w-full rounded border border-outline-variant px-3 py-2 text-sm bg-surface-container-lowest text-on-surface">
                     <option>Last 30 days</option>
                     <option>Last 90 days</option>
                   </select>
@@ -211,7 +211,7 @@ export default function ShadowAuditPage() {
               <button
                 onClick={handleRunAudit}
                 disabled={!files || files.length === 0}
-                className="bg-[#B8860B] text-white px-6 py-2.5 rounded-md text-sm font-medium hover:bg-[#9a7209] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Run Shadow Audit
               </button>
@@ -220,63 +220,65 @@ export default function ShadowAuditPage() {
         )}
 
         {isRunning && (
-          <div className="bg-white rounded-lg border border-[#E2E8F0] p-6">
+          <div className="bg-surface border border-outline-variant p-6">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-700">Analysing {totalShipments} shipments...</span>
-              <span className="text-sm text-gray-500">{completed} complete</span>
+              <span className="font-body-md text-on-surface">Analysing {totalShipments} shipments...</span>
+              <span className="font-data-tabular text-on-surface-variant">{completed} complete</span>
             </div>
-            <div className="h-3 w-full rounded-full bg-gray-100 overflow-hidden">
+            <div className="h-3 w-full rounded-full bg-surface-container-highest overflow-hidden">
               <div
-                className="h-full rounded-full bg-[#B8860B] transition-all duration-500"
+                className="h-full rounded bg-primary-container transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-2">{progress}% processed</p>
+            <p className="font-data-tabular text-[10px] text-on-surface-variant mt-2">{progress}% processed</p>
           </div>
         )}
 
         {(showDemo || (!isRunning && progress === 100)) && (
-          <div className="bg-white rounded-lg border border-[#E2E8F0] p-6 space-y-6">
-            <div className="rounded-lg bg-red-50 border border-red-100 p-4">
-              <p className="text-sm font-medium text-red-700">R{currentExposure.toLocaleString('en-ZA')} in exposure identified across {showDemo ? 6 : totalShipments} shipments</p>
+          <div className="bg-surface border border-outline-variant p-6 space-y-gutter">
+            <div className="rounded border-l-4 border-error bg-error-container/20 p-4">
+              <p className="font-body-md text-error">R{currentExposure.toLocaleString('en-ZA')} in exposure identified across {showDemo ? 6 : totalShipments} shipments</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter">
               {findings.map((item) => (
                 <div key={item.label} className={cn('rounded-lg p-4 flex items-center gap-3', item.color)}>
                   <item.icon className="h-5 w-5" />
                   <div>
-                    <p className="text-xs font-medium opacity-80">{item.label}</p>
-                    <p className="text-xl font-bold">{item.count}</p>
+                    <p className="font-label-caps text-label-caps text-on-surface-variant opacity-80">{item.label}</p>
+                    <p className="font-data-tabular text-xl font-bold text-on-surface">{item.count}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold text-[#1A2332] mb-3">Findings Detail</h3>
-              <div className="rounded-lg border border-[#E2E8F0] overflow-hidden">
+              <h3 className="font-headline-md text-headline-md text-on-surface mb-3">Findings Detail</h3>
+              <div className="rounded-lg border border-outline-variant overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-[#F1F4F8] text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <tr className="bg-surface-container-lowest text-left font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">
                       <th className="px-4 py-3">Shipment</th>
                       <th className="px-4 py-3">Finding</th>
                       <th className="px-4 py-3 text-right">Amount (ZAR)</th>
                       <th className="px-4 py-3">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E2E8F0]">
+                  <tbody className="divide-y divide-outline-variant">
                     {currentFindings.map((row) => (
-                      <tr key={row.shipment} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3 font-mono text-xs">{row.shipment}</td>
-                        <td className="px-4 py-3">{row.finding}</td>
-                        <td className="px-4 py-3 text-right font-mono">
-                          {row.amount > 0 ? row.amount.toLocaleString('en-ZA') : '—'}
+                      <tr key={row.shipment} className="hover:bg-surface-container-highest transition-colors">
+                        <td className="px-4 py-3 font-data-tabular text-xs">{row.shipment}</td>
+                        <td className="px-4 py-3 text-body-md">{row.finding}</td>
+                        <td className="px-4 py-3 text-right font-data-tabular mono">
+                          {row.amount > 0 ? 'R' + row.amount.toLocaleString('en-ZA').replace(/,/g, ' ') : '—'}
                         </td>
                         <td className="px-4 py-3">
                           <span className={cn(
-                            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                            row.status === 'open' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                            'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold uppercase',
+                            row.status === 'open'
+                              ? 'bg-error-container/20 border border-error/30 text-error'
+                              : 'bg-tertiary/10 border border-tertiary/30 text-tertiary'
                           )}>
                             {row.status === 'open' ? 'Open' : 'Info'}
                           </span>
@@ -288,41 +290,41 @@ export default function ShadowAuditPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-gutter">
               <button
                 onClick={() => handleCopyProof(showDemo ? 'demo' : 'live')}
-                className="inline-flex items-center gap-2 bg-[#B8860B] text-white px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#9a7209] transition-colors"
+                className="inline-flex items-center gap-2 bg-primary-container text-on-primary-container px-4 py-2.5 rounded text-sm font-medium hover:opacity-90 transition-colors"
               >
                 <Share2 className="h-4 w-4" />
                 {copied ? 'Copied!' : 'Copy proof-page link'}
               </button>
               <button
                 onClick={handleDownloadCertificate}
-                className="inline-flex items-center gap-2 border border-[#B8860B] text-[#B8860B] px-4 py-2.5 rounded-md text-sm font-medium hover:bg-[#B8860B] hover:text-white transition-colors"
+                className="inline-flex items-center gap-2 border border-primary-container text-primary-container px-4 py-2.5 rounded text-sm font-medium hover:bg-primary-container hover:text-on-primary-container transition-colors"
               >
                 <Download className="h-4 w-4" />
                 Download Savings Certificate
               </button>
             </div>
             {downloadMsg && (
-              <p className="text-xs text-red-600 mt-2">{downloadMsg}</p>
+              <p className="font-label-caps text-label-caps text-error text-xs mt-2">{downloadMsg}</p>
             )}
           </div>
         )}
 
-        <div className="bg-white rounded-lg border border-[#E2E8F0] divide-y divide-[#E2E8F0]">
-          <h3 className="px-6 py-4 text-lg font-semibold text-[#1A2332]">Previous Audits</h3>
+        <div className="bg-surface border border-outline-variant divide-y divide-outline-variant">
+          <h3 className="font-label-caps text-label-caps text-on-surface px-6 py-4 uppercase tracking-wider">Previous Audits</h3>
           {previousAudits.map((audit) => (
             <Link
               key={audit.id}
               href={`/shadow-audit/${audit.id}`}
-              className="w-full flex items-center justify-between py-4 text-left hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-surface-container-highest transition-colors"
             >
               <div>
-                <p className="text-sm font-medium text-[#1A2332]">{audit.date}</p>
-                <p className="text-xs text-gray-500">{audit.shipments} shipments · R{audit.exposure.toLocaleString('en-ZA')} exposure</p>
+                <p className="font-data-tabular text-on-surface text-sm">{audit.date}</p>
+                <p className="font-label-caps text-label-caps text-on-surface-variant text-xs">{audit.shipments} shipments · R{audit.exposure.toLocaleString('en-ZA')} exposure</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-gray-400" />
+              <ChevronRight className="h-4 w-4 text-on-surface-variant" />
             </Link>
           ))}
         </div>

@@ -198,11 +198,11 @@ setParsingState('done');
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F4F8] text-[#0D1B2A] font-sans">
+    <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body-md">
       <div className="mx-auto max-w-6xl p-6">
         <h1 className="text-3xl font-bold text-[#1A2332] mb-6">Carrier Audit</h1>
 
-        <div className="flex gap-1 rounded-lg bg-white p-1 border border-[#E2E8F0] mb-6 w-fit">
+        <div className="flex gap-1 rounded bg-surface-container p-1 border border-outline-variant mb-6 w-fit">
           {[
             { key: 'rate-cards', label: 'Rate Cards' },
             { key: 'upload-audit', label: 'Upload & Audit' },
@@ -212,7 +212,7 @@ setParsingState('done');
               key={tab.key}
               onClick={() => setActiveTab(tab.key as typeof activeTab)}
               className={cn(
-                'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+                'px-4 py-2 text-sm font-medium rounded transition-colors',
                 activeTab === tab.key
                   ? 'bg-[#1A2332] text-white'
                   : 'text-gray-600 hover:text-[#1A2332]'
@@ -228,7 +228,7 @@ setParsingState('done');
             <div className="flex justify-between items-center">
               <button
                 onClick={() => { setEditingRateCard(null); setRateCardForm({ carrier: '', chargeType: '', route: '', mode: 'per_container', ratePerKg: '', ratePerContainer: '', currency: 'USD', validFrom: '', validTo: '' }); setShowRateCardForm(true); }}
-                className="inline-flex items-center gap-2 bg-[#D97706] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#B45309] transition-colors"
+                className="inline-flex items-center gap-2 bg-[#D97706] text-white px-4 py-2 rounded text-sm font-medium hover:bg-[#B45309] transition-colors"
               >
                 <Plus className="h-4 w-4" />
                 Add Rate Card
@@ -236,71 +236,71 @@ setParsingState('done');
             </div>
 
             {showRateCardForm && (
-              <div className="bg-white rounded-lg border border-[#E2E8F0] p-6 space-y-4">
+              <div className="bg-surface-container rounded border border-outline-variant p-6 space-y-4">
                 <h3 className="text-sm font-semibold text-[#1A2332]">{editingRateCard ? 'Edit Rate Card' : 'New Rate Card'}</h3>
                 <form onSubmit={handleRateCardSubmit} className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Carrier</label>
-                      <input type="text" value={rateCardForm.carrier} onChange={(e) => setRateCardForm({ ...rateCardForm, carrier: e.target.value })} required className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                      <input type="text" value={rateCardForm.carrier} onChange={(e) => setRateCardForm({ ...rateCardForm, carrier: e.target.value })} required className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Charge Type</label>
-                      <input type="text" value={rateCardForm.chargeType} onChange={(e) => setRateCardForm({ ...rateCardForm, chargeType: e.target.value })} required className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                      <input type="text" value={rateCardForm.chargeType} onChange={(e) => setRateCardForm({ ...rateCardForm, chargeType: e.target.value })} required className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Route</label>
-                      <input type="text" value={rateCardForm.route} onChange={(e) => setRateCardForm({ ...rateCardForm, route: e.target.value })} required className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                      <input type="text" value={rateCardForm.route} onChange={(e) => setRateCardForm({ ...rateCardForm, route: e.target.value })} required className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Mode</label>
-                      <select value={rateCardForm.mode} onChange={(e) => setRateCardForm({ ...rateCardForm, mode: e.target.value })} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm bg-white">
+                      <select value={rateCardForm.mode} onChange={(e) => setRateCardForm({ ...rateCardForm, mode: e.target.value })} className="w-full rounded border border-outline-variant px-3 py-2 text-sm bg-surface-container">
                         {modes.map((m) => <option key={m} value={m}>{m.replace('_', ' ')}</option>)}
                       </select>
                     </div>
                     {rateCardForm.mode === 'per_kg' && (
                       <div>
                         <label className="block text-xs font-medium text-gray-600 mb-1">Rate per KG (ZAR)</label>
-                        <input type="number" step="0.01" value={rateCardForm.ratePerKg} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerKg: e.target.value })} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                        <input type="number" step="0.01" value={rateCardForm.ratePerKg} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerKg: e.target.value })} className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                       </div>
                     )}
                     {rateCardForm.mode === 'per_container' && (
                       <div>
                         <label className="block text-xs font-medium text-gray-600 mb-1">Rate per Container (ZAR)</label>
-                        <input type="number" step="0.01" value={rateCardForm.ratePerContainer} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerContainer: e.target.value })} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                        <input type="number" step="0.01" value={rateCardForm.ratePerContainer} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerContainer: e.target.value })} className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                       </div>
                     )}
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Currency</label>
-                      <input type="text" value={rateCardForm.currency} onChange={(e) => setRateCardForm({ ...rateCardForm, currency: e.target.value })} maxLength={3} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                      <input type="text" value={rateCardForm.currency} onChange={(e) => setRateCardForm({ ...rateCardForm, currency: e.target.value })} maxLength={3} className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Valid From</label>
-                      <input type="date" value={rateCardForm.validFrom} onChange={(e) => setRateCardForm({ ...rateCardForm, validFrom: e.target.value })} required className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                      <input type="date" value={rateCardForm.validFrom} onChange={(e) => setRateCardForm({ ...rateCardForm, validFrom: e.target.value })} required className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-gray-600 mb-1">Valid To (optional)</label>
-                      <input type="date" value={rateCardForm.validTo} onChange={(e) => setRateCardForm({ ...rateCardForm, validTo: e.target.value })} className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                      <input type="date" value={rateCardForm.validTo} onChange={(e) => setRateCardForm({ ...rateCardForm, validTo: e.target.value })} className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button type="submit" className="bg-[#D97706] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#B45309]">Save</button>
-                    <button type="button" onClick={() => { setShowRateCardForm(false); setEditingRateCard(null); }} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300">Cancel</button>
+                    <button type="submit" className="bg-[#D97706] text-white px-4 py-2 rounded text-sm font-medium hover:bg-[#B45309]">Save</button>
+                    <button type="button" onClick={() => { setShowRateCardForm(false); setEditingRateCard(null); }} className="bg-gray-200 text-on-surface px-4 py-2 rounded text-sm font-medium hover:bg-gray-300">Cancel</button>
                   </div>
                 </form>
               </div>
             )}
 
             {rateCardsLoading ? (
-              <div className="text-sm text-gray-500">Loading rate cards...</div>
+              <div className="text-sm text-on-surface-variant">Loading rate cards...</div>
             ) : rateCards.length === 0 && !useDemo ? (
-              <div className="text-sm text-gray-500">No rate cards yet. Add your first one above.</div>
+              <div className="text-sm text-on-surface-variant">No rate cards yet. Add your first one above.</div>
             ) : (
-              <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
-                <div className="overflow-x-auto">
+              <div className="bg-surface-container rounded border border-outline-variant overflow-hidden">
+                <div className="">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-[#F1F4F8] text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      <tr className="bg-surface-container-lowest text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
                         <th className="px-4 py-3">Carrier</th>
                         <th className="px-4 py-3">Charge Type</th>
                         <th className="px-4 py-3">Route</th>
@@ -321,8 +321,8 @@ setParsingState('done');
                           <td className="px-4 py-3 text-gray-600">{row.mode.replace('_', ' ')}</td>
                           <td className="px-4 py-3 text-right font-mono">{(row.ratePerContainer || row.ratePerKg || '—')}</td>
                           <td className="px-4 py-3">{row.currency}</td>
-                          <td className="px-4 py-3 text-gray-500">{row.validFrom ? row.validFrom.split('T')[0] : '—'}</td>
-                          <td className="px-4 py-3 text-gray-500">{row.validTo ? row.validTo.split('T')[0] : '—'}</td>
+                          <td className="px-4 py-3 text-on-surface-variant">{row.validFrom ? row.validFrom.split('T')[0] : '—'}</td>
+                          <td className="px-4 py-3 text-on-surface-variant">{row.validTo ? row.validTo.split('T')[0] : '—'}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <button onClick={() => handleRateCardEdit(row)} className="p-1 hover:bg-gray-200 rounded" title="Edit"><Edit2 className="h-3.5 w-3.5 text-gray-600" /></button>
@@ -345,17 +345,17 @@ setParsingState('done');
               onDrop={handleDrop}
               onDragOver={(e) => e.preventDefault()}
               onDragLeave={() => {}}
-              className="rounded-lg border-2 border-dashed border-[#D97706] bg-amber-50 p-8 text-center cursor-pointer hover:bg-amber-100 transition-colors"
+              className="rounded border-2 border-dashed border-[#D97706] bg-amber-50 p-8 text-center cursor-pointer hover:bg-amber-100 transition-colors"
               onClick={() => document.getElementById('audit-file-input')?.click()}
             >
-              <Upload className="mx-auto h-10 w-10 text-[#D97706] mb-3" />
+              <Upload className="mx-auto h-10 w-10 text-primary-container mb-3" />
               <p className="text-sm font-medium text-[#1A2332] mb-1">Upload invoice or customs document</p>
-              <p className="text-xs text-gray-500">PDF, PNG, JPG, or WebP up to 10MB</p>
+              <p className="text-xs text-on-surface-variant">PDF, PNG, JPG, or WebP up to 10MB</p>
               <input id="audit-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" className="hidden" onChange={handleFileSelect} />
             </div>
 
             {parsingState !== 'idle' && (
-              <div className="rounded-lg border p-4">
+              <div className="rounded border p-4">
                 {parsingState === 'uploading' && (
                   <div className="flex items-center gap-3 text-sm text-gray-600"><div className="w-2 h-2 rounded-full bg-[#D97706] animate-pulse" /> Uploading document...</div>
                 )}
@@ -392,11 +392,11 @@ setParsingState('done');
               </div>
             )}
 
-            <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
-              <div className="overflow-x-auto">
+            <div className="bg-surface-container rounded border border-outline-variant overflow-hidden">
+              <div className="">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-[#F1F4F8] text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <tr className="bg-surface-container-lowest text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
                       <th className="px-4 py-3">Charge</th>
                       <th className="px-4 py-3 text-right">Billed Amount</th>
                       <th className="px-4 py-3 text-right">Rate Card</th>
@@ -429,7 +429,7 @@ setParsingState('done');
                         </td>
                         <td className="px-4 py-3 text-right">
                           {row.status === 'overcharge' && (
-                            <button className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-100 transition-colors">
+                            <button className="inline-flex items-center gap-1 rounded border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-surface-container transition-colors">
                               <FileText className="h-3 w-3" />
                               Generate Dispute Notice
                             </button>
@@ -442,7 +442,7 @@ setParsingState('done');
               </div>
             </div>
 
-            <div className="sticky bottom-0 mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex items-center justify-between">
+            <div className="sticky bottom-0 mt-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 flex items-center justify-between">
               <span className="text-sm font-medium text-amber-800">
                 Total overcharges: R{totalOvercharge.toLocaleString('en-ZA')} across {overchargeItems.length} line items
               </span>
@@ -451,7 +451,7 @@ setParsingState('done');
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { setUseDemo(true); setAuditItems(demoAuditItems); setParsedResult(null); setParsingState('idle'); }}
-                className={cn('px-3 py-1.5 text-xs font-medium rounded-full transition-colors', useDemo ? 'bg-[#B8860B] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')}
+                className={cn('px-3 py-1.5 text-xs font-medium rounded-full transition-colors', useDemo ? 'bg-primary-container text-white' : 'bg-surface-container text-gray-600 hover:bg-gray-200')}
               >
                 Try a sample audit (demo data)
               </button>
@@ -461,12 +461,12 @@ setParsingState('done');
 
         {activeTab === 'fsc-checker' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg border border-[#E2E8F0] p-6 space-y-4">
+            <div className="bg-surface-container rounded border border-outline-variant p-6 space-y-4">
               <h2 className="text-lg font-semibold text-[#1A2332]">FSC Parameters</h2>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Carrier</label>
-                  <select className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm bg-white">
+                  <label className="block text-sm font-medium text-on-surface mb-1">Carrier</label>
+                  <select className="w-full rounded border border-outline-variant px-3 py-2 text-sm bg-surface-container">
                     <option value="">Select carrier</option>
                     {carriers.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -474,19 +474,19 @@ setParsingState('done');
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Invoice Date</label>
-                  <input type="date" className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                  <label className="block text-sm font-medium text-on-surface mb-1">Invoice Date</label>
+                  <input type="date" className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Base Freight Amount (ZAR)</label>
-                  <input type="number" placeholder="e.g. 50000" className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                  <label className="block text-sm font-medium text-on-surface mb-1">Base Freight Amount (ZAR)</label>
+                  <input type="number" placeholder="e.g. 50000" className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Billed FSC %</label>
-                  <input type="number" step="0.01" placeholder="e.g. 35.5" className="w-full rounded-md border border-[#E2E8F0] px-3 py-2 text-sm" />
+                  <label className="block text-sm font-medium text-on-surface mb-1">Billed FSC %</label>
+                  <input type="number" step="0.01" placeholder="e.g. 35.5" className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Region</label>
+                  <label className="block text-sm font-medium text-on-surface mb-2">Region</label>
                   <div className="flex gap-4">
                     {regions.map((r) => (
                       <label key={r} className="flex items-center gap-2 text-sm">
@@ -499,7 +499,7 @@ setParsingState('done');
               </div>
               <button
                 onClick={handleFscCheck}
-                className="w-full inline-flex items-center justify-center gap-2 bg-[#D97706] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#B45309] transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#D97706] text-white px-4 py-3 rounded text-sm font-medium hover:bg-[#B45309] transition-colors"
               >
                 <FileText className="h-4 w-4" />
                 Calculate FSC
@@ -507,32 +507,32 @@ setParsingState('done');
             </div>
 
             <div className="space-y-4">
-              <div className="bg-white rounded-lg border border-[#E2E8F0] p-6">
-                <h3 className="text-sm font-semibold text-gray-500 mb-4">FSC CALCULATION RESULT</h3>
+              <div className="bg-surface-container rounded border border-outline-variant p-6">
+                <h3 className="text-sm font-semibold text-on-surface-variant mb-4">FSC CALCULATION RESULT</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500">Diesel Price (ZAR/l)</p>
+                    <p className="text-xs text-on-surface-variant">Diesel Price (ZAR/l)</p>
                     <p className="text-lg font-mono font-semibold text-[#1A2332]">24.35</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Correct FSC %</p>
+                    <p className="text-xs text-on-surface-variant">Correct FSC %</p>
                     <p className="text-lg font-mono font-semibold text-[#1A2332]">32.40%</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Correct Amount (ZAR)</p>
+                    <p className="text-xs text-on-surface-variant">Correct Amount (ZAR)</p>
                     <p className="text-lg font-mono font-semibold text-green-600">16,200.00</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Charged Amount (ZAR)</p>
+                    <p className="text-xs text-on-surface-variant">Charged Amount (ZAR)</p>
                     <p className="text-lg font-mono font-semibold text-red-600">18,500.00</p>
                   </div>
                 </div>
-                <div className="mt-4 rounded-lg bg-red-50 border border-red-100 p-3 flex items-center justify-between">
+                <div className="mt-4 rounded bg-red-50 border border-red-100 p-3 flex items-center justify-between">
                   <span className="text-sm font-medium text-red-700">Overcharge Difference</span>
                   <span className="text-lg font-mono font-bold text-red-600">R2,300.00</span>
                 </div>
               </div>
-              <button className="w-full inline-flex items-center justify-center gap-2 bg-[#D97706] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#B45309] transition-colors">
+              <button className="w-full inline-flex items-center justify-center gap-2 bg-[#D97706] text-white px-4 py-3 rounded text-sm font-medium hover:bg-[#B45309] transition-colors">
                 <FileText className="h-4 w-4" />
                 Generate FSC Dispute Notice
               </button>

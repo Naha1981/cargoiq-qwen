@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import { X, TrendingDown, TrendingUp, Shield } from 'lucide-react';
@@ -112,15 +112,15 @@ export default function SentinelPage() {
   }, []);
 
   const colors: Record<string, string> = {
-    green: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-    amber: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    blue: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    red: 'bg-red-500/20 text-red-300 border-red-500/30',
+    green: 'bg-success/10 text-success border-emerald-500/30',
+    amber: 'bg-primary-container/10 text-primary-container border-amber-500/30',
+    blue: 'bg-tertiary/10 text-tertiary border-blue-500/30',
+    red: 'bg-risk-red/20 text-risk-red border-red-500/30',
   };
 
   return (
-    <div className="min-h-screen bg-[#020817] text-white font-sans">
-      <div className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#020817]/90 backdrop-blur">
+    <div className="min-h-screen bg-surface-container-lowest text-on-surface font-sans">
+      <div className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-outline-variant bg-surface-container-lowest/90 backdrop-blur">
         <h1 className="text-lg font-semibold tracking-wide">SENTINEL LIVE</h1>
         <button
           onClick={handleExit}
@@ -132,28 +132,28 @@ export default function SentinelPage() {
 
       <div className="w-full max-w-full overflow-x-hidden p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 min-w-0">
-            <span className="text-xs font-semibold tracking-widest text-red-400 mb-2">
+          <div className="flex flex-col items-center justify-center p-6 rounded border border-outline-variant bg-elevated min-w-0">
+            <span className="font-label-caps text-label-caps text-risk-red mb-2">
               ACTIVE REVENUE AT RISK
             </span>
-            <span className="font-mono text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#EF4444] leading-tight min-w-0 overflow-hidden text-ellipsis">
+            <span className="data-tabular text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-risk-red leading-tight min-w-0 overflow-hidden text-ellipsis">
               {formatZar(activeRisk)}
             </span>
-            <TrendingDown className="h-6 w-6 text-red-400 mt-4" />
+            <TrendingDown className="h-6 w-6 text-risk-red mt-4" />
           </div>
 
-          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 min-w-0">
-            <span className="text-xs font-semibold tracking-widest text-green-400 mb-2">
+          <div className="flex flex-col items-center justify-center p-6 rounded border border-outline-variant bg-elevated min-w-0">
+            <span className="font-label-caps text-label-caps text-success mb-2">
               VALUE DELIVERED
             </span>
-            <span className="font-mono text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#22C55E] leading-tight min-w-0 overflow-hidden text-ellipsis">
+            <span className="data-tabular text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-success leading-tight min-w-0 overflow-hidden text-ellipsis">
               {formatZar(valueDelivered)}
             </span>
-            <TrendingUp className="h-6 w-6 text-green-400 mt-4" />
+            <TrendingUp className="h-6 w-6 text-success mt-4" />
           </div>
 
-          <div className="flex flex-col items-center justify-center p-6 rounded-2xl border border-white/10 bg-white/5 min-w-0">
-            <span className="text-xs font-semibold tracking-widest text-blue-400 mb-4">
+          <div className="flex flex-col items-center justify-center p-6 rounded border border-outline-variant bg-elevated min-w-0">
+            <span className="font-label-caps text-label-caps text-tertiary mb-4">
               COMPLIANCE PASS RATE
             </span>
             <div className="relative w-40 h-40">
@@ -173,17 +173,17 @@ export default function SentinelPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-mono text-3xl font-bold text-[#3B82F6]">97%</span>
+                <span className="data-tabular text-3xl font-bold text-tertiary">97%</span>
               </div>
             </div>
-            <Shield className="h-6 w-6 text-blue-400 mt-4" />
+            <Shield className="h-6 w-6 text-tertiary mt-4" />
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <h2 className="text-sm font-semibold text-gray-300 mb-4">Containers at Risk</h2>
-            <div className="overflow-x-auto">
+          <div className="rounded border border-outline-variant bg-elevated p-4">
+            <h2 className="text-sm font-semibold text-on-surface-variant mb-4">Containers at Risk</h2>
+            <div className="">
               <table className="w-full table-fixed text-sm">
                 <colgroup>
                   <col style={{ width: '30%' }} />
@@ -192,7 +192,7 @@ export default function SentinelPage() {
                   <col style={{ width: '35%' }} />
                 </colgroup>
                 <thead>
-                  <tr className="text-left text-gray-500 border-b border-white/10">
+                  <tr className="text-left text-outline-variant border-b border-outline-variant">
                     <th className="pb-2 font-medium">Container</th>
                     <th className="pb-2 font-medium">Line</th>
                     <th className="pb-2 font-medium">Days Past Free</th>
@@ -204,18 +204,18 @@ export default function SentinelPage() {
                     <tr
                       key={row.id}
                       className={cn(
-                        'border-b border-white/5',
-                        row.exposure > 40000 ? 'bg-red-500/10' : ''
+                        'border-b border-outline-variant/30',
+                        row.exposure > 40000 ? 'bg-risk-red/10' : ''
                       )}
                     >
-                      <td className="py-3 font-mono text-xs truncate" title={row.id}>{row.id}</td>
+                      <td className="py-3 data-tabular text-xs truncate" title={row.id}>{row.id}</td>
                       <td className="py-3">{row.line}</td>
                       <td className="py-3">
-                        <span className="inline-flex items-center rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-300">
+                        <span className="inline-flex items-center rounded-full bg-risk-red/20 px-2 py-0.5 text-xs font-medium text-risk-red">
                           {row.days}d
                         </span>
                       </td>
-                      <td className="py-3 text-right font-mono text-xs">
+                      <td className="py-3 text-right data-tabular text-xs">
                         {formatZar(row.exposure)}
                       </td>
                     </tr>
@@ -225,9 +225,9 @@ export default function SentinelPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <h2 className="text-sm font-semibold text-gray-300 mb-4">Unbilled Waiting Time</h2>
-            <div className="overflow-x-auto">
+          <div className="rounded border border-outline-variant bg-elevated p-4">
+            <h2 className="text-sm font-semibold text-on-surface-variant mb-4">Unbilled Waiting Time</h2>
+            <div className="">
               <table className="w-full table-fixed text-sm">
                 <colgroup>
                   <col style={{ width: '25%' }} />
@@ -237,7 +237,7 @@ export default function SentinelPage() {
                   <col style={{ width: '20%' }} />
                 </colgroup>
                 <thead>
-                  <tr className="text-left text-gray-500 border-b border-white/10">
+                  <tr className="text-left text-outline-variant border-b border-outline-variant">
                     <th className="pb-2 font-medium">Driver</th>
                     <th className="pb-2 font-medium">Location</th>
                     <th className="pb-2 font-medium">Hours</th>
@@ -247,17 +247,17 @@ export default function SentinelPage() {
                 </thead>
                 <tbody>
                   {unbilledDrivers.map((row) => (
-                    <tr key={row.driver} className="border-b border-white/5">
+                    <tr key={row.driver} className="border-b border-outline-variant/30">
                       <td className="py-3 truncate" title={row.driver}>{row.driver}</td>
-                      <td className="py-3 text-gray-400">{row.location}</td>
+                      <td className="py-3 text-on-surface-variant">{row.location}</td>
                       <td className="py-3">{row.hours.toFixed(1)}</td>
-                      <td className="py-3 text-right font-mono text-xs">
+                      <td className="py-3 text-right data-tabular text-xs">
                         {formatZar(row.value)}
                       </td>
                       <td className="py-3 text-right">
                         <button
                           onClick={() => generateInvoice(row)}
-                          className="rounded-md bg-[#D97706] px-3 py-1 text-xs font-medium text-white hover:bg-[#B45309] transition-colors"
+                          className="rounded-md bg-primary-container px-3 py-1 text-xs font-medium text-on-surface hover:bg-[#B45309] transition-colors"
                           disabled={invoiceGenerating === row.driver}
                         >
                           {invoiceGenerating === row.driver ? 'Generating...' : 'Generate Invoice'}
@@ -271,9 +271,9 @@ export default function SentinelPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <h2 className="text-sm font-semibold text-gray-300 mb-4">Live Event Feed</h2>
-          <div className="flex gap-3 overflow-x-auto pb-2">
+        <div className="rounded border border-outline-variant bg-elevated p-4">
+          <h2 className="text-sm font-semibold text-on-surface-variant mb-4">Live Event Feed</h2>
+          <div className="flex gap-3  pb-2">
             {events.map((event) => (
               <span
                 key={event.id}

@@ -10,7 +10,7 @@ import { Footer } from '@/components/landing/Footer';
 
 export default function HomePage() {
   return (
-    <main className="bg-cargoiq-navy">
+    <main className="bg-[#2A0B04]">
       <Hero />
       <PainPoints />
       <HowItWorks />

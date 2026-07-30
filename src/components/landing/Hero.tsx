@@ -1,77 +1,140 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Play } from 'lucide-react';
 import { Logo } from '@/components/ui/logo';
 import { Navbar } from './Navbar';
-import { LeakageShader } from './LeakageShader';
 
 export function Hero() {
-  const [count, setCount] = useState(1248500);
-
-  useEffect(() => {
-    const duration = 2000;
-    const steps = 60;
-    const increment = 1248500 / steps;
-    let current = 0;
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= 1248500) {
-        setCount(1248500);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, duration / steps);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
-    <section className="relative min-h-[85vh] flex flex-col justify-center items-start px-margin-page overflow-hidden pt-16">
-      <div className="absolute inset-0 -z-10 opacity-40">
-        <LeakageShader />
-      </div>
+    <section className="relative min-h-screen flex flex-col overflow-hidden ember-bg">
+      {/* soft radial glow on the right */}
+      <div className="pointer-events-none absolute inset-0 ember-bg-glow" aria-hidden />
+
       <Navbar />
-      <div className="max-w-4xl space-y-6">
-        <h1 className="font-display-lg text-display-lg industrial-tracking text-on-surface uppercase font-extrabold max-w-3xl">
-          Your freight operation is bleeding. <span className="text-primary-container">You just cannot see where.</span>
-        </h1>
-        <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
-          Carrier overcharges, SARS storage penalties, unbilled waiting time, and RLA suspensions are draining your margin in silence. CargoIQ stops the leak.
-        </p>
-        <div className="flex flex-col gap-4 pt-4">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/calculator"
-              className="px-8 py-4 bg-primary-container text-on-primary-container font-display-lg text-body-lg font-bold flex items-center gap-2 hover:translate-y-[-2px] transition-all active:translate-y-0"
-            >
-              Run My Free Shadow Audit
-              <span className="material-symbols-outlined">arrow_forward</span>
-            </Link>
+
+      <div className="relative z-10 mx-auto w-full max-w-[1280px] px-6 md:px-10 lg:px-16">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center pt-10 pb-[140px]">
+          {/* ---- Left: copy ---- */}
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-3 py-1 font-[var(--font-body-md)] text-[11px] font-semibold uppercase tracking-[0.08em] text-white/90">
+              AI-Powered Freight Audit &amp; Recovery
+            </span>
+
+            <h1 className="mt-6 font-[var(--font-display-lg)] text-white font-bold leading-[1.05] tracking-[-0.03em] text-[40px] sm:text-[52px] lg:text-[60px]">
+              Your freight operations
+              <br className="hidden sm:block" /> are{' '}
+              <span className="ember-accent">bleeding.</span>
+            </h1>
+            <p className="mt-3 font-[var(--font-display-lg)] text-[22px] sm:text-[26px] font-semibold ember-accent leading-tight">
+              You just cannot see where.
+            </p>
+
+            <p className="mt-6 font-[var(--font-body-md)] text-[16px] sm:text-[18px] leading-relaxed text-white/85 max-w-xl">
+              Carrier overcharges, SARS storage penalties, unbilled waiting time and RLA
+              suspensions are draining your margin in silence. CargoIQ finds the leakage —
+              and recovers it.
+            </p>
+
+            <div className="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <Link
+                href="/signup"
+                className="group h-[52px] inline-flex items-center gap-2 px-7 ember-button font-[var(--font-body-md)] text-[16px] font-semibold rounded-[6px] transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#F2451C]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A3C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2A0B04]"
+              >
+                Activate Your Free Trial
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
+                href="#workflow"
+                className="h-[52px] inline-flex items-center gap-2 px-6 border border-white/30 hover:border-white/60 text-white font-[var(--font-body-md)] text-[16px] font-semibold rounded-[6px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A3C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2A0B04]"
+              >
+                <Play className="h-4 w-4" />
+                See How It Works
+              </Link>
+            </div>
+
+            <p className="mt-6 font-[var(--font-body-md)] text-[13px] text-white/70">
+              No credit card required — your free shadow audit runs in seconds.
+            </p>
           </div>
-          <p className="font-label-caps text-label-caps text-outline flex items-center gap-2">
-            <span className="material-symbols-outlined text-[14px]">verified</span>
-            The verified number is yours — it comes from your free shadow audit, not from us.
-          </p>
+
+          {/* ---- Right: CSS/SVG product-preview card ---- */}
+          <div className="relative">
+            <div className="relative rounded-[8px] border border-white/15 bg-[#1A0703]/70 backdrop-blur-sm p-6 shadow-2xl shadow-black/40">
+              {/* window chrome */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-5">
+                <div className="flex items-center gap-2">
+                  <Logo size="sm" dark />
+                </div>
+                <span className="rounded-full border border-white/20 bg-white/5 px-2 py-0.5 font-[var(--font-body-md)] text-[10px] font-semibold uppercase tracking-wider text-white/60">
+                  Preview / Sample
+                </span>
+              </div>
+
+              {/* KPI grid */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Exposure Found', value: 'R 945 000', tone: 'risk' },
+                  { label: 'Documents Audited', value: '1 284', tone: 'plain' },
+                  { label: 'Recovery Rate', value: '94.2%', tone: 'plain' },
+                  { label: 'Checks / Document', value: '7', tone: 'plain' },
+                ].map((kpi) => (
+                  <div key={kpi.label} className="rounded-[6px] border border-white/10 bg-white/[0.03] p-3">
+                    <p className="font-[var(--font-body-md)] text-[10px] uppercase tracking-wider text-white/55">
+                      {kpi.label}
+                    </p>
+                    <p
+                      className={`mt-1 font-[var(--font-mono)] text-[20px] font-semibold text-right ${
+                        kpi.tone === 'risk' ? 'text-[#FF7A3C]' : 'text-white'
+                      }`}
+                    >
+                      {kpi.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* sparkline */}
+              <div className="mt-4 rounded-[6px] border border-white/10 bg-white/[0.03] p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-[var(--font-body-md)] text-[10px] uppercase tracking-wider text-white/55">
+                    Recovery Trend
+                  </p>
+                  <span className="font-[var(--font-body-md)] text-[10px] text-[#FF7A3C]">▲ illustrative</span>
+                </div>
+                <svg className="w-full h-16" viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden>
+                  <defs>
+                    <linearGradient id="spark-fill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#F2451C" stopOpacity="0.35" />
+                      <stop offset="100%" stopColor="#F2451C" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,48 L30,42 L60,46 L90,34 L120,38 L150,26 L180,30 L210,18 L240,22 L270,10 L300,6 L300,60 L0,60 Z" fill="url(#spark-fill)" />
+                  <path
+                    d="M0,48 L30,42 L60,46 L90,34 L120,38 L150,26 L180,30 L210,18 L240,22 L270,10 L300,6"
+                    fill="none"
+                    stroke="#FF7A3C"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+            <span className="pointer-events-none absolute -bottom-3 right-4 rounded-full border border-white/20 bg-[#2A0B04] px-2 py-0.5 font-[var(--font-body-md)] text-[9px] uppercase tracking-wider text-white/50">
+              CSS / SVG render — no live data
+            </span>
+          </div>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 w-full bg-surface-container-low border-t border-outline-variant py-4 overflow-hidden">
-        <div className="flex items-center gap-12 animate-scroll whitespace-nowrap">
-          <div className="flex items-center gap-12">
-            <span className="mono text-risk-red flex items-center gap-2"><span className="material-symbols-outlined">warning</span> MSCU4821 · detention · <span className="text-on-surface font-bold">R2 750</span> recovered</span>
-            <span className="mono text-primary flex items-center gap-2"><span className="material-symbols-outlined">check_circle</span> INV-2201 · duplicate · <span className="text-on-surface font-bold">R8 400</span> flagged</span>
-            <span className="mono text-risk-red flex items-center gap-2"><span className="material-symbols-outlined">warning</span> SARS-PEN-92 · late-file · <span className="text-on-surface font-bold">R14 500</span> saved</span>
-            <span className="mono text-primary flex items-center gap-2"><span className="material-symbols-outlined">check_circle</span> MAEU-882 · waiting-time · <span className="text-on-surface font-bold">R3 200</span> recovered</span>
-            <span className="text-primary font-bold px-8 border-x border-outline-variant">TOTAL RECOVERED THIS MONTH: <span className="mono">R{count.toLocaleString()}</span></span>
-          </div>
-          <div className="flex items-center gap-12">
-            <span className="mono text-risk-red flex items-center gap-2"><span className="material-symbols-outlined">warning</span> MSCU4821 · detention · <span className="text-on-surface font-bold">R2 750</span> recovered</span>
-            <span className="mono text-primary flex items-center gap-2"><span className="material-symbols-outlined">check_circle</span> INV-2201 · duplicate · <span className="text-on-surface font-bold">R8 400</span> flagged</span>
-            <span className="mono text-risk-red flex items-center gap-2"><span className="material-symbols-outlined">warning</span> SARS-PEN-92 · late-file · <span className="text-on-surface font-bold">R14 500</span> saved</span>
-            <span className="mono text-primary flex items-center gap-2"><span className="material-symbols-outlined">check_circle</span> MAEU-882 · waiting-time · <span className="text-on-surface font-bold">R3 200</span> recovered</span>
-            <span className="text-primary font-bold px-8 border-x border-outline-variant">TOTAL RECOVERED THIS MONTH: <span className="mono">R{count.toLocaleString()}</span></span>
-          </div>
+
+      {/* ---- Honest trust strip (NOT a logo wall) ---- */}
+      <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-[#2A0B04]/50 backdrop-blur-sm py-5">
+        <div className="mx-auto max-w-[1280px] px-6 md:px-10 lg:px-16">
+          <p className="text-center font-[var(--font-body-md)] text-[13px] text-white/70">
+            Built for SARS-licensed clearing agents &amp; freight forwarders across South Africa.
+          </p>
         </div>
       </div>
     </section>

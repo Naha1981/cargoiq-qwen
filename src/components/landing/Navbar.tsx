@@ -15,19 +15,21 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { label: 'Features', href: '#features' },
+    { label: 'Platform', href: '#platform' },
     { label: 'How It Works', href: '#workflow' },
     { label: 'Pricing', href: '#pricing' },
+    { label: 'Roadmap', href: '/roadmap' },
   ];
 
   return (
     <nav
       className={cn(
-        'sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant h-16 flex items-center justify-between px-margin-page transition-all duration-200'
+        'sticky top-0 z-50 h-[80px] flex items-center justify-between px-6 md:px-10 lg:px-16 transition-all duration-200',
+        scrolled ? 'backdrop-blur-md bg-[#2A0B04]/60' : 'bg-transparent'
       )}
     >
-      <div className="flex items-center gap-8">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="flex items-center gap-10">
+        <Link href="/" className="flex items-center gap-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A3C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2A0B04]" aria-label="CargoIQ home">
           <Logo size="md" dark />
         </Link>
         <div className="hidden md:flex items-center gap-8">
@@ -35,23 +37,23 @@ export function Navbar() {
             <Link
               key={link.label}
               href={link.href}
-              className="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+              className="font-[var(--font-body-md)] text-[14px] font-medium text-white/80 hover:text-white transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A3C]"
             >
               {link.label}
             </Link>
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <Link
           href="/login"
-          className="px-4 py-2 font-label-caps text-label-caps text-on-surface-variant border border-outline-variant hover:bg-surface-container-high transition-all"
+          className="h-[44px] inline-flex items-center px-4 font-[var(--font-body-md)] text-[14px] font-medium text-white/90 hover:text-white border border-white/25 hover:border-white/50 transition-all rounded-[4px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A3C]"
         >
           Sign In
         </Link>
         <Link
           href="/signup"
-          className="px-4 py-2 font-label-caps text-label-caps bg-primary-container text-on-primary-container hover:opacity-90 transition-all font-bold"
+          className="h-[44px] inline-flex items-center gap-2 px-5 ember-button font-[var(--font-body-md)] text-[14px] font-semibold rounded-[4px] transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#F2451C]/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF7A3C] focus-visible:ring-offset-2 focus-visible:ring-offset-[#2A0B04]"
         >
           Start Free Audit
         </Link>

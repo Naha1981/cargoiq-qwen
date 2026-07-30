@@ -1,40 +1,54 @@
 'use client';
 
 import React from 'react';
-import { Upload, Search, TrendingUp } from 'lucide-react';
 
 const steps = [
   {
-    icon: Upload,
+    icon: 'upload',
     title: 'Upload Documents',
-    body: 'Sync your EDI, scan Bill of Ladings, or upload carrier invoices directly.',
+    body: 'Sync your EDI, scan Bill of Ladings, or upload carrier invoices directly into CargoIQ.',
   },
   {
-    icon: Search,
-    title: 'Seven Compliance Checks',
-    body: 'Our engine runs 7 proprietary audits against SARS and carrier datasets.',
+    icon: 'neurology',
+    title: 'AI Compliance Analysis',
+    body: 'Our engine runs 7 proprietary audits against SARS regulations and carrier datasets, line by line.',
   },
   {
-    icon: TrendingUp,
+    icon: 'trending_up',
     title: 'Recover Revenue',
-    body: 'Automated recovery notes are sent to carriers and SARS disputes filed.',
+    body: 'Automated recovery notes are sent to carriers and SARS disputes filed — with a verified savings certificate.',
   },
 ];
 
 export function HowItWorks() {
   return (
-    <section className="py-24 px-margin-page bg-surface" id="workflow">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="font-headline-lg text-headline-lg mb-20 text-center uppercase industrial-tracking">Three Steps to Recovery</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 relative">
-          <div className="hidden md:block absolute top-12 left-[15%] right-[15%] h-[1px] bg-outline-variant -z-10"></div>
+    <section className="py-[104px] px-6 md:px-10 lg:px-16 bg-[#1F0803]" id="workflow">
+      <div className="mx-auto max-w-[1280px]">
+        <div className="text-center mb-16">
+          <span className="font-[var(--font-body-md)] text-[12px] font-semibold uppercase tracking-[0.08em] text-[#FF7A3C]">
+            How it works
+          </span>
+          <h2 className="mt-3 font-[var(--font-display-lg)] text-white font-bold text-[32px] sm:text-[40px] tracking-[-0.03em]">
+            Three simple steps to recover what&apos;s yours
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          {/* connecting line */}
+          <div className="hidden md:block absolute top-[44px] left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-[#F2451C]/40 to-transparent" aria-hidden />
           {steps.map((step, index) => (
-            <div key={index} className="text-center group">
-              <div className="w-24 h-24 bg-surface-container-high border-technical flex items-center justify-center mx-auto mb-6 group-hover:border-primary transition-colors">
-                <span className="font-display-lg text-headline-lg text-primary">{String(index + 1).padStart(2, '0')}</span>
+            <div key={index} className="relative text-center">
+              <div className="relative z-10 mx-auto mb-6 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#F2451C]/40 bg-[#2A0B04]">
+                <span className="material-symbols-outlined text-[#FF7A3C] text-[32px]">{step.icon}</span>
+                <span className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full ember-button font-[var(--font-mono)] text-[11px] font-bold text-white">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
               </div>
-              <h3 className="font-headline-md text-headline-md mb-4">{step.title}</h3>
-              <p className="text-on-surface-variant">{step.body}</p>
+              <h3 className="font-[var(--font-display-lg)] text-white font-semibold text-[20px] mb-3">
+                {step.title}
+              </h3>
+              <p className="font-[var(--font-body-md)] text-[15px] leading-relaxed text-white/70 max-w-xs mx-auto">
+                {step.body}
+              </p>
             </div>
           ))}
         </div>

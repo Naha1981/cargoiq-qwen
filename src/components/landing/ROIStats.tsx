@@ -1,61 +1,68 @@
 'use client';
 
 import React from 'react';
-import { TrendingUp, PiggyBank, CheckSquare } from 'lucide-react';
 
+/* Proof / honesty band: three mono stats, each illustrative/typical, plus the
+   honesty line. No fabricated per-client figures. */
 const stats = [
   {
-    icon: TrendingUp,
-    value: '21.6×',
+    icon: 'trending_up',
+    value: '21.6\u00d7',
     label: 'Illustrative ROI',
-    description: 'Detected leakage vs. subscription, modelled for a mid-size operation. Your real multiple comes from your audit.',
+    micro: 'illustrative / modelled',
+    description:
+      'Detected leakage vs. subscription, modelled for a mid-size operation. Your real multiple comes from your audit.',
   },
   {
-    icon: PiggyBank,
+    icon: 'payments',
     value: 'R14,169',
-    label: 'Typical Monthly Leakage (illustrative)',
-    description: 'Modelled monthly leakage per mid-size operation. NOT a client result — your audit makes it real.',
+    label: 'Typical Monthly Leakage',
+    micro: 'illustrative / typical',
+    description:
+      'Modelled monthly leakage per mid-size operation. NOT a client result — your audit makes it real.',
   },
   {
-    icon: CheckSquare,
+    icon: 'verified',
     value: '7',
     label: 'Automated Checks Per Document',
-    description: 'HS code · valuation · origin · Incoterms · detention · RLA status · personal-liability — every document, every time.',
+    micro: 'spec',
+    description:
+      'HS code \u00b7 valuation \u00b7 origin \u00b7 Incoterms \u00b7 detention \u00b7 RLA status \u00b7 personal liability — every document, every time.',
   },
 ];
 
 export function ROIStats() {
   return (
-    <section className="py-20 px-margin-page bg-surface-container-lowest">
-      <div className="max-w-7xl mx-auto px-margin-page">
-        <div className="text-center mb-16">
-          <p className="font-label-caps text-label-caps text-primary uppercase tracking-widest mb-3">Proof</p>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">
+    <section className="py-[96px] px-6 md:px-10 lg:px-16 bg-[#1F0803]">
+      <div className="mx-auto max-w-[1280px]">
+        <div className="text-center mb-14">
+          <span className="font-[var(--font-body-md)] text-[12px] font-semibold uppercase tracking-[0.08em] text-[#FF7A3C]">
+            Proof
+          </span>
+          <h2 className="mt-3 font-[var(--font-display-lg)] text-white font-bold text-[32px] sm:text-[40px] tracking-[-0.03em] max-w-3xl mx-auto">
             Grounded in real law and real economics — your verified number is next.
           </h2>
-          <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-            These figures are illustrative benchmarks. The only verified figure we publish is the one your own shadow audit produces.
-          </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter bg-surface-container-low">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-surface-container p-8 md:p-10 text-center border-technical"
-            >
-              <span className="material-symbols-outlined text-primary mx-auto mb-6">{stat.icon === TrendingUp ? 'trending_up' : stat.icon === PiggyBank ? 'payments' : 'verified'}</span>
-              <p className="mono text-right text-headline-md text-on-surface mb-4 tracking-tight">{stat.value}</p>
-              <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-2">
-                {stat.label}
-              </h3>
-              <p className="text-xs text-on-surface-variant/70">
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {stats.map((stat) => (
+            <div key={stat.label} className="rounded-[8px] border border-white/10 bg-white/[0.03] p-8 text-center">
+              <span className="material-symbols-outlined text-[#FF7A3C] text-[28px] mx-auto mb-5 block">{stat.icon}</span>
+              <p className="font-[var(--font-mono)] text-[36px] font-bold text-white">{stat.value}</p>
+              <p className="mt-2 font-[var(--font-body-md)] text-[11px] uppercase tracking-wider text-[#FF7A3C]">
+                {stat.micro}
+              </p>
+              <h3 className="mt-1 font-[var(--font-body-md)] text-[14px] font-semibold text-white/85">{stat.label}</h3>
+              <p className="mt-3 font-[var(--font-body-md)] text-[12px] leading-relaxed text-white/55">
                 {stat.description}
               </p>
             </div>
           ))}
         </div>
-        <p className="text-center text-xs text-outline mono text-right uppercase tracking-tighter mt-8">
-          Figures on this page are illustrative — modelled from published SARS penalty schedules, the Customs and Excise Act (incl. Section 99(2)), and industry billing-error benchmarks. They are not client results, and we do not publish fake ones. Your verified figure is generated by your own free shadow audit, line by line, before you pay anything.
+
+        <p className="mt-12 text-center font-[var(--font-body-md)] text-[13px] leading-relaxed text-white/60 max-w-3xl mx-auto">
+          These figures are illustrative benchmarks. The only verified figure we publish is the one{' '}
+          <span className="text-white/85">your own shadow audit</span> produces.
         </p>
       </div>
     </section>

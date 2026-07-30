@@ -2,27 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * CargoIQ — two-mode theme tokens.
+ * CIVIC (authenticated app + auth + proof): clean white government-portal.
+ * EMBER (public marketing): warm red-orange diagonal gradient.
+ * The --*-variable names below are kept for backwards-compat with code that
+ * still reads raw CSS vars; their VALUES are now the CIVIC white palette.
+ */
 :root {
   --background: #ffffff;
-  --foreground: #0D1B2A;
-  --color-cargoiq-bg: #F1F4F8;
-  --color-cargoiq-navy: #1A2332;
-  --color-cargoiq-gold: #B8860B;
-  --color-cargoiq-green: #16A34A;
-  --color-cargoiq-red: #DC2626;
-  --color-cargoiq-textPrimary: #0D1B2A;
-  --color-cargoiq-textSecondary: #4A5568;
-  --color-cargoiq-border: #E2E8F0;
-  --color-cargoiq-warning: #D97706;
-  --color-cargoiq-canvas: #F1F4F8;
-  --hull: #0A0E13;
-  --panel: #12181F;
-  --elevated: #161D26;
-  --border-subtle: #1E2733;
-  --cargo-gold: #E8B84B;
-  --iq-orange: #E26A1E;
-  --risk-red: #E5484D;
-  --success-green: #2FBF71;
+  --foreground: #101318;
+  --color-cargoiq-bg: #f6f7f9;
+  --color-cargoiq-navy: #101318;
+  --color-cargoiq-gold: #c83a12;
+  --color-cargoiq-green: #027a48;
+  --color-cargoiq-red: #d92d20;
+  --color-cargoiq-textPrimary: #101318;
+  --color-cargoiq-textSecondary: #5b6573;
+  --color-cargoiq-border: #e4e7ec;
+  --color-cargoiq-warning: #b54708;
+  --color-cargoiq-canvas: #f6f7f9;
+  --hull: #ffffff;
+  --panel: #f6f7f9;
+  --elevated: #ffffff;
+  --border-subtle: #e4e7ec;
+  --cargo-gold: #c83a12;
+  --iq-orange: #f2451c;
+  --risk-red: #d92d20;
+  --success-green: #027a48;
+
+  /* EMBER gradients (public marketing only) */
+  --ember-page: linear-gradient(150deg, #2a0b04 0%, #5e1e0c 20%, #97300f 42%, #d2430f 66%, #ff531c 100%);
+  --ember-glow: radial-gradient(60% 60% at 85% 60%, rgba(255, 90, 31, 0.35), transparent 70%);
+  --ember-button: linear-gradient(135deg, #7e2410 0%, #c83a12 50%, #f2451c 100%);
+  --ember-text: linear-gradient(135deg, #f2451c 0%, #ff7a3c 100%);
+  --ember-tint: linear-gradient(135deg, rgba(200, 58, 18, 0.08) 0%, rgba(242, 69, 28, 0.04) 100%);
+  --ember-leftbar: linear-gradient(180deg, #c83a12 0%, #f2451c 100%);
 }
 
 html {
@@ -32,49 +47,219 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  font-family: var(--font-body-md), IBM Plex Sans, Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .font-mono {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-mono), JetBrains Mono, monospace;
+}
+
+/* ---- EMBER gradient utilities (public marketing) ---- */
+.ember-bg {
+  background: var(--ember-page);
+}
+.ember-bg-glow {
+  background: var(--ember-glow);
+}
+.ember-button {
+  background: var(--ember-button);
+  color: #fff;
+}
+.ember-text {
+  background: var(--ember-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.ember-tint-bg {
+  background: var(--ember-tint);
+}
+.iq-gradient {
+  background: var(--ember-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+/* Active sidebar item (CIVIC): gradient left bar + tint + bold gradient text */
+.active-item-tint {
+  background: var(--ember-tint);
+}
+.active-item-bar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--ember-leftbar);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
-  .mono { font-family: 'JetBrains Mono', monospace; }
-  .industrial-tracking { letter-spacing: -0.05em; }
-  .border-technical { border: 1px solid #1E2733; }
-  .hover-gold:hover { border-color: rgba(232,184,75,.4); }
-  .zebra-table tr:nth-child(even), .zebra-row:nth-child(even), .audit-row:nth-child(even) { background-color: #161D26; }
-  .ai-glow { box-shadow: inset 2px 0 0 0 #e8b84b; }
-  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-  .custom-scrollbar::-webkit-scrollbar-track { background: #0A0E13; }
-  .custom-scrollbar::-webkit-scrollbar-thumb { background: #1E2733; }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #E8B84B; }
-  .coming-soon-badge { background: linear-gradient(90deg, rgba(232,184,75,.1), rgba(232,184,75,.02)); border-left: 2px solid #E8B84B; }
-  .gloss-effect { position: relative; overflow: hidden; }
-  .gloss-effect::after { content: ""; position: absolute; inset: -50%; background: linear-gradient(45deg, transparent, rgba(255,255,255,.03), transparent); transform: rotate(45deg); pointer-events: none; }
-  .technical-grid { background-image: linear-gradient(#1E2733 1px, transparent 1px), linear-gradient(90deg, #1E2733 1px, transparent 1px); background-size: 40px 40px; }
-  @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-  .animate-scroll { animation: scroll 40s linear infinite; }
-  @keyframes dash { to { stroke-dashoffset: 0; } }
-  .sparkline { stroke-dasharray: 100; stroke-dashoffset: 100; animation: dash 2s ease-in-out forwards; }
-  @keyframes count-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .animate-count { animation: count-up .8s cubic-bezier(.16,1,.3,1) forwards; }
-  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-  .shimmer { background: linear-gradient(90deg, transparent, rgba(232,184,75,.05), transparent); background-size: 200% 100%; animation: shimmer 3s infinite; }
-  @keyframes pulse-red { 0% { transform: scale(.95); box-shadow: 0 0 0 0 rgba(229,72,77,.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(229,72,77,0); } 100% { transform: scale(.95); box-shadow: 0 0 0 0 rgba(229,72,77,0); } }
-  .pulse-red { animation: pulse-red 2s infinite; }
-  @keyframes subtle-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
-  .animate-status { animation: subtle-pulse 3s infinite ease-in-out; }
-  .drawer-transition { transition: transform .4s cubic-bezier(.16,1,.3,1); }
+  .mono {
+    font-family: var(--font-mono), JetBrains Mono, monospace;
+  }
+  .industrial-tracking {
+    letter-spacing: -0.03em;
+  }
+  .border-technical {
+    border: 1px solid #e4e7ec;
+  }
+  .hover-gold:hover {
+    border-color: rgba(200, 58, 18, 0.4);
+  }
+  .zebra-table tr:nth-child(even),
+  .zebra-row:nth-child(even),
+  .audit-row:nth-child(even) {
+    background-color: #f9fafb;
+  }
+  .ai-glow {
+    box-shadow: inset 3px 0 0 0 var(--ember-button);
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f6f7f9;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #d0d5dd;
+    border-radius: 3px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #9aa4b2;
+  }
+  .coming-soon-badge {
+    background: linear-gradient(90deg, rgba(200, 58, 18, 0.1), rgba(200, 58, 18, 0.02));
+    border-left: 2px solid #c83a12;
+  }
+  .gloss-effect {
+    position: relative;
+    overflow: hidden;
+  }
+  .gloss-effect::after {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+    transform: rotate(45deg);
+    pointer-events: none;
+  }
+  .technical-grid {
+    background-image: linear-gradient(#e4e7ec 1px, transparent 1px),
+      linear-gradient(90deg, #e4e7ec 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-scroll {
+    animation: scroll 40s linear infinite;
+  }
+  @keyframes dash {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .sparkline {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: dash 2s ease-in-out forwards;
+  }
+  @keyframes count-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-count {
+    animation: count-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  .shimmer {
+    background: linear-gradient(90deg, transparent, rgba(200, 58, 18, 0.05), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+  }
+  @keyframes pulse-red {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(217, 45, 32, 0.7);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 6px rgba(217, 45, 32, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(217, 45, 32, 0);
+    }
+  }
+  .pulse-red {
+    animation: pulse-red 2s infinite;
+  }
+  @keyframes subtle-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  .animate-status {
+    animation: subtle-pulse 3s infinite ease-in-out;
+  }
+  .drawer-transition {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* EMBER gradient text accent (display headings >= 24px only) */
+  .ember-accent {
+    background: var(--ember-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
   @media (prefers-reduced-motion: reduce) {
-    .animate-scroll, .shimmer, .pulse-red, .animate-status { animation: none !important; }
-    .sparkline { animation: none !important; stroke-dashoffset: 0; }
-    .animate-count { animation: none !important; opacity: 1; transform: none; }
+    .animate-scroll,
+    .shimmer,
+    .pulse-red,
+    .animate-status {
+      animation: none !important;
+    }
+    .sparkline {
+      animation: none !important;
+      stroke-dashoffset: 0;
+    }
+    .animate-count {
+      animation: none !important;
+      opacity: 1;
+      transform: none;
+    }
   }
 }

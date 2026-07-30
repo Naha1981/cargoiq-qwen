@@ -93,21 +93,23 @@ export default async function RootLayout({
         <ClerkProvider
           appearance={{
             variables: {
-              colorPrimary: '#E8B84B',
-              colorForeground: '#e0e2ea',
-              colorBackground: '#0a0e13',
-              colorInput: '#1c2025',
-              colorInputForeground: '#e0e2ea',
-              borderRadius: '0.125rem',
+              colorPrimary: '#C83A12',
+              colorForeground: '#101318',
+              colorBackground: '#FFFFFF',
+              colorInput: '#FFFFFF',
+              colorInputForeground: '#101318',
+              colorNeutral: '#5B6573',
+              borderRadius: '0.25rem',
             },
             elements: {
-              formButtonPrimary: 'bg-primary-container hover:bg-primary',
-              cardBox: 'bg-surface-container-lowest border border-outline-variant',
-              headerTitle: 'text-on-surface',
-              headerSubtitle: 'text-on-surface-variant',
-              formFieldLabel: 'text-on-surface-variant',
-              formFieldInput: 'bg-surface-container text-on-surface border-outline-variant',
-              footerActionLink: 'text-primary-container',
+              formButtonPrimary:
+                'bg-[linear-gradient(135deg,#7E2410_0%,#C83A12_50%,#F2451C_100%)] text-white hover:opacity-90',
+              cardBox: 'bg-white border border-[#E4E7EC] shadow-sm',
+              headerTitle: 'text-[#101318]',
+              headerSubtitle: 'text-[#5B6573]',
+              formFieldLabel: 'text-[#344054]',
+              formFieldInput: 'bg-white text-[#101318] border border-[#D0D5DD]',
+              footerActionLink: 'text-[#C83A12]',
             },
           }}
         >

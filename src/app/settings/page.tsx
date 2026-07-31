@@ -71,9 +71,9 @@ export default function SettingsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
                   'flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors',
-isActive
-                      ? 'border-primary-container text-primary-container'
-                      : 'border-transparent text-on-surface-variant hover:text-on-surface'
+                  isActive
+                    ? 'border-primary text-primary font-semibold'
+                    : 'border-transparent text-on-surface-variant hover:text-primary'
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -93,7 +93,7 @@ isActive
                   <Badge variant="warning">Growth</Badge>
                 </div>
                 <Input label="Billing contact email" type="email" defaultValue="billing@cargoiq.io" />
-                <Button>Save changes</Button>
+                <Button className="ember-button">Save changes</Button>
               </div>
             </Card>
           )}
@@ -158,7 +158,7 @@ isActive
                     <Input label="Portal" placeholder="e.g. SARS eFiling" />
                     <Input label="Username" placeholder="Enter username" />
                     <Input label="Password" type="password" placeholder="Enter password" />
-                    <Button className="gap-2" disabled>
+                    <Button className="ember-button gap-2" disabled>
                       <Plus className="h-4 w-4" />
                       Save credentials
                     </Button>
@@ -171,7 +171,7 @@ isActive
           {activeTab === 'whatsapp' && (
             <Card title="WhatsApp" subtitle="Evolution API setup for driver check-ins and status updates.">
               <div className="space-y-6">
-                <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+                <div className="flex items-center justify-between rounded-lg border border-outline-variant p-4">
                   <div className="flex items-center gap-3">
                     <div className={`h-2 w-2 rounded-full ${hasWhatsAppConfig() ? 'bg-success' : 'bg-on-surface-variant'}`} />
                     <span className="text-sm font-medium text-on-surface">
@@ -194,7 +194,10 @@ isActive
 
                 <div>
                   <h4 className="text-sm font-semibold text-on-surface">Driver check-in feed</h4>
-                  <p className="text-xs text-on-surface-variant">Last 10 check-ins received via WhatsApp.</p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <p className="text-xs text-on-surface-variant">Last 10 check-ins received via WhatsApp.</p>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant border border-outline-variant bg-surface-container-low px-1.5 py-0.5 rounded uppercase tracking-wider text-xs">Sample data</span>
+                  </div>
                   <div className="mt-3 space-y-2">
                     {mockCheckins.map((item) => (
                       <div key={item.id} className="flex items-center justify-between rounded-lg border border-outline-variant bg-surface-container px-4 py-3">
@@ -248,7 +251,7 @@ isActive
                   <Input label="Current password" type="password" />
                   <Input label="New password" type="password" />
                   <Input label="Confirm new password" type="password" />
-                  <Button>Update password</Button>
+                  <Button className="ember-button">Update password</Button>
                 </div>
               </Card>
 

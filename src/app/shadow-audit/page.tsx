@@ -6,8 +6,8 @@ import { Upload, Share2, Download, ChevronRight, AlertTriangle, CheckCircle2, Cl
 import { cn } from '@/lib/utils';
 
 const findings = [
-  { icon: AlertTriangle, label: 'Overcharges', count: 7, color: 'text-error bg-error-container/20' },
-  { icon: Clock, label: 'Demurrage', count: 3, color: 'text-primary-container bg-primary-container/10' },
+  { icon: AlertTriangle, label: 'Overcharges', count: 7, color: 'text-risk-red bg-risk-red/10' },
+  { icon: Clock, label: 'Demurrage', count: 3, color: 'text-warn bg-warn/10' },
   { icon: FileSearch, label: 'Missing Docs', count: 2, color: 'text-tertiary bg-tertiary/10' },
   { icon: CheckCircle2, label: 'Verified', count: 6, color: 'text-success bg-success/10' },
 ];
@@ -154,12 +154,20 @@ export default function ShadowAuditPage() {
   return (
     <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body-md">
       <div className="mx-auto max-w-6xl p-margin-page space-y-gutter">
-        <h1 className="font-headline-lg text-headline-lg text-on-surface uppercase industrial-tracking">Shadow Audit</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-headline-lg text-headline-lg text-on-surface uppercase industrial-tracking">Shadow Audit</h1>
+          <span className="font-label-caps text-label-caps text-on-surface-variant border border-outline-variant bg-surface-container-low px-2 py-1 rounded uppercase tracking-wider">Sample data</span>
+        </div>
+
+        {/* Honesty banner: sample figures until real documents are connected */}
+        <div className="rounded border-l-4 border-warn bg-warn/10 p-3 text-sm text-warn">
+          You're viewing sample data. The figures below are illustrative findings from a demo audit — run a Shadow Audit on your own documents for verified results.
+        </div>
 
         {!isRunning && progress < 100 && !showDemo && (
-          <div className="bg-surface border border-outline-variant p-6">
+          <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
             <h2 className="font-headline-md text-headline-md text-on-surface mb-4">Run Shadow Audit</h2>
-            <div className="rounded-lg border-2 border-dashed border-outline-variant bg-surface-container-lowest p-8 text-center cursor-pointer hover:border-primary-container transition-colors relative">
+            <div className="ember-tint-bg rounded-lg border-2 border-dashed border-outline-variant p-8 text-center cursor-pointer hover:border-primary transition-colors relative">
               <input
                 type="file"
                 accept=".pdf"
@@ -167,18 +175,18 @@ export default function ShadowAuditPage() {
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 onChange={(e) => setFiles(e.target.files)}
               />
-              <Upload className="mx-auto h-10 w-10 text-on-surface-variant mb-3" />
+              <Upload className="mx-auto h-10 w-10 text-primary mb-3" />
               <p className="font-body-md text-on-surface-variant mb-1">Click to upload PDF invoices</p>
               <p className="font-label-caps text-label-caps text-on-surface-variant">Multiple files accepted</p>
               {files && files.length > 0 && (
-                <p className="font-label-caps text-label-caps text-primary-container mt-2 font-bold">{files.length} file(s) selected</p>
+                <p className="font-label-caps text-label-caps text-primary mt-2 font-bold">{files.length} file(s) selected</p>
               )}
             </div>
 
             <div className="mt-4">
               <button
                 onClick={handleDemoAudit}
-                className="inline-flex items-center gap-2 border border-primary-container text-primary-container px-6 py-2.5 rounded text-sm font-medium hover:bg-primary-container hover:text-on-primary-container transition-colors"
+                className="inline-flex items-center gap-2 border border-primary text-primary px-6 py-2.5 rounded text-sm font-medium hover:bg-ember-tint-bg transition-colors"
               >
                 ▶ Run Demo Audit (sample data — no upload needed)
               </button>
@@ -191,7 +199,7 @@ export default function ShadowAuditPage() {
               <div className="mt-3 grid grid-cols-2 gap-gutter">
                 <div>
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-1">Carrier Filter</label>
-                  <select className="w-full rounded border border-outline-variant px-3 py-2 text-sm bg-surface-container-lowest text-on-surface">
+                  <select className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm bg-surface-container-lowest text-on-surface">
                     <option>All carriers</option>
                     <option>Maersk</option>
                     <option>MSC</option>
@@ -199,7 +207,7 @@ export default function ShadowAuditPage() {
                 </div>
                 <div>
                   <label className="block font-label-caps text-label-caps text-on-surface-variant mb-1">Date Range</label>
-                  <select className="w-full rounded border border-outline-variant px-3 py-2 text-sm bg-surface-container-lowest text-on-surface">
+                  <select className="w-full rounded-md border border-outline-variant px-3 py-2 text-sm bg-surface-container-lowest text-on-surface">
                     <option>Last 30 days</option>
                     <option>Last 90 days</option>
                   </select>
@@ -211,7 +219,7 @@ export default function ShadowAuditPage() {
               <button
                 onClick={handleRunAudit}
                 disabled={!files || files.length === 0}
-                className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="ember-button px-6 py-2.5 rounded text-sm font-bold transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Run Shadow Audit
               </button>
@@ -220,14 +228,14 @@ export default function ShadowAuditPage() {
         )}
 
         {isRunning && (
-          <div className="bg-surface border border-outline-variant p-6">
+          <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <span className="font-body-md text-on-surface">Analysing {totalShipments} shipments...</span>
               <span className="font-data-tabular text-on-surface-variant">{completed} complete</span>
             </div>
             <div className="h-3 w-full rounded-full bg-surface-container-highest overflow-hidden">
               <div
-                className="h-full rounded bg-primary-container transition-all duration-500"
+                className="ember-button h-full rounded transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -236,9 +244,9 @@ export default function ShadowAuditPage() {
         )}
 
         {(showDemo || (!isRunning && progress === 100)) && (
-          <div className="bg-surface border border-outline-variant p-6 space-y-gutter">
-            <div className="rounded border-l-4 border-error bg-error-container/20 p-4">
-              <p className="font-body-md text-error">R{currentExposure.toLocaleString('en-ZA')} in exposure identified across {showDemo ? 6 : totalShipments} shipments</p>
+          <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg space-y-gutter">
+            <div className="rounded border-l-4 border-risk-red bg-risk-red/10 p-4">
+              <p className="font-body-md text-risk-red">R{currentExposure.toLocaleString('en-ZA')} in exposure identified across {showDemo ? 6 : totalShipments} shipments</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter">
@@ -258,7 +266,7 @@ export default function ShadowAuditPage() {
               <div className="rounded-lg border border-outline-variant overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-surface-container-lowest text-left font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">
+                    <tr className="bg-surface-container-low text-left font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">
                       <th className="px-4 py-3">Shipment</th>
                       <th className="px-4 py-3">Finding</th>
                       <th className="px-4 py-3 text-right">Amount (ZAR)</th>
@@ -267,7 +275,7 @@ export default function ShadowAuditPage() {
                   </thead>
                   <tbody className="divide-y divide-outline-variant">
                     {currentFindings.map((row) => (
-                      <tr key={row.shipment} className="hover:bg-surface-container-highest transition-colors">
+                      <tr key={row.shipment} className="hover:bg-surface-container-low transition-colors">
                         <td className="px-4 py-3 font-data-tabular text-xs">{row.shipment}</td>
                         <td className="px-4 py-3 text-body-md">{row.finding}</td>
                         <td className="px-4 py-3 text-right font-data-tabular mono">
@@ -277,7 +285,7 @@ export default function ShadowAuditPage() {
                           <span className={cn(
                             'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-bold uppercase',
                             row.status === 'open'
-                              ? 'bg-error-container/20 border border-error/30 text-error'
+                              ? 'bg-risk-red/15 border border-risk-red/30 text-risk-red'
                               : 'bg-tertiary/10 border border-tertiary/30 text-tertiary'
                           )}>
                             {row.status === 'open' ? 'Open' : 'Info'}
@@ -293,32 +301,32 @@ export default function ShadowAuditPage() {
             <div className="flex flex-wrap gap-gutter">
               <button
                 onClick={() => handleCopyProof(showDemo ? 'demo' : 'live')}
-                className="inline-flex items-center gap-2 bg-primary-container text-on-primary-container px-4 py-2.5 rounded text-sm font-medium hover:opacity-90 transition-colors"
+                className="inline-flex items-center gap-2 border border-primary text-primary px-4 py-2.5 rounded text-sm font-medium hover:bg-ember-tint-bg transition-colors"
               >
                 <Share2 className="h-4 w-4" />
                 {copied ? 'Copied!' : 'Copy proof-page link'}
               </button>
               <button
                 onClick={handleDownloadCertificate}
-                className="inline-flex items-center gap-2 border border-primary-container text-primary-container px-4 py-2.5 rounded text-sm font-medium hover:bg-primary-container hover:text-on-primary-container transition-colors"
+                className="ember-button inline-flex items-center gap-2 px-4 py-2.5 rounded text-sm font-medium transition-opacity"
               >
                 <Download className="h-4 w-4" />
                 Download Savings Certificate
               </button>
             </div>
             {downloadMsg && (
-              <p className="font-label-caps text-label-caps text-error text-xs mt-2">{downloadMsg}</p>
+              <p className="font-label-caps text-label-caps text-risk-red text-xs mt-2">{downloadMsg}</p>
             )}
           </div>
         )}
 
-        <div className="bg-surface border border-outline-variant divide-y divide-outline-variant">
+        <div className="bg-surface-container-lowest border border-outline-variant divide-y divide-outline-variant rounded-lg overflow-hidden">
           <h3 className="font-label-caps text-label-caps text-on-surface px-6 py-4 uppercase tracking-wider">Previous Audits</h3>
           {previousAudits.map((audit) => (
             <Link
               key={audit.id}
               href={`/shadow-audit/${audit.id}`}
-              className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-surface-container-highest transition-colors"
+              className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-surface-container-low transition-colors"
             >
               <div>
                 <p className="font-data-tabular text-on-surface text-sm">{audit.date}</p>

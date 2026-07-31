@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Plus, FileText, Trash2, Edit2, X, Check } from 'lucide-react';
+import { Upload, Plus, FileText, Trash2, Edit2, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ParsingState = 'idle' | 'uploading' | 'processing' | 'done' | 'configured' | 'warn' | 'error';
@@ -163,7 +163,7 @@ export default function CarrierAuditPage() {
       if (data.report) {
         const { report } = data;
         setParsedResult(data);
-setParsingState('done');
+        setParsingState('done');
         const newItems: { charge: string; billed: number; rateCard: number; variance: number; status: 'overcharge' | 'ok' }[] = [];
         if (report.totalExposureZar && report.totalExposureZar > 0) {
           newItems.push({ charge: 'AI Compliance Finding', billed: report.totalExposureZar, rateCard: 0, variance: report.totalExposureZar, status: 'overcharge' });
@@ -200,9 +200,14 @@ setParsingState('done');
   return (
     <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body-md">
       <div className="mx-auto max-w-6xl p-6">
-        <h1 className="text-3xl font-bold text-on-surface mb-6">Carrier Audit</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-on-surface">Carrier Audit</h1>
+          <span className="font-label-caps text-label-caps text-on-surface-variant">
+            Sample data
+          </span>
+        </div>
 
-        <div className="flex gap-1 rounded bg-surface-container p-1 border border-outline-variant mb-6 w-fit">
+        <div className="flex gap-1 rounded-md bg-surface-container-low p-1 border border-outline-variant mb-6 w-fit">
           {[
             { key: 'rate-cards', label: 'Rate Cards' },
             { key: 'upload-audit', label: 'Upload & Audit' },
@@ -214,7 +219,7 @@ setParsingState('done');
               className={cn(
                 'px-4 py-2 text-sm font-medium rounded transition-colors',
                 activeTab === tab.key
-                  ? 'bg-surface-container-lowest text-on-surface'
+                  ? 'active-item-tint text-primary font-semibold'
                   : 'text-on-surface-variant hover:text-on-surface'
               )}
             >
@@ -228,7 +233,7 @@ setParsingState('done');
             <div className="flex justify-between items-center">
               <button
                 onClick={() => { setEditingRateCard(null); setRateCardForm({ carrier: '', chargeType: '', route: '', mode: 'per_container', ratePerKg: '', ratePerContainer: '', currency: 'USD', validFrom: '', validTo: '' }); setShowRateCardForm(true); }}
-                className="inline-flex items-center gap-2 bg-primary-container text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary transition-colors"
+                className="ember-button inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-opacity hover:opacity-90"
               >
                 <Plus className="h-4 w-4" />
                 Add Rate Card
@@ -236,56 +241,56 @@ setParsingState('done');
             </div>
 
             {showRateCardForm && (
-              <div className="bg-surface-container rounded border border-outline-variant p-6 space-y-4">
+              <div className="bg-surface-container-low rounded-md border border-outline-variant p-6 space-y-4">
                 <h3 className="text-sm font-semibold text-on-surface">{editingRateCard ? 'Edit Rate Card' : 'New Rate Card'}</h3>
                 <form onSubmit={handleRateCardSubmit} className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-on-surface-variant mb-1">Carrier</label>
-                      <input type="text" value={rateCardForm.carrier} onChange={(e) => setRateCardForm({ ...rateCardForm, carrier: e.target.value })} required className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                      <input type="text" value={rateCardForm.carrier} onChange={(e) => setRateCardForm({ ...rateCardForm, carrier: e.target.value })} required className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-on-surface-variant mb-1">Charge Type</label>
-                      <input type="text" value={rateCardForm.chargeType} onChange={(e) => setRateCardForm({ ...rateCardForm, chargeType: e.target.value })} required className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                      <input type="text" value={rateCardForm.chargeType} onChange={(e) => setRateCardForm({ ...rateCardForm, chargeType: e.target.value })} required className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-on-surface-variant mb-1">Route</label>
-                      <input type="text" value={rateCardForm.route} onChange={(e) => setRateCardForm({ ...rateCardForm, route: e.target.value })} required className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                      <input type="text" value={rateCardForm.route} onChange={(e) => setRateCardForm({ ...rateCardForm, route: e.target.value })} required className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-on-surface-variant mb-1">Mode</label>
-                      <select value={rateCardForm.mode} onChange={(e) => setRateCardForm({ ...rateCardForm, mode: e.target.value })} className="w-full rounded border border-outline-variant px-3 py-2 text-sm bg-surface-container">
+                      <select value={rateCardForm.mode} onChange={(e) => setRateCardForm({ ...rateCardForm, mode: e.target.value })} className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm">
                         {modes.map((m) => <option key={m} value={m}>{m.replace('_', ' ')}</option>)}
                       </select>
                     </div>
                     {rateCardForm.mode === 'per_kg' && (
                       <div>
                         <label className="block text-xs font-medium text-on-surface-variant mb-1">Rate per KG (ZAR)</label>
-                        <input type="number" step="0.01" value={rateCardForm.ratePerKg} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerKg: e.target.value })} className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                        <input type="number" step="0.01" value={rateCardForm.ratePerKg} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerKg: e.target.value })} className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                       </div>
                     )}
                     {rateCardForm.mode === 'per_container' && (
                       <div>
                         <label className="block text-xs font-medium text-on-surface-variant mb-1">Rate per Container (ZAR)</label>
-                        <input type="number" step="0.01" value={rateCardForm.ratePerContainer} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerContainer: e.target.value })} className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                        <input type="number" step="0.01" value={rateCardForm.ratePerContainer} onChange={(e) => setRateCardForm({ ...rateCardForm, ratePerContainer: e.target.value })} className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                       </div>
                     )}
                     <div>
                       <label className="block text-xs font-medium text-on-surface-variant mb-1">Currency</label>
-                      <input type="text" value={rateCardForm.currency} onChange={(e) => setRateCardForm({ ...rateCardForm, currency: e.target.value })} maxLength={3} className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                      <input type="text" value={rateCardForm.currency} onChange={(e) => setRateCardForm({ ...rateCardForm, currency: e.target.value })} maxLength={3} className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-on-surface-variant mb-1">Valid From</label>
-                      <input type="date" value={rateCardForm.validFrom} onChange={(e) => setRateCardForm({ ...rateCardForm, validFrom: e.target.value })} required className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                      <input type="date" value={rateCardForm.validFrom} onChange={(e) => setRateCardForm({ ...rateCardForm, validFrom: e.target.value })} required className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-on-surface-variant mb-1">Valid To (optional)</label>
-                      <input type="date" value={rateCardForm.validTo} onChange={(e) => setRateCardForm({ ...rateCardForm, validTo: e.target.value })} className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                      <input type="date" value={rateCardForm.validTo} onChange={(e) => setRateCardForm({ ...rateCardForm, validTo: e.target.value })} className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button type="submit" className="bg-primary-container text-white px-4 py-2 rounded text-sm font-medium hover:bg-primary">Save</button>
-                    <button type="button" onClick={() => { setShowRateCardForm(false); setEditingRateCard(null); }} className="bg-surface-container-highest text-on-surface px-4 py-2 rounded text-sm font-medium hover:bg-surface">Cancel</button>
+                    <button type="submit" className="ember-button px-4 py-2 rounded-md text-sm font-medium transition-opacity hover:opacity-90">Save</button>
+                    <button type="button" onClick={() => { setShowRateCardForm(false); setEditingRateCard(null); }} className="bg-surface-container-highest text-on-surface px-4 py-2 rounded-md text-sm font-medium hover:bg-surface transition-colors">Cancel</button>
                   </div>
                 </form>
               </div>
@@ -296,7 +301,7 @@ setParsingState('done');
             ) : rateCards.length === 0 && !useDemo ? (
               <div className="text-sm text-on-surface-variant">No rate cards yet. Add your first one above.</div>
             ) : (
-              <div className="bg-surface-container rounded border border-outline-variant overflow-hidden">
+              <div className="bg-surface-container-low rounded-md border border-outline-variant overflow-hidden">
                 <div className="">
                   <table className="w-full text-sm">
                     <thead>
@@ -312,7 +317,7 @@ setParsingState('done');
                         <th className="px-4 py-3">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-outline-variant/30">
+                    <tbody className="divide-y divide-outline-variant/50">
                       {(rateCards.length > 0 || useDemo ? rateCards : demoRateCards).map((row) => (
                         <tr key={row.id} className="hover:bg-surface-container-highest transition-colors">
                           <td className="px-4 py-3 font-medium">{row.carrier}</td>
@@ -334,6 +339,11 @@ setParsingState('done');
                     </tbody>
                   </table>
                 </div>
+                {useDemo && rateCards.length === 0 && (
+                  <div className="px-4 py-2 border-t border-outline-variant text-xs text-on-surface-variant font-label-caps text-label-caps">
+                    Showing sample rate cards
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -345,22 +355,22 @@ setParsingState('done');
               onDrop={handleDrop}
               onDragOver={(e) => e.preventDefault()}
               onDragLeave={() => {}}
-              className="rounded border-2 border-dashed border-primary-container bg-primary-container/10 p-8 text-center cursor-pointer hover:bg-primary-container/20 transition-colors"
+              className="ember-tint-bg rounded-md border-2 border-dashed border-primary p-8 text-center cursor-pointer hover:bg-ember-tint-bg transition-colors"
               onClick={() => document.getElementById('audit-file-input')?.click()}
             >
-              <Upload className="mx-auto h-10 w-10 text-primary-container mb-3" />
+              <Upload className="mx-auto h-10 w-10 text-primary mb-3" />
               <p className="text-sm font-medium text-on-surface mb-1">Upload invoice or customs document</p>
               <p className="text-xs text-on-surface-variant">PDF, PNG, JPG, or WebP up to 10MB</p>
               <input id="audit-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" className="hidden" onChange={handleFileSelect} />
             </div>
 
             {parsingState !== 'idle' && (
-              <div className="rounded border p-4">
+              <div className="rounded-md border border-outline-variant p-4">
                 {parsingState === 'uploading' && (
-                  <div className="flex items-center gap-3 text-sm text-on-surface-variant"><div className="w-2 h-2 rounded-full bg-primary-container animate-pulse" /> Uploading document...</div>
+                  <div className="flex items-center gap-3 text-sm text-on-surface-variant"><div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Uploading document...</div>
                 )}
                 {parsingState === 'processing' && (
-                  <div className="flex items-center gap-3 text-sm text-on-surface-variant"><div className="w-2 h-2 rounded-full bg-primary-container animate-pulse" /> Running AI extraction and compliance checks...</div>
+                  <div className="flex items-center gap-3 text-sm text-on-surface-variant"><div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Running AI extraction and compliance checks...</div>
                 )}
                 {parsingState === 'done' && parsedResult && (
                   <div className="space-y-2 text-sm">
@@ -381,18 +391,18 @@ setParsingState('done');
                   </div>
                 )}
                 {parsingState === 'configured' && (
-                  <div className="text-sm text-primary-container">AI parsing is not configured. Add a Gemini API key to enable document extraction.</div>
+                  <div className="text-sm text-warn">AI parsing is not configured. Add a Gemini API key to enable document extraction.</div>
                 )}
                 {parsingState === 'warn' && parsedResult && (
-                  <div className="text-sm text-primary-container">Could not read this document clearly enough for a full audit. Please review manually.</div>
+                  <div className="text-sm text-warn">Could not read this document clearly enough for a full audit. Please review manually.</div>
                 )}
                 {parsingState === 'error' && (
-                  <div className="text-sm text-red-700">Parsing failed. Please try again with a clearer document.</div>
+                  <div className="text-sm text-risk-red">Parsing failed. Please try again with a clearer document.</div>
                 )}
               </div>
             )}
 
-            <div className="bg-surface-container rounded border border-outline-variant overflow-hidden">
+            <div className="bg-surface-container-low rounded-md border border-outline-variant overflow-hidden">
               <div className="">
                 <table className="w-full text-sm">
                   <thead>
@@ -405,13 +415,13 @@ setParsingState('done');
                       <th className="px-4 py-3 text-right">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-outline-variant/30">
+                  <tbody className="divide-y divide-outline-variant/50">
                     {auditItems.map((row, idx) => (
                       <tr
                         key={idx}
                         className={cn(
                           'hover:bg-surface-container-highest transition-colors',
-                          row.status === 'overcharge' ? 'bg-primary-container/10' : ''
+                          row.status === 'overcharge' ? 'bg-risk-red/10' : ''
                         )}
                       >
                         <td className="px-4 py-3 font-medium">{row.charge}</td>
@@ -422,14 +432,14 @@ setParsingState('done');
                         </td>
                         <td className="px-4 py-3">
                           {row.status === 'overcharge' ? (
-                            <span className="inline-flex items-center rounded-full bg-primary-container/20 px-2 py-0.5 text-xs font-medium text-primary-container">Overcharge</span>
+                            <span className="inline-flex items-center rounded-full bg-risk-red/15 px-2 py-0.5 text-xs font-medium text-risk-red">Overcharge</span>
                           ) : (
-                            <span className="inline-flex items-center rounded-full bg-success/20 px-2 py-0.5 text-xs font-medium text-success">OK</span>
+                            <span className="inline-flex items-center rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success">OK</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
                           {row.status === 'overcharge' && (
-                            <button className="inline-flex items-center gap-1 rounded border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-surface-container transition-colors">
+                            <button className="ember-button inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium transition-opacity hover:opacity-90">
                               <FileText className="h-3 w-3" />
                               Generate Dispute Notice
                             </button>
@@ -442,16 +452,17 @@ setParsingState('done');
               </div>
             </div>
 
-            <div className="sticky bottom-0 mt-4 rounded border border-amber-200 bg-primary-container/10 px-4 py-3 flex items-center justify-between">
-              <span className="text-sm font-medium text-amber-800">
+            <div className="mt-4 rounded-md border border-risk-red/30 bg-risk-red/10 px-4 py-3 flex items-center justify-between">
+              <span className="text-sm font-medium text-risk-red">
                 Total overcharges: R{totalOvercharge.toLocaleString('en-ZA')} across {overchargeItems.length} line items
               </span>
+              <span className="font-label-caps text-label-caps text-risk-red/80">Sample data</span>
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { setUseDemo(true); setAuditItems(demoAuditItems); setParsedResult(null); setParsingState('idle'); }}
-                className={cn('px-3 py-1.5 text-xs font-medium rounded-full transition-colors', useDemo ? 'bg-primary-container text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high')}
+                className={cn('px-3 py-1.5 text-xs font-medium rounded-full transition-colors', useDemo ? 'ember-button' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high')}
               >
                 Try a sample audit (demo data)
               </button>
@@ -461,12 +472,12 @@ setParsingState('done');
 
         {activeTab === 'fsc-checker' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-surface-container rounded border border-outline-variant p-6 space-y-4">
+            <div className="bg-surface-container-low rounded-md border border-outline-variant p-6 space-y-4">
               <h2 className="text-lg font-semibold text-on-surface">FSC Parameters</h2>
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-on-surface mb-1">Carrier</label>
-                  <select className="w-full rounded border border-outline-variant px-3 py-2 text-sm bg-surface-container">
+                  <select className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm">
                     <option value="">Select carrier</option>
                     {carriers.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -475,22 +486,22 @@ setParsingState('done');
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-on-surface mb-1">Invoice Date</label>
-                  <input type="date" className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                  <input type="date" className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-on-surface mb-1">Base Freight Amount (ZAR)</label>
-                  <input type="number" placeholder="e.g. 50000" className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                  <input type="number" placeholder="e.g. 50000" className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-on-surface mb-1">Billed FSC %</label>
-                  <input type="number" step="0.01" placeholder="e.g. 35.5" className="w-full rounded border border-outline-variant px-3 py-2 text-sm" />
+                  <input type="number" step="0.01" placeholder="e.g. 35.5" className="w-full rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-on-surface mb-2">Region</label>
                   <div className="flex gap-4">
                     {regions.map((r) => (
                       <label key={r} className="flex items-center gap-2 text-sm">
-                        <input type="radio" name="region" value={r} className="accent-primary-container" checked={fscRegion === r} onChange={() => setFscRegion(r)} />
+                        <input type="radio" name="region" value={r} className="accent-primary" checked={fscRegion === r} onChange={() => setFscRegion(r)} />
                         {r}
                       </label>
                     ))}
@@ -499,7 +510,7 @@ setParsingState('done');
               </div>
               <button
                 onClick={handleFscCheck}
-                className="w-full inline-flex items-center justify-center gap-2 bg-primary-container text-white px-4 py-3 rounded text-sm font-medium hover:bg-primary transition-colors"
+                className="ember-button w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-opacity hover:opacity-90"
               >
                 <FileText className="h-4 w-4" />
                 Calculate FSC
@@ -507,8 +518,11 @@ setParsingState('done');
             </div>
 
             <div className="space-y-4">
-              <div className="bg-surface-container rounded border border-outline-variant p-6">
-                <h3 className="text-sm font-semibold text-on-surface-variant mb-4">FSC CALCULATION RESULT</h3>
+              <div className="bg-surface-container-low rounded-md border border-outline-variant p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-on-surface-variant">FSC CALCULATION RESULT</h3>
+                  <span className="font-label-caps text-label-caps text-on-surface-variant">Sample data</span>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-on-surface-variant">Diesel Price (ZAR/l)</p>
@@ -527,12 +541,12 @@ setParsingState('done');
                     <p className="text-lg font-mono font-semibold text-risk-red">18,500.00</p>
                   </div>
                 </div>
-                  <div className="mt-4 rounded bg-risk-red/10 border border-risk-red/30 p-3 flex items-center justify-between">
-                    <span className="text-sm font-medium text-risk-red">Overcharge Difference</span>
-                    <span className="text-lg font-mono font-bold text-risk-red">R2,300.00</span>
+                <div className="mt-4 rounded-md bg-risk-red/10 border border-risk-red/30 p-3 flex items-center justify-between">
+                  <span className="text-sm font-medium text-risk-red">Overcharge Difference</span>
+                  <span className="text-lg font-mono font-bold text-risk-red">R2,300.00</span>
                 </div>
               </div>
-              <button className="w-full inline-flex items-center justify-center gap-2 bg-primary-container text-white px-4 py-3 rounded text-sm font-medium hover:bg-primary transition-colors">
+              <button className="ember-button w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-md text-sm font-medium transition-opacity hover:opacity-90">
                 <FileText className="h-4 w-4" />
                 Generate FSC Dispute Notice
               </button>

@@ -13,7 +13,7 @@ const demoFindings = [
 
 const categories = [
   { icon: 'AlertTriangle', label: 'Overcharges', count: 7, color: 'text-risk-red bg-risk-red/10' },
-  { icon: 'Clock', label: 'Demurrage', count: 3, color: 'text-primary-container bg-primary-container/10' },
+  { icon: 'Clock', label: 'Demurrage', count: 3, color: 'text-warn bg-warn/10' },
   { icon: 'FileSearch', label: 'Missing Docs', count: 2, color: 'text-tertiary bg-tertiary/10' },
   { icon: 'CheckCircle2', label: 'Verified', count: 6, color: 'text-success bg-success/10' },
 ];
@@ -46,22 +46,33 @@ export default async function PublicProofPage({ params }: { params: Promise<{ to
     return (
       <div className="min-h-screen bg-surface-container-lowest flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Proof not found</h1>
+          <h1 className="text-2xl font-bold text-on-surface mb-4">Proof not found</h1>
           <p className="text-on-surface-variant">This proof link is invalid or has expired.</p>
         </div>
       </div>
     );
   }
 
+  const isDemo = token === 'demo';
+
   return (
-    <div className="min-h-screen bg-surface-container-lowest text-white font-body-md">
+    <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body-md">
       <div className="mx-auto max-w-4xl p-8 space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">CargoIQ</h1>
-          <p className="text-primary-container text-lg">Verified Shadow Audit Results</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-on-surface mb-2">
+            Cargo<span className="iq-gradient">IQ</span>
+          </h1>
+          <p className="text-lg ember-text font-semibold">Verified Shadow Audit Results</p>
         </div>
 
-        <div className="bg-surface-container rounded p-8 text-on-surface space-y-6">
+        {/* Honesty: tag demo/sample proof so it is never mistaken for a live audit */}
+        {isDemo && (
+          <div className="mx-auto max-w-2xl rounded border-l-4 border-warn bg-warn/10 p-3 text-sm text-warn">
+            You're viewing a <strong>Demo Audit</strong> with illustrative sample data — not findings from a real shipment set.
+          </div>
+        )}
+
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm p-8 space-y-6">
           <div className="text-center border-b border-outline-variant pb-6">
             <p className="text-sm font-medium text-on-surface-variant mb-2">Total Exposure Identified</p>
             <p className="font-mono text-5xl md:text-6xl font-bold text-risk-red">
@@ -90,7 +101,7 @@ export default async function PublicProofPage({ params }: { params: Promise<{ to
             <div className="rounded-lg border border-outline-variant overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-surface-container text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  <tr className="bg-surface-container-low text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
                     <th className="px-4 py-3">Shipment</th>
                     <th className="px-4 py-3">Finding</th>
                     <th className="px-4 py-3 text-right">Amount (ZAR)</th>
@@ -99,7 +110,7 @@ export default async function PublicProofPage({ params }: { params: Promise<{ to
                 </thead>
                 <tbody className="divide-y divide-outline-variant">
                   {data.findings.map((row: any) => (
-                    <tr key={row.shipment} className="hover:bg-surface-container-highest transition-colors">
+                    <tr key={row.shipment} className="hover:bg-surface-container-low transition-colors">
                       <td className="px-4 py-3 font-mono text-xs">{row.shipment}</td>
                       <td className="px-4 py-3">{row.finding}</td>
                       <td className="px-4 py-3 text-right font-mono">
@@ -125,7 +136,7 @@ export default async function PublicProofPage({ params }: { params: Promise<{ to
             </p>
             <a
               href="/shadow-audit"
-              className="inline-flex items-center gap-2 bg-primary-container text-white px-6 py-3 rounded-full font-semibold hover:bg-primary transition-colors"
+              className="ember-button inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-opacity"
             >
               Run My Free Shadow Audit
             </a>

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { cn } from '@/lib/utils';
 import {
   Building2,
@@ -355,6 +356,16 @@ export default function SettingsPage() {
 
         <div className="mt-6">
           {activeTab === 'org' && (
+            <>
+            <Card title="Appearance" subtitle="Choose how CargoIQ looks for you. Switch anytime.">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h4 className="text-sm font-semibold text-on-surface">Theme</h4>
+                  <p className="text-sm text-on-surface-variant">Light is the clean white default. Dark is the warm terminal look.</p>
+                </div>
+                <ThemeToggle />
+              </div>
+            </Card>
             <Card title="Organisation" subtitle="Update your company details and billing contact.">
               <div className="space-y-4">
                 <Input label="Organisation name" defaultValue="CargoIQ Demo Pty Ltd" />
@@ -366,6 +377,7 @@ export default function SettingsPage() {
                 <Button className="ember-button">Save changes</Button>
               </div>
             </Card>
+            </>
           )}
 
           {activeTab === 'email' && (

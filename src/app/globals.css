@@ -6,38 +6,178 @@
  * CargoIQ — two-mode theme tokens.
  * CIVIC (authenticated app + auth + proof): clean white government-portal.
  * EMBER (public marketing): warm red-orange diagonal gradient.
- * The --*-variable names below are kept for backwards-compat with code that
- * still reads raw CSS vars; their VALUES are now the CIVIC white palette.
+ *
+ * Token values swap on a `.dark` class on <html> (Tailwind darkMode: 'class').
+ *
+ * Light = DEFAULT (no stored preference = white government-portal).
+ *        Neutral scale is COOL SLATE — never warm taupe/brown.
+ * Dark  = optional persisted toggle; warm terminal neutrals read fine on near-black.
+ *
+ * Warm/ember/gold appear ONLY on accent surfaces (CTAs, active nav, 'IQ',
+ * Upgrade, value highlights in dark) — never as plain text on white.
  */
 :root {
+  /* ---- CIVIC neutral scale (cool slate) ---- */
   --background: #ffffff;
-  --foreground: #101318;
+  --foreground: #0f172a;
+  --surface: #f8fafc;
+  --surface-container: #ffffff;
+  --surface-container-low: #f8fafc;
+  --surface-container-lowest: #ffffff;
+  --surface-container-high: #f1f5f9;
+  --surface-container-highest: #e2e8f0;
+  --elevated: #ffffff;
+  --border-subtle: #e2e8f0;
+  --outline-variant: #e2e8f0;
+  --outline: #cbd5e1;
+  --on-surface: #0f172a;
+  --on-surface-variant: #475569;
+  --outline-text: #94a3b8;
+  --on-primary: #ffffff;
+
+  /* ---- semantic data (flat, not gradients) ---- */
+  --primary: #c83a12;
+  --primary-container: #c83a12;
+  --on-primary-container: #7e2410;
+  --secondary: #f2451c;
+  --secondary-container: #c25300;
+  --tertiary: #2563eb;
+  --error: #dc2626;
+  --error-container: #fef2f2;
+  --success: #059669;
+  --warn: #d97706;
+  --info: #2563eb;
+
+  /* ---- tinted semantic pills ---- */
+  --risk-pill-bg: #fef2f2;
+  --risk-pill-text: #dc2626;
+  --risk-pill-border: #fecaca;
+  --warn-pill-bg: #fffbeb;
+  --warn-pill-text: #d97706;
+  --ok-pill-bg: #ecfdf5;
+  --ok-pill-text: #059669;
+  --info-pill-bg: #eff6ff;
+  --info-pill-text: #2563eb;
+
+  /* ---- table accents ---- */
+  --table-header-bg: #f8fafc;
+  --table-header-text: #475569;
+  --zebra: #f8fafc;
+  --row-hover: #f1f5f9;
+
+  /* ---- scrollbar (light) ---- */
+  --scroll-track: #f1f5f9;
+  --scroll-thumb: #cbd5e1;
+  --scroll-thumb-hover: #ea580c;
+
+  /* ---- backwards-compat aliases (older code reads these) ---- */
   --color-cargoiq-bg: #f6f7f9;
-  --color-cargoiq-navy: #101318;
+  --color-cargoiq-navy: #0f172a;
   --color-cargoiq-gold: #c83a12;
-  --color-cargoiq-green: #027a48;
-  --color-cargoiq-red: #d92d20;
-  --color-cargoiq-textPrimary: #101318;
-  --color-cargoiq-textSecondary: #5b6573;
-  --color-cargoiq-border: #e4e7ec;
-  --color-cargoiq-warning: #b54708;
+  --color-cargoiq-green: #059669;
+  --color-cargoiq-red: #dc2626;
+  --color-cargoiq-textPrimary: #0f172a;
+  --color-cargoiq-textSecondary: #475569;
+  --color-cargoiq-border: #e2e8f0;
+  --color-cargoiq-warning: #d97706;
   --color-cargoiq-canvas: #f6f7f9;
   --hull: #ffffff;
-  --panel: #f6f7f9;
-  --elevated: #ffffff;
-  --border-subtle: #e4e7ec;
+  --panel: #f8fafc;
   --cargo-gold: #c83a12;
   --iq-orange: #f2451c;
-  --risk-red: #d92d20;
-  --success-green: #027a48;
+  --risk-red: #dc2626;
+  --success-green: #059669;
 
-  /* EMBER gradients (public marketing only) */
+  /* ---- EMBER gradient text accent on white (light) ---- */
+  --ember-text: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f97316 100%);
+  --ember-focus: #c2410c;
+
+  /* ---- EMBER gradient fills (CTAs / active bar — SAME in both themes) ---- */
+  --ember-button: linear-gradient(135deg, #7e2410 0%, #c83a12 50%, #f2451c 100%);
+  --ember-leftbar: linear-gradient(180deg, #7e2410 0%, #c83a12 50%, #f2451c 100%);
+  --ember-tint: linear-gradient(135deg, rgba(200, 58, 18, 0.08) 0%, rgba(242, 69, 28, 0.04) 100%);
+
+  /* ---- EMBER marketing surfaces (public homepage + /roadmap only) ---- */
   --ember-page: linear-gradient(150deg, #2a0b04 0%, #5e1e0c 20%, #97300f 42%, #d2430f 66%, #ff531c 100%);
   --ember-glow: radial-gradient(60% 60% at 85% 60%, rgba(255, 90, 31, 0.35), transparent 70%);
-  --ember-button: linear-gradient(135deg, #7e2410 0%, #c83a12 50%, #f2451c 100%);
-  --ember-text: linear-gradient(135deg, #f2451c 0%, #ff7a3c 100%);
-  --ember-tint: linear-gradient(135deg, rgba(200, 58, 18, 0.08) 0%, rgba(242, 69, 28, 0.04) 100%);
-  --ember-leftbar: linear-gradient(180deg, #c83a12 0%, #f2451c 100%);
+}
+
+/*
+ * DARK theme (optional persisted toggle).
+ * Warm terminal neutrals live ONLY here — never inside :root / light scope.
+ * Gold allowed as value/highlight on near-black.
+ */
+.dark {
+  --background: #0a0e13;
+  --foreground: #e0e2ea;
+  --surface: #12181f;
+  --surface-container: #161d26;
+  --surface-container-low: #101419;
+  --surface-container-lowest: #0a0e13;
+  --surface-container-high: #1c2025;
+  --surface-container-highest: #262a30;
+  --elevated: #161d26;
+  --border-subtle: #4e4636;
+  --outline-variant: #4e4636;
+  --outline: #9b8f7c;
+  --on-surface: #e0e2ea;
+  --on-surface-variant: #d2c5b0;
+  --outline-text: #9b8f7c;
+  --on-primary: #0a0e13;
+
+  --primary: #ffd57e;
+  --primary-container: #e8b84b;
+  --on-primary-container: #0a0e13;
+  --secondary: #f2451c;
+  --secondary-container: #c25300;
+  --tertiary: #2563eb;
+  --error: #e5484d;
+  --error-container: #ffb4ab;
+  --success: #2fbf71;
+  --warn: #d97706;
+  --info: #2563eb;
+
+  --risk-pill-bg: rgba(229, 72, 77, 0.12);
+  --risk-pill-text: #ffb4ab;
+  --risk-pill-border: #e5484d;
+  --warn-pill-bg: rgba(217, 119, 6, 0.12);
+  --warn-pill-text: #ffd57e;
+  --ok-pill-bg: rgba(47, 191, 113, 0.12);
+  --ok-pill-text: #7be8a8;
+  --info-pill-bg: rgba(37, 99, 235, 0.12);
+  --info-pill-text: #93c5fd;
+
+  --table-header-bg: #12181f;
+  --table-header-text: #d2c5b0;
+  --zebra: #12181f;
+  --row-hover: #1c2025;
+
+  --scroll-track: #12181f;
+  --scroll-thumb: #4e4636;
+  --scroll-thumb-hover: #f2451c;
+
+  /* backwards-compat aliases follow the dark palette so older refs flip too */
+  --color-cargoiq-bg: #0a0e13;
+  --color-cargoiq-navy: #e0e2ea;
+  --color-cargoiq-gold: #ffd57e;
+  --color-cargoiq-green: #2fbf71;
+  --color-cargoiq-red: #e5484d;
+  --color-cargoiq-textPrimary: #e0e2ea;
+  --color-cargoiq-textSecondary: #d2c5b0;
+  --color-cargoiq-border: #4e4636;
+  --color-cargoiq-warning: #d97706;
+  --color-cargoiq-canvas: #0a0e13;
+  --hull: #0a0e13;
+  --panel: #12181f;
+  --cargo-gold: #ffd57e;
+  --iq-orange: #f2451c;
+  --risk-red: #e5484d;
+  --success-green: #2fbf71;
+
+  --ember-text: linear-gradient(135deg, #e26a1e 0%, #ff7a33 100%);
+  --ember-focus: #f2451c;
+
+  /* EMBER marketing surfaces unchanged in dark — they carry their own gradient */
 }
 
 html {
@@ -110,7 +250,7 @@ body {
     letter-spacing: -0.03em;
   }
   .border-technical {
-    border: 1px solid #e4e7ec;
+    border: 1px solid var(--border-subtle);
   }
   .hover-gold:hover {
     border-color: rgba(200, 58, 18, 0.4);
@@ -118,7 +258,7 @@ body {
   .zebra-table tr:nth-child(even),
   .zebra-row:nth-child(even),
   .audit-row:nth-child(even) {
-    background-color: #f9fafb;
+    background-color: var(--zebra);
   }
   .ai-glow {
     box-shadow: inset 3px 0 0 0 var(--ember-button);
@@ -128,18 +268,18 @@ body {
     height: 6px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f6f7f9;
+    background: var(--scroll-track);
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #d0d5dd;
+    background: var(--scroll-thumb);
     border-radius: 3px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #9aa4b2;
+    background: var(--scroll-thumb-hover);
   }
   .coming-soon-badge {
     background: linear-gradient(90deg, rgba(200, 58, 18, 0.1), rgba(200, 58, 18, 0.02));
-    border-left: 2px solid #c83a12;
+    border-left: 2px solid var(--primary);
   }
   .gloss-effect {
     position: relative;
@@ -154,8 +294,8 @@ body {
     pointer-events: none;
   }
   .technical-grid {
-    background-image: linear-gradient(#e4e7ec 1px, transparent 1px),
-      linear-gradient(90deg, #e4e7ec 1px, transparent 1px);
+    background-image: linear-gradient(var(--outline-variant) 1px, transparent 1px),
+      linear-gradient(90deg, var(--outline-variant) 1px, transparent 1px);
     background-size: 40px 40px;
   }
   @keyframes scroll {
@@ -208,15 +348,15 @@ body {
   @keyframes pulse-red {
     0% {
       transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(217, 45, 32, 0.7);
+      box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
     }
     70% {
       transform: scale(1);
-      box-shadow: 0 0 0 6px rgba(217, 45, 32, 0);
+      box-shadow: 0 0 0 6px rgba(220, 38, 38, 0);
     }
     100% {
       transform: scale(0.95);
-      box-shadow: 0 0 0 0 rgba(217, 45, 32, 0);
+      box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
     }
   }
   .pulse-red {

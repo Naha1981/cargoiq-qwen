@@ -30,6 +30,7 @@ export const drivers = pgTable('drivers', {
   tenantId: varchar('tenant_id', { length: 36 }).notNull().references(() => tenants.id),
   name: varchar('name', { length: 255 }),
   phoneNumber: varchar('phone_number', { length: 20 }).notNull().unique(),
+  defaultLocation: varchar('default_location', { length: 255 }),
   active: boolean('active').default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => [

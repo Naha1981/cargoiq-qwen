@@ -10,6 +10,18 @@ import { eq } from "drizzle-orm";
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+async function resolveTenant(userId: string) {
+  if (!db) return null;
+  const appUser = await db.query.users.findFirst({
+    where: eq(users.clerk_id, userId as string),
+  });
+  if (!appUser) return null;
+  const tenant = await db.query.tenants.findFirst({
+    where: eq(tenants.id, appUser.tenantId),
+  });
+  return tenant;
+}
+
 const createDriverSchema = z.object({
   name: z.string().min(1, "Driver name is required"),
   phoneNumber: z.string().min(1, "Phone number is required"),
@@ -42,20 +54,7 @@ export async function POST(request: NextRequest) {
     const { name, phoneNumber } = parsed.data;
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
 
-    const appUser = await db.query.users.findFirst({
-      where: eq(users.clerk_id, userId as string),
-    });
-
-    if (!appUser) {
-      return NextResponse.json(
-        { error: "USER_NOT_FOUND", message: "User profile not found." },
-        { status: 404 }
-      );
-    }
-
-    const tenant = await db.query.tenants.findFirst({
-      where: eq(tenants.id, appUser.tenantId),
-    });
+    const tenant = await resolveTenant(userId as string);
 
     if (!tenant) {
       return NextResponse.json(
@@ -80,6 +79,7 @@ export async function POST(request: NextRequest) {
       tenantId: tenant.id,
       name,
       phoneNumber: normalizedPhone,
+      defaultLocation: (body as Record<string, unknown>).defaultLocation as string | undefined,
       active: true,
     }).returning();
 
@@ -92,6 +92,41 @@ export async function POST(request: NextRequest) {
     console.error("[Create Driver Error]:", error);
     return NextResponse.json(
       { error: "INTERNAL_ERROR", message: "Failed to create driver." },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/v1/drivers
+ * Tenant-scoped driver list. Tenant derived from authenticated Clerk user,
+ * never client-supplied. Returns drivers for the WhatsApp driver-mapping table.
+ */
+export async function GET() {
+  if (!db) {
+    return NextResponse.json(
+      { error: "SERVICE_UNAVAILABLE", message: "Database not configured." },
+      { status: 503 }
+    );
+  }
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
+    const tenant = await resolveTenant(userId as string);
+    if (!tenant) {
+      return NextResponse.json({ error: "TENANT_NOT_FOUND" }, { status: 403 });
+    }
+    const list = await db.query.drivers.findMany({
+      where: eq(drivers.tenantId, tenant.id),
+      orderBy: (d, { desc }) => [desc(d.createdAt)],
+    });
+    return NextResponse.json({ data: list, tenantId: tenant.id });
+  } catch (error) {
+    console.error("[Drivers GET Error]:", error);
+    return NextResponse.json(
+      { error: "INTERNAL_ERROR", message: "Failed to fetch drivers." },
       { status: 500 }
     );
   }

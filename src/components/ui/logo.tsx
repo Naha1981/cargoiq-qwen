@@ -21,7 +21,7 @@ export function Logo({ size = 'md', dark = false, className }: LogoProps) {
       className={cn('inline-flex font-[var(--font-display-lg)] tracking-tight', sizeStyles[size], className)}
       style={{ letterSpacing: '-0.02em' }}
     >
-      <span className="font-bold" style={{ color: dark ? '#FFFFFF' : '#101318' }}>
+      <span className="font-bold" style={{ color: dark ? '#FFFFFF' : 'var(--on-surface)' }}>
         Cargo
       </span>
       {/* "IQ" always uses the ember gradient text-fill (both themes) */}

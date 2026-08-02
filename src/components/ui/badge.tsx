@@ -10,11 +10,16 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  success: 'bg-green-100 text-green-800',
-  warning: 'bg-amber-100 text-amber-800',
-  error: 'bg-red-100 text-red-800',
-  info: 'bg-blue-100 text-blue-800',
-  neutral: 'bg-gray-100 text-gray-800',
+  success:
+    'border border-[color:var(--ok-pill-border)] bg-[color:var(--ok-pill-bg)] text-[color:var(--ok-pill-text)]',
+  warning:
+    'border border-[color:var(--warn-pill-border)] bg-[color:var(--warn-pill-bg)] text-[color:var(--warn-pill-text)]',
+  error:
+    'border border-[color:var(--risk-pill-border)] bg-[color:var(--risk-pill-bg)] text-[color:var(--risk-pill-text)]',
+  info:
+    'border border-[color:var(--info-pill-border)] bg-[color:var(--info-pill-bg)] text-[color:var(--info-pill-text)]',
+  neutral:
+    'border border-outline-variant bg-surface-container-high text-on-surface-variant',
 };
 
 export function Badge({ variant = 'neutral', children, className }: BadgeProps) {

@@ -8,10 +8,10 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles = {
-  primary: 'bg-amber-500 text-white hover:bg-amber-600',
-  outline: 'border border-gray-300 bg-transparent hover:bg-gray-50',
-  ghost: 'bg-transparent hover:bg-gray-100',
-  navy: 'bg-[#1A2332] text-white hover:bg-[#1A2332]/90',
+  primary: 'ember-button hover:opacity-90',
+  outline: 'border border-outline bg-surface-container text-on-surface hover:bg-surface-container-high',
+  ghost: 'bg-transparent text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface',
+  navy: 'bg-[var(--on-surface)] text-[var(--background)] hover:opacity-90',
 };
 
 const sizeStyles = {
@@ -24,7 +24,7 @@ export function Button({ variant = 'primary', size = 'md', className, children, 
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+        'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ember-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:pointer-events-none disabled:opacity-50',
         variantStyles[variant],
         sizeStyles[size],
         className

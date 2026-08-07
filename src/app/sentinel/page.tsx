@@ -222,8 +222,8 @@ export default function SentinelPage() {
                 Sample data
               </span>
             </div>
-            <div className="">
-              <table className="w-full table-fixed text-sm">
+            <div className="overflow-x-auto">
+              <table className="min-w-[560px] w-full table-fixed text-sm">
                 <colgroup>
                   <col style={{ width: '30%' }} />
                   <col style={{ width: '15%' }} />
@@ -272,8 +272,8 @@ export default function SentinelPage() {
                 Sample data
               </span>
             </div>
-            <div className="">
-              <table className="w-full table-fixed text-sm">
+            <div className="overflow-x-auto">
+              <table className="min-w-[560px] w-full table-fixed text-sm">
                 <colgroup>
                   <col style={{ width: '25%' }} />
                   <col style={{ width: '20%' }} />

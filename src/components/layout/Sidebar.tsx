@@ -35,7 +35,7 @@ export default function Sidebar({ identity }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r border-outline-variant bg-surface-container-lowest">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[260px] flex-col border-r border-outline-variant bg-surface-container-lowest lg:flex">
       {/* Logo + workspace */}
       <div className="flex flex-col gap-3 border-b border-outline-variant px-6 pt-6 pb-5">
         <Logo size="sm" />

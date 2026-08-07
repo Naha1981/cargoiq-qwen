@@ -36,11 +36,11 @@
   --on-primary: #ffffff;
 
   /* ---- semantic data (flat, not gradients) ---- */
-  --primary: #c83a12;
-  --primary-container: #c83a12;
-  --on-primary-container: #7e2410;
-  --secondary: #f2451c;
-  --secondary-container: #c25300;
+  --primary: #f97316;
+  --primary-container: #ea580c;
+  --on-primary-container: #c2410c;
+  --secondary: #ea580c;
+  --secondary-container: #c2410c;
   --tertiary: #2563eb;
   --error: #dc2626;
   --error-container: #fef2f2;
@@ -73,7 +73,7 @@
   /* ---- backwards-compat aliases (older code reads these) ---- */
   --color-cargoiq-bg: #f6f7f9;
   --color-cargoiq-navy: #0f172a;
-  --color-cargoiq-gold: #c83a12;
+  --color-cargoiq-gold: #f97316;
   --color-cargoiq-green: #059669;
   --color-cargoiq-red: #dc2626;
   --color-cargoiq-textPrimary: #0f172a;
@@ -84,18 +84,18 @@
   --hull: #ffffff;
   --panel: #f8fafc;
   --cargo-gold: #c83a12;
-  --iq-orange: #f2451c;
+  --iq-orange: #f97316;
   --risk-red: #dc2626;
   --success-green: #059669;
 
   /* ---- EMBER gradient text accent on white (light) ---- */
-  --ember-text: linear-gradient(135deg, #c2410c 0%, #ea580c 50%, #f97316 100%);
-  --ember-focus: #c2410c;
+  --ember-text: linear-gradient(135deg, #c2410c 0%, #ea580c 55%, #f97316 100%);
+  --ember-focus: #ea580c;
 
   /* ---- EMBER gradient fills (CTAs / active bar — SAME in both themes) ---- */
-  --ember-button: linear-gradient(135deg, #7e2410 0%, #c83a12 50%, #f2451c 100%);
-  --ember-leftbar: linear-gradient(180deg, #7e2410 0%, #c83a12 50%, #f2451c 100%);
-  --ember-tint: linear-gradient(135deg, rgba(200, 58, 18, 0.08) 0%, rgba(242, 69, 28, 0.04) 100%);
+  --ember-button: linear-gradient(135deg, #c2410c 0%, #ea580c 55%, #f97316 100%);
+  --ember-leftbar: linear-gradient(180deg, #c2410c 0%, #ea580c 55%, #f97316 100%);
+  --ember-tint: linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, rgba(234, 88, 12, 0.06) 100%);
 
   /* ---- EMBER marketing surfaces (public homepage + /roadmap only) ---- */
   --ember-page: linear-gradient(150deg, #2a0b04 0%, #5e1e0c 20%, #97300f 42%, #d2430f 66%, #ff531c 100%);
@@ -170,12 +170,12 @@
   --hull: #0a0e13;
   --panel: #12181f;
   --cargo-gold: #ffd57e;
-  --iq-orange: #f2451c;
+  --iq-orange: #f97316;
   --risk-red: #e5484d;
   --success-green: #2fbf71;
 
-  --ember-text: linear-gradient(135deg, #e26a1e 0%, #ff7a33 100%);
-  --ember-focus: #f2451c;
+  --ember-text: linear-gradient(135deg, #c2410c 0%, #ea580c 55%, #f97316 100%);
+  --ember-focus: #f97316;
 
   /* EMBER marketing surfaces unchanged in dark — they carry their own gradient */
 }
@@ -190,6 +190,7 @@ body {
   font-family: var(--font-body-md), IBM Plex Sans, Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 .font-mono {

@@ -301,9 +301,9 @@ export default function CarrierAuditPage() {
             ) : rateCards.length === 0 && !useDemo ? (
               <div className="text-sm text-on-surface-variant">No rate cards yet. Add your first one above.</div>
             ) : (
-              <div className="bg-surface-container-low rounded-md border border-outline-variant overflow-hidden">
-                <div className="">
-                  <table className="w-full text-sm">
+              <div className="overflow-hidden rounded-md border border-outline-variant bg-surface-container-low">
+                <div className="overflow-x-auto">
+                  <table className="min-w-[760px] w-full text-sm">
                     <thead>
                       <tr className="bg-surface-container-lowest text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
                         <th className="px-4 py-3">Carrier</th>
@@ -402,9 +402,9 @@ export default function CarrierAuditPage() {
               </div>
             )}
 
-            <div className="bg-surface-container-low rounded-md border border-outline-variant overflow-hidden">
-              <div className="">
-                <table className="w-full text-sm">
+            <div className="overflow-hidden rounded-md border border-outline-variant bg-surface-container-low">
+              <div className="overflow-x-auto">
+                <table className="min-w-[720px] w-full text-sm">
                   <thead>
                     <tr className="bg-surface-container-lowest text-left text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
                       <th className="px-4 py-3">Charge</th>

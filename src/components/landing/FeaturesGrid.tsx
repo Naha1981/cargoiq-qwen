@@ -96,7 +96,7 @@ export function FeaturesGrid() {
           <span className="font-[var(--font-body-md)] text-[12px] font-semibold uppercase tracking-[0.08em] text-[#FF7A3C]">
             The CargoIQ Platform
           </span>
-          <h2 className="mt-3 font-[var(--font-display-lg)] text-white font-bold text-[32px] sm:text-[40px] tracking-[-0.03em]">
+          <h2 className="mt-3 font-[var(--font-display-lg)] text-white font-bold text-3xl sm:text-4xl tracking-[-0.03em]">
             Built for high-velocity freight
           </h2>
           <p className="mt-4 font-[var(--font-body-md)] text-[16px] text-white/65 max-w-2xl">

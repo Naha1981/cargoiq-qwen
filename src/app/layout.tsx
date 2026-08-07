@@ -38,6 +38,12 @@ const ibmPlexSans = IBM_Plex_Sans({
 export const metadata: Metadata = {
   title: 'CargoIQ — AI Compliance & Revenue Recovery',
   description: "South Africa's first AI-powered compliance and cost-containment platform for freight forwarders and customs clearing agents.",
+  icons: [
+    { rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' },
+    { rel: 'apple-touch-icon', url: '/favicon.svg' },
+  ],
+  manifest: '/manifest.webmanifest',
+  themeColor: '#0A0E13',
 };
 
 export default async function RootLayout({
@@ -98,7 +104,7 @@ export default async function RootLayout({
         <ClerkProvider
           appearance={{
             variables: {
-              colorPrimary: '#C83A12',
+              colorPrimary: '#F97316',
               colorForeground: '#101318',
               colorBackground: '#FFFFFF',
               colorInput: '#FFFFFF',
@@ -108,7 +114,7 @@ export default async function RootLayout({
             },
             elements: {
               formButtonPrimary:
-                'bg-[linear-gradient(135deg,#7E2410_0%,#C83A12_50%,#F2451C_100%)] text-white hover:opacity-90',
+                'bg-[linear-gradient(135deg,#C2410C_0%,#EA580C_55%,#F97316_100%)] text-white hover:opacity-90',
               cardBox: 'bg-white border border-[#E4E7EC] shadow-sm',
               headerTitle: 'text-[#101318]',
               headerSubtitle: 'text-[#5B6573]',

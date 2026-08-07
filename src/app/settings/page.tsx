@@ -479,8 +479,8 @@ export default function SettingsPage() {
                           ? 'Checking gateway…'
                           : gwHealth.configured && gwHealth.reachable
                             ? connected
-                              ? `Connected ✓ ${gwHealth.instance ?? ''}`
-                              : 'Gateway reachable — not connected'
+                              ? `Gateway connected${gwHealth.instance ? ` · ${gwHealth.instance}` : ''}`
+                              : 'Gateway reachable — pending connection'
                             : gwHealth.configured
                               ? 'Gateway unreachable'
                               : 'Evolution not configured'}
@@ -508,8 +508,8 @@ export default function SettingsPage() {
                   <div className="rounded-lg border border-outline-variant p-4">
                     <h4 className="text-sm font-semibold text-on-surface">Scan QR with WhatsApp</h4>
                     <p className="mt-1 text-xs text-on-surface-variant">
-                      Open WhatsApp → Linked Devices → Link a Device → scan this QR. The status above
-                      will flip to <strong>Connected ✓</strong> automatically.
+                      Open WhatsApp → Linked Devices → Link a Device → scan this QR. The gateway status
+                      above will update after the device is recognised by Evolution.
                     </p>
                     <div className="mt-4 flex justify-center">
                       <img
@@ -538,7 +538,7 @@ export default function SettingsPage() {
                         <div className="h-2.5 w-2.5 rounded-full bg-success" />
                         <div>
                           <span className="text-sm font-semibold text-success">
-                            Connected ✓
+                            Gateway connected
                           </span>
                           {gwHealth.instance && (
                             <span className="ml-2 text-xs text-on-surface-variant">

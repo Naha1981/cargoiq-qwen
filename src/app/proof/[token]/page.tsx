@@ -1,5 +1,6 @@
 import { previousAudits, auditFindings } from '@/lib/auditData';
 import { AlertTriangle, Clock, FileSearch, CheckCircle2 } from 'lucide-react';
+import { Logo } from '@/components/ui/logo';
 
 const demoExposure = 88400;
 const demoFindings = [
@@ -59,10 +60,10 @@ export default async function PublicProofPage({ params }: { params: Promise<{ to
     <div className="min-h-screen bg-surface-container-lowest text-on-surface font-body-md">
       <div className="mx-auto max-w-4xl p-8 space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-on-surface mb-2">
-            Cargo<span className="iq-gradient">IQ</span>
-          </h1>
-          <p className="text-lg ember-text font-semibold">Verified Shadow Audit Results</p>
+          <div className="flex justify-center">
+            <Logo size="lg" className="justify-center" />
+          </div>
+          <p className="mt-3 text-lg ember-text font-semibold">Verified Shadow Audit Results</p>
         </div>
 
         {/* Honesty: tag demo/sample proof so it is never mistaken for a live audit */}

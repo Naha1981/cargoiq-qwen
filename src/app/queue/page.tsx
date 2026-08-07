@@ -130,6 +130,7 @@ export default function QueuePage() {
   const [useDemo, setUseDemo] = useState(true);
   const [demoShipments, setDemoShipments] =
     useState<DemoShipment[]>(SAMPLE_SHIPMENTS);
+  const [selectedShipment, setSelectedShipment] = useState<DemoShipment | null>(null);
 
   const filtered = demoShipments.filter((s) => {
     if (activeTab !== 'All' && s.status !== activeTab) return false;
@@ -236,9 +237,9 @@ export default function QueuePage() {
     <div className="min-h-screen bg-surface-container-lowest text-on-surface">
       <div className="p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-on-surface flex items-center gap-2">
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-on-surface">
               <Logo size="sm" />
               <span className="text-on-surface-variant font-normal">/</span>
               Shipment Queue
@@ -401,8 +402,8 @@ export default function QueuePage() {
           onDragOver={(e) => e.preventDefault()}
         >
           {/* Toolbar */}
-          <div className="flex items-center gap-4 p-4 border-b border-outline-variant">
-            <div className="flex gap-1">
+          <div className="flex flex-col gap-3 border-b border-outline-variant p-4 md:flex-row md:items-center">
+            <div className="flex flex-wrap gap-1">
               {ALL_TABS.map((tab) => (
                 <button
                   key={tab}
@@ -423,14 +424,14 @@ export default function QueuePage() {
               ))}
             </div>
             <div className="flex-1" />
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant" />
               <input
                 type="text"
                 placeholder="Search reference or shipper..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-3 py-1.5 border border-outline-variant rounded text-sm w-64 bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container"
+                className="w-full rounded border border-outline-variant bg-surface-container-lowest py-1.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-container"
               />
             </div>
             <input
@@ -438,40 +439,42 @@ export default function QueuePage() {
               placeholder="Filter importer..."
               value={importer}
               onChange={(e) => setImporter(e.target.value)}
-              className="px-3 py-1.5 border border-outline-variant rounded text-sm w-48 bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-container"
+              className="w-full rounded border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-container md:w-48"
             />
           </div>
 
-          {/* Column header */}
-          <div
-            className={cn(
-              COLS,
-              'bg-surface-container px-4 py-2 text-xs font-semibold text-on-surface-variant uppercase',
-            )}
-          >
-            <div>Risk</div>
-            <div>Reference</div>
-            <div>Shipper</div>
-            <div>Consignee</div>
-            <div>Route</div>
-            <div>Type</div>
-            <div>Status</div>
-            <div>Actions</div>
-          </div>
-
-          {/* Rows */}
-          {filtered.length === 0 ? (
-            <div className="px-4 py-10 text-center text-sm text-on-surface-variant">
-              No shipments match the current filters. Upload a document or
-              reset the filters to see sample shipments.
-            </div>
-          ) : (
-            filtered.map((row) => (
+          <div className="overflow-x-auto">
+            <div className="min-w-[900px]">
               <div
-                key={row.id}
-                className="border-t border-outline-variant hover:bg-surface-container-highest transition-colors"
+                className={cn(
+                  COLS,
+                  'bg-surface-container px-4 py-2 text-xs font-semibold uppercase text-on-surface-variant',
+                )}
               >
-                <div className={cn(COLS, 'px-4 py-3 text-sm')}>
+                <div>Risk</div>
+                <div>Reference</div>
+                <div>Shipper</div>
+                <div>Consignee</div>
+                <div>Route</div>
+                <div>Type</div>
+                <div>Status</div>
+                <div>Actions</div>
+              </div>
+
+              {filtered.length === 0 ? (
+                <div className="px-4 py-10 text-center text-sm text-on-surface-variant">
+                  No shipments match the current filters. Upload a document or
+                  reset the filters to see sample shipments.
+                </div>
+              ) : (
+                filtered.map((row) => (
+                  <button
+                    key={row.id}
+                    type="button"
+                    className="block w-full border-t border-outline-variant text-left transition-colors hover:bg-surface-container-highest"
+                    onClick={() => setSelectedShipment(row)}
+                  >
+                    <div className={cn(COLS, 'px-4 py-3 text-sm')}>
                   <div className="flex items-center">
                     <div
                       className={cn(
@@ -502,34 +505,61 @@ export default function QueuePage() {
                       {row.status}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="p-1 hover:bg-surface-container-high rounded cursor-not-allowed opacity-50"
-                      title="View detail"
-                      disabled
-                    >
-                      <Eye className="w-4 h-4 text-on-surface-variant" />
-                    </button>
-                    <button
-                      className="p-1 hover:bg-success/20 rounded cursor-not-allowed opacity-50"
-                      title="Approve shipment"
-                      disabled
-                    >
-                      <Check className="w-4 h-4 text-success" />
-                    </button>
-                    <button
-                      className="p-1 hover:bg-risk-red/10 rounded cursor-not-allowed opacity-50"
-                      title="Reject shipment"
-                      disabled
-                    >
-                      <X className="w-4 h-4 text-risk-red" />
-                    </button>
-                  </div>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded p-1 text-on-surface-variant">
+                          <Eye className="h-4 w-4" />
+                        </span>
+                        <span className="rounded p-1 text-success">
+                          <Check className="h-4 w-4" />
+                        </span>
+                        <span className="rounded p-1 text-risk-red">
+                          <X className="h-4 w-4" />
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {selectedShipment && (
+          <div className="fixed inset-0 z-[60] flex items-end bg-black/40 lg:items-center lg:justify-center" onClick={() => setSelectedShipment(null)}>
+            <div className="w-full rounded-t-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xl lg:max-w-2xl lg:rounded-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Shipment detail</p>
+                  <h2 className="text-lg font-semibold text-on-surface">{selectedShipment.reference}</h2>
+                </div>
+                <button type="button" className="rounded-full p-2 hover:bg-surface-container-high" onClick={() => setSelectedShipment(null)}>
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="mt-4 grid gap-3 text-sm text-on-surface-variant sm:grid-cols-2">
+                <div className="rounded-lg border border-outline-variant p-3">
+                  <p className="text-xs uppercase tracking-wide">Shipper</p>
+                  <p className="mt-1 font-medium text-on-surface">{selectedShipment.shipper}</p>
+                </div>
+                <div className="rounded-lg border border-outline-variant p-3">
+                  <p className="text-xs uppercase tracking-wide">Consignee</p>
+                  <p className="mt-1 font-medium text-on-surface">{selectedShipment.consignee}</p>
+                </div>
+                <div className="rounded-lg border border-outline-variant p-3">
+                  <p className="text-xs uppercase tracking-wide">Route</p>
+                  <p className="mt-1 font-medium text-on-surface">{selectedShipment.route}</p>
+                </div>
+                <div className="rounded-lg border border-outline-variant p-3">
+                  <p className="text-xs uppercase tracking-wide">Status</p>
+                  <p className="mt-1 font-medium text-on-surface">{selectedShipment.status}</p>
                 </div>
               </div>
-            ))
-          )}
-        </div>
+              <div className="mt-4 rounded-lg border border-outline-variant bg-surface-container-low p-3 text-sm text-on-surface-variant">
+                This sample detail panel is a mobile-friendly fallback for the queue view. Upload or connect a live document to see the real shipment record here.
+              </div>
+            </div>
+          </div>
+        )}
 
         <p className="text-xs text-on-surface-variant">
           Tip: you can also drag and drop a customs document onto the queue

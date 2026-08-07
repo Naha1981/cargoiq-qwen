@@ -22,7 +22,7 @@ export function Hero() {
               AI-Powered Freight Audit &amp; Recovery
             </span>
 
-            <h1 className="mt-6 font-[var(--font-display-lg)] text-white font-bold leading-[1.05] tracking-[-0.03em] text-[40px] sm:text-[52px] lg:text-[60px]">
+            <h1 className="mt-6 font-[var(--font-display-lg)] text-white font-bold leading-[1.05] tracking-[-0.03em] text-4xl sm:text-5xl lg:text-6xl">
               Your freight operations
               <br className="hidden sm:block" /> are{' '}
               <span className="ember-accent">bleeding.</span>

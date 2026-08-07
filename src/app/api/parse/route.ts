@@ -1,14 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { generateObject } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { z } from "zod";
-import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { runComplianceShield } from "@/modules/compliance-shield/service";
-import { shipments, complianceResults, events } from "@/lib/db/schema";
-import { generateId } from "@/lib/utils";
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { generateObject } from 'ai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { z } from 'zod';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
+import { runComplianceShield } from '@/modules/compliance-shield/service';
+import { shipments, complianceResults, events } from '@/lib/db/schema';
+import { generateId } from '@/lib/utils';
+import { consumeRateLimit, getRequestIp } from '@/lib/security';
 
 const ExtractionSchema = z.object({
   shipmentRef: z.string().optional(),
@@ -34,7 +35,11 @@ export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
-      return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+      return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+
+    if (!consumeRateLimit(`parse:${userId || getRequestIp(req)}`)) {
+      return NextResponse.json({ error: 'RATE_LIMIT_EXCEEDED' }, { status: 429 });
     }
 
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;

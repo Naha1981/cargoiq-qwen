@@ -3,11 +3,20 @@ import { whatsappCheckInSchema } from '@/modules/driver-checkin/schema';
 import { processDriverCheckIn, resolveDriverAndTenant } from '@/modules/driver-checkin/service';
 import { normalizePhoneNumber } from '@/lib/utils';
 import { sendEvolutionText } from '@/lib/integrations/evolution/client';
+import { consumeRateLimit, verifyWebhookSecret } from '@/lib/security';
 
 const processedMessages = new Set<string>();
 
 export async function POST(req: NextRequest) {
   try {
+    if (!verifyWebhookSecret(req)) {
+      return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+
+    if (!consumeRateLimit(`webhook:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`)) {
+      return NextResponse.json({ error: 'RATE_LIMIT_EXCEEDED' }, { status: 429 });
+    }
+
     const body = await req.json();
 
     const parsed = whatsappCheckInSchema.safeParse(body);

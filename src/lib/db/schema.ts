@@ -189,3 +189,98 @@ export const invoices = pgTable('invoices', {
 export const invoicesRelations = relations(invoices, ({ one }) => ({
   tenant: one(tenants, { fields: [invoices.tenantId], references: [tenants.id] }),
 }));
+
+// ─── PROSPECTS (cold prospect intelligence — Stage 1) ──────
+export const prospects = pgTable('prospects', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  firstName: varchar('first_name', { length: 100 }),
+  lastName: varchar('last_name', { length: 100 }),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  companyName: varchar('company_name', { length: 255 }).notNull(),
+  jobTitle: varchar('job_title', { length: 150 }),
+  companyType: varchar('company_type', { length: 100 }),
+  location: varchar('location', { length: 150 }),
+  operatingRegion: varchar('operating_region', { length: 150 }),
+  primaryProblem: varchar('primary_problem', { length: 100 }),
+  secondaryProblem: varchar('secondary_problem', { length: 100 }),
+  recommendedModule: varchar('recommended_module', { length: 100 }),
+  campaignActive: boolean('campaign_active').default(true).notNull(),
+  doNotContact: boolean('do_not_contact').default(false).notNull(),
+  emailStatus: varchar('email_status', { length: 50 }).default('active').notNull(),
+  lastReportDate: timestamp('last_report_date'),
+  nextReportDate: timestamp('next_report_date'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('idx_prospects_email').on(table.email),
+]);
+
+// ─── RESEARCH JOBS (Base44 will populate these in a later stage) ──
+export const researchJobs = pgTable('research_jobs', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  prospectId: varchar('prospect_id', { length: 36 }).notNull().references(() => prospects.id),
+  status: varchar('status', { length: 30 }).default('queued').notNull(), // queued | researching | completed | needs_review | approved | failed
+  researchTopic: varchar('research_topic', { length: 255 }),
+  evidenceStatus: varchar('evidence_status', { length: 30 }),
+  sourceCount: integer('source_count').default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => [
+  index('idx_research_jobs_prospect_id').on(table.prospectId),
+]);
+
+// ─── BRIEFS (the personalized /brief/[token] content) ──────
+export const briefs = pgTable('briefs', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  prospectId: varchar('prospect_id', { length: 36 }).notNull().references(() => prospects.id),
+  researchJobId: varchar('research_job_id', { length: 36 }).references(() => researchJobs.id),
+  token: varchar('token', { length: 64 }).notNull().unique(), // cryptographically random, never sequential
+  headline: varchar('headline', { length: 255 }),
+  bodyHtml: text('body_html'),
+  cargoiqModule: varchar('cargoiq_module', { length: 100 }),
+  demoScenarioId: varchar('demo_scenario_id', { length: 100 }),
+  sources: text('sources'), // JSON-encoded array of {title, url}
+  expiresAt: timestamp('expires_at'),
+  revoked: boolean('revoked').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('idx_briefs_token').on(table.token),
+  index('idx_briefs_prospect_id').on(table.prospectId),
+]);
+
+// ─── CAMPAIGN EVENTS (funnel analytics: brief_viewed, audit_cta_clicked, etc.) ──
+export const campaignEvents = pgTable('campaign_events', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  prospectId: varchar('prospect_id', { length: 36 }).notNull().references(() => prospects.id),
+  briefId: varchar('brief_id', { length: 36 }).references(() => briefs.id),
+  eventType: varchar('event_type', { length: 50 }).notNull(),
+  campaignId: varchar('campaign_id', { length: 100 }),
+  metadata: text('metadata'), // JSON-encoded
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => [
+  index('idx_campaign_events_prospect_id').on(table.prospectId),
+  index('idx_campaign_events_type').on(table.eventType),
+]);
+
+// ─── RELATIONS: prospect intelligence ───────────────────────
+export const prospectsRelations = relations(prospects, ({ many }) => ({
+  researchJobs: many(researchJobs),
+  briefs: many(briefs),
+  campaignEvents: many(campaignEvents),
+}));
+
+export const researchJobsRelations = relations(researchJobs, ({ one, many }) => ({
+  prospect: one(prospects, { fields: [researchJobs.prospectId], references: [prospects.id] }),
+  briefs: many(briefs),
+}));
+
+export const briefsRelations = relations(briefs, ({ one, many }) => ({
+  prospect: one(prospects, { fields: [briefs.prospectId], references: [prospects.id] }),
+  researchJob: one(researchJobs, { fields: [briefs.researchJobId], references: [researchJobs.id] }),
+  campaignEvents: many(campaignEvents),
+}));
+
+export const campaignEventsRelations = relations(campaignEvents, ({ one }) => ({
+  prospect: one(prospects, { fields: [campaignEvents.prospectId], references: [prospects.id] }),
+  brief: one(briefs, { fields: [campaignEvents.briefId], references: [briefs.id] }),
+}));

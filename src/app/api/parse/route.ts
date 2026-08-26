@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    if (!consumeRateLimit(`parse:${userId || getRequestIp(req)}`)) {
+    if (!(await consumeRateLimit(`parse:${userId || getRequestIp(req)}`))) {
       return NextResponse.json({ error: 'RATE_LIMIT_EXCEEDED' }, { status: 429 });
     }
 

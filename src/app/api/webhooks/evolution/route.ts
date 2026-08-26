@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    if (!consumeRateLimit(`webhook:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`)) {
+    if (!(await consumeRateLimit(`webhook:${req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'}`))) {
       return NextResponse.json({ error: 'RATE_LIMIT_EXCEEDED' }, { status: 429 });
     }
 

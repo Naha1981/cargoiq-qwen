@@ -1,26 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { drivers, tenants, users } from "@/lib/db/schema";
-import { generateId } from "@/lib/utils";
-import { normalizePhoneNumber } from "@/lib/utils";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { getTenantForUser } from "@/lib/tenant/for-user";
+import { createDriver, listDriversForTenant } from "@/modules/logistics/service";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-async function resolveTenant(userId: string) {
-  if (!db) return null;
-  const appUser = await db.query.users.findFirst({
-    where: eq(users.clerk_id, userId as string),
-  });
-  if (!appUser) return null;
-  const tenant = await db.query.tenants.findFirst({
-    where: eq(tenants.id, appUser.tenantId),
-  });
-  return tenant;
-}
 
 const createDriverSchema = z.object({
   name: z.string().min(1, "Driver name is required"),
@@ -43,7 +29,6 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => null);
     const parsed = createDriverSchema.safeParse(body);
-
     if (!parsed.success) {
       return NextResponse.json(
         { error: "VALIDATION_ERROR", details: parsed.error.flatten() },
@@ -51,43 +36,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, phoneNumber } = parsed.data;
-    const normalizedPhone = normalizePhoneNumber(phoneNumber);
-
-    const tenant = await resolveTenant(userId as string);
-
-    if (!tenant) {
+    const resolved = await getTenantForUser(userId);
+    if (!resolved) {
       return NextResponse.json(
         { error: "TENANT_NOT_FOUND", message: "Organisation not found." },
         { status: 404 }
       );
     }
 
-    const existingDriver = await db.query.drivers.findFirst({
-      where: eq(drivers.phoneNumber, normalizedPhone),
+    const result = await createDriver({
+      tenantId: resolved.tenant.id,
+      ...parsed.data,
+      defaultLocation: (body as Record<string, unknown>).defaultLocation as string | undefined,
     });
-
-    if (existingDriver) {
+    if (!result.ok) {
       return NextResponse.json(
         { error: "DRIVER_EXISTS", message: "A driver with this phone number already exists." },
         { status: 409 }
       );
     }
 
-    const driver = await db.insert(drivers).values({
-      id: generateId(),
-      tenantId: tenant.id,
-      name,
-      phoneNumber: normalizedPhone,
-      defaultLocation: (body as Record<string, unknown>).defaultLocation as string | undefined,
-      active: true,
-    }).returning();
-
-    return NextResponse.json({
-      success: true,
-      driver: driver[0],
-    }, { status: 201 });
-
+    return NextResponse.json({ success: true, driver: result.driver }, { status: 201 });
   } catch (error) {
     console.error("[Create Driver Error]:", error);
     return NextResponse.json(
@@ -114,15 +83,12 @@ export async function GET() {
     if (!userId) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
-    const tenant = await resolveTenant(userId as string);
-    if (!tenant) {
+    const resolved = await getTenantForUser(userId);
+    if (!resolved) {
       return NextResponse.json({ error: "TENANT_NOT_FOUND" }, { status: 403 });
     }
-    const list = await db.query.drivers.findMany({
-      where: eq(drivers.tenantId, tenant.id),
-      orderBy: (d, { desc }) => [desc(d.createdAt)],
-    });
-    return NextResponse.json({ data: list, tenantId: tenant.id });
+    const list = await listDriversForTenant(resolved.tenant.id);
+    return NextResponse.json({ data: list, tenantId: resolved.tenant.id });
   } catch (error) {
     console.error("[Drivers GET Error]:", error);
     return NextResponse.json(

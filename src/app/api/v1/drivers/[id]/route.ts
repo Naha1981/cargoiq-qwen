@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '@/lib/db';
-import { drivers, tenants, users } from '@/lib/db/schema';
-import { normalizePhoneNumber } from '@/lib/utils';
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
+import { getTenantForUser } from '@/lib/tenant/for-user';
+import { getDriverForTenant, updateDriverForTenant, deleteDriverForTenant } from '@/modules/logistics/service';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -15,18 +14,6 @@ const patchDriverSchema = z.object({
   defaultLocation: z.string().optional().nullable(),
   active: z.boolean().optional(),
 });
-
-async function resolveTenant(userId: string) {
-  if (!db) return null;
-  const appUser = await db.query.users.findFirst({
-    where: eq(users.clerk_id, userId as string),
-  });
-  if (!appUser) return null;
-  const tenant = await db.query.tenants.findFirst({
-    where: eq(tenants.id, appUser.tenantId),
-  });
-  return tenant;
-}
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -47,15 +34,13 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (!userId) {
       return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
     }
-    const tenant = await resolveTenant(userId as string);
-    if (!tenant) {
+    const resolved = await getTenantForUser(userId);
+    if (!resolved) {
       return NextResponse.json({ error: 'TENANT_NOT_FOUND' }, { status: 403 });
     }
 
     const { id } = await params;
-    const existing = await db.query.drivers.findFirst({
-      where: and(eq(drivers.id, id), eq(drivers.tenantId, tenant.id)),
-    });
+    const existing = await getDriverForTenant(id, resolved.tenant.id);
     if (!existing) {
       return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
     }
@@ -69,22 +54,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    const updates: Record<string, unknown> = {};
-    if (parsed.data.name !== undefined) updates.name = parsed.data.name;
-    if (parsed.data.phoneNumber !== undefined) {
-      updates.phoneNumber = normalizePhoneNumber(parsed.data.phoneNumber);
-    }
-    if (parsed.data.defaultLocation !== undefined) {
-      updates.defaultLocation = parsed.data.defaultLocation;
-    }
-    if (parsed.data.active !== undefined) updates.active = parsed.data.active;
-
-    const [updated] = await db
-      .update(drivers)
-      .set(updates)
-      .where(and(eq(drivers.id, id), eq(drivers.tenantId, tenant.id)))
-      .returning();
-
+    const updated = await updateDriverForTenant(id, resolved.tenant.id, parsed.data);
     return NextResponse.json({ success: true, driver: updated });
   } catch (error) {
     console.error('[Driver PATCH error]:', error);
@@ -112,23 +82,18 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
     if (!userId) {
       return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
     }
-    const tenant = await resolveTenant(userId as string);
-    if (!tenant) {
+    const resolved = await getTenantForUser(userId);
+    if (!resolved) {
       return NextResponse.json({ error: 'TENANT_NOT_FOUND' }, { status: 403 });
     }
 
     const { id } = await params;
-    const existing = await db.query.drivers.findFirst({
-      where: and(eq(drivers.id, id), eq(drivers.tenantId, tenant.id)),
-    });
+    const existing = await getDriverForTenant(id, resolved.tenant.id);
     if (!existing) {
       return NextResponse.json({ error: 'NOT_FOUND' }, { status: 404 });
     }
 
-    await db
-      .delete(drivers)
-      .where(and(eq(drivers.id, id), eq(drivers.tenantId, tenant.id)));
-
+    await deleteDriverForTenant(id, resolved.tenant.id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[Driver DELETE error]:', error);

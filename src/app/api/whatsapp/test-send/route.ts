@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { sendEvolutionText, hasWhatsAppConfig } from '@/lib/integrations/evolution/client';
 import { normalizePhoneNumber } from '@/lib/utils';
+import { consumeRateLimit } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -27,6 +28,15 @@ export async function POST(req: NextRequest) {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // This endpoint sends a real WhatsApp message to an attacker-suppliable
+    // destination number using CargoIQ's own business number -- without a
+    // limit, an authenticated user could relay unlimited messages to
+    // unlimited third-party numbers. 10/minute is generous for its actual
+    // purpose (one-off "test the loop" clicks) while blocking abuse.
+    if (!(await consumeRateLimit(`whatsapp-test-send:${userId}`, 10, 60_000))) {
+      return NextResponse.json({ ok: false, error: 'RATE_LIMIT_EXCEEDED' }, { status: 429 });
     }
 
     const body = await req.json().catch(() => ({}));

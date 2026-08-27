@@ -5,12 +5,19 @@ import { runComplianceShield } from "@/modules/compliance-shield/service";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { consumeRateLimit, getRequestIp } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
+    }
+
+    // Was previously unmetered, unlike /api/parse and /api/webhooks/evolution
+    // which both already rate-limit -- brought in line for consistency.
+    if (!(await consumeRateLimit(`compliance-check:${userId || getRequestIp(req)}`))) {
+      return NextResponse.json({ error: "RATE_LIMIT_EXCEEDED" }, { status: 429 });
     }
 
     if (!db) {

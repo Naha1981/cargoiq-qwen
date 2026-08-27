@@ -67,9 +67,15 @@ export function verifyWebhookSecret(req: NextRequest): boolean {
   const webhookSecret = process.env.WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn('[Security] WEBHOOK_SECRET is not configured; webhook secret check is bypassed. Inbound Evolution webhooks are allowed through until it is set.');
+    if (process.env.NODE_ENV === 'production') {
+      // Fail closed in production: an unset secret must never mean "allow
+      // everyone". Previously this returned true unconditionally, silently
+      // accepting unsigned webhook requests if WEBHOOK_SECRET was ever left
+      // unconfigured in production.
+      console.error('[Security] WEBHOOK_SECRET is not configured in production; rejecting all inbound webhook requests until it is set.');
+      return false;
     }
+    console.warn('[Security] WEBHOOK_SECRET is not configured; webhook secret check is bypassed in this non-production environment. Inbound Evolution webhooks are allowed through until it is set.');
     return true;
   }
 

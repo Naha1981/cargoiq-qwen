@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { tenants, drivers, waitingTimeFindings } from "@/lib/db/schema";
 import { generateId, normalizePhoneNumber } from "@/lib/utils";
 import { eq, and, isNull } from "drizzle-orm";
+import { consumeRateLimit, getRequestIp } from "@/lib/security";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -10,6 +11,22 @@ export const revalidate = 0;
 const SELFTEST_TENANT_ID = "00000000-0000-0000-0000-000000000001";
 
 export async function POST(request: NextRequest) {
+  // This route writes to the database and, before this fix, required no
+  // authentication at all -- reachable by anyone who found the URL, with no
+  // rate limit, for unbounded production DB writes (scoped only to a fixed
+  // sentinel tenant, so not a cross-tenant data leak, but still an open
+  // write/DoS surface). Restrict to non-production and rate-limit by IP.
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_SELFTEST_IN_PRODUCTION !== 'true') {
+    return NextResponse.json(
+      { error: "NOT_AVAILABLE", message: "Selftest route is disabled in production." },
+      { status: 404 }
+    );
+  }
+
+  if (!(await consumeRateLimit(`selftest:${getRequestIp(request)}`, 5, 60_000))) {
+    return NextResponse.json({ error: "RATE_LIMIT_EXCEEDED" }, { status: 429 });
+  }
+
   if (!db) {
     return NextResponse.json(
       { error: "SERVICE_UNAVAILABLE", message: "Database not configured." },

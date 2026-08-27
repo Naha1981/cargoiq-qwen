@@ -2,9 +2,10 @@ import { generateObject } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { shipments, complianceResults, events } from '@/lib/db/schema';
-import { runComplianceShield } from '@/modules/compliance-shield/service';
-import { generateId } from '@/lib/utils';
+import {
+  buildComplianceDocument,
+  runComplianceShieldForNewShipment,
+} from '@/modules/compliance-shield/service';
 
 export const ExtractionSchema = z.object({
   shipmentRef: z.string().optional(),
@@ -99,93 +100,9 @@ export async function getTenantForClerkUser(userId: string) {
   });
 }
 
-/** Map extracted AI fields into the shape the Compliance Shield expects. */
-export function buildComplianceDocument(extracted: ExtractedFields) {
-  return {
-    invoiceItems: extracted.invoiceQty
-      ? [{ description: extracted.productType ?? "Goods", quantity: extracted.invoiceQty, unitPrice: (extracted.declaredValueZar ?? 0) / Math.max(extracted.invoiceQty, 1), totalValue: extracted.declaredValueZar ?? 0, hsCode: extracted.hsCode }]
-      : undefined,
-    packingListItems: extracted.packingListQty
-      ? [{ description: extracted.productType ?? "Goods", quantity: extracted.packingListQty }]
-      : undefined,
-    invoiceTotal: extracted.declaredValueZar,
-    currency: "ZAR",
-    originCountry: extracted.origin === "SACU" ? "ZA" : extracted.origin === "non-SACU" ? "XX" : undefined,
-    destinationCountry: "ZA",
-    isSacuOrigin: extracted.origin === "SACU",
-    customsValueZar: extracted.declaredValueZar,
-    cargoDescription: extracted.productType,
-    hsCode: extracted.hsCode,
-    hasDa65Stamp: extracted.hasDA65,
-    containsSugar: extracted.hasHPL,
-    isCrossBorderRoad: !!extracted.truckReg,
-    vehicleRegistration: extracted.truckReg,
-    isForeignRegistered: !!extracted.truckReg,
-    tmsDeclarationNumber: extracted.tmsNumber,
-    importerCode: undefined,
-    invoiceNumber: extracted.shipmentRef,
-  };
-}
-
-export { runComplianceShield };
-
-export interface PersistComplianceRunParams {
-  tenantId: string;
-  extracted: ExtractedFields;
-  results: ReturnType<typeof runComplianceShield>["results"];
-  overallStatus: ReturnType<typeof runComplianceShield>["overallStatus"];
-}
-
-/** Persist compliance-check results and the resulting shipment record. */
-export async function persistComplianceRun({ tenantId, extracted, results, overallStatus }: PersistComplianceRunParams) {
-  const shipmentId = generateId();
-
-  for (const result of results) {
-    await db!.insert(complianceResults).values({
-      id: generateId(),
-      tenantId,
-      shipmentId,
-      module: result.module,
-      status: result.status,
-      message: result.message,
-      exposureZar: result.exposureZar.toFixed(2),
-    });
-  }
-
-  const riskScore = overallStatus === "hold" ? 5 : overallStatus === "warn" ? 3 : 1;
-  await db!.insert(shipments).values({
-    id: shipmentId,
-    tenantId,
-    reference: extracted.shipmentRef ?? `PARSED-${Date.now()}`,
-    hsCode: extracted.hsCode,
-    cargoDescription: extracted.productType,
-    customsValueZar: extracted.declaredValueZar,
-    riskScore,
-    status: overallStatus === "hold" ? "held" : overallStatus === "warn" ? "review" : "cleared",
-  } as any);
-
-  return { shipmentId, riskScore };
-}
-
-export interface RecordComplianceEventParams {
-  tenantId: string;
-  shipmentId: string;
-  overallStatus: string;
-  totalExposureZar: number;
-  results: ReturnType<typeof runComplianceShield>["results"];
-}
-
-/** Emit the domain event for a completed compliance run. */
-export async function recordComplianceEvent({ tenantId, shipmentId, overallStatus, totalExposureZar, results }: RecordComplianceEventParams) {
-  await db!.insert(events).values({
-    id: generateId(),
-    tenantId,
-    type: "ComplianceShieldCompleted",
-    payload: JSON.stringify({
-      shipmentId, overallStatus, totalExposureZar, modulesRun: results.length,
-      holds: results.filter(r => r.status === "hold").length,
-      warnings: results.filter(r => r.status === "warn").length,
-      extractedFrom: "ai",
-    }),
-  });
-}
+// Compliance-domain logic (document mapping, check execution, persistence,
+// event emission) lives in src/modules/compliance-shield -- re-exported here
+// only so route.ts's import list doesn't need to change. Moved out of this
+// file during Phase 4 (domain module structure) to remove duplication with
+// runAndPersistComplianceShield, which already existed in that module.
+export { buildComplianceDocument, runComplianceShieldForNewShipment };

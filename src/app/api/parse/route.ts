@@ -7,9 +7,7 @@ import {
   isLowConfidenceExtraction,
   getTenantForClerkUser,
   buildComplianceDocument,
-  runComplianceShield,
-  persistComplianceRun,
-  recordComplianceEvent,
+  runComplianceShieldForNewShipment,
 } from './service';
 
 export async function POST(req: NextRequest) {
@@ -57,10 +55,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { tenantId } = appUser;
-    const { results, overallStatus, totalExposureZar } = runComplianceShield(doc);
-
-    const { shipmentId, riskScore } = await persistComplianceRun({ tenantId, extracted, results, overallStatus });
-    await recordComplianceEvent({ tenantId, shipmentId, overallStatus, totalExposureZar, results });
+    const { shipmentId, results, overallStatus, totalExposureZar, riskScore } =
+      await runComplianceShieldForNewShipment(tenantId, extracted, doc);
 
     return NextResponse.json({
       success: true,

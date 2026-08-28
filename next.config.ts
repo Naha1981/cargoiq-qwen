@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -19,7 +20,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
               "font-src 'self' https://fonts.gstatic.com; " +
               "img-src 'self' data:; " +
-              "connect-src 'self' https://api.clerk.com https://accounts.clerk.com https://cdn.clerk.com; " +
+              "connect-src 'self' https://api.clerk.com https://accounts.clerk.com https://cdn.clerk.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io; " +
               "frame-ancestors 'self'; " +
               "base-uri 'self'; " +
               "form-action 'self';",
@@ -30,4 +31,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// withSentryConfig no-ops safely when SENTRY_ORG/SENTRY_PROJECT/SENTRY_AUTH_TOKEN
+// are unset -- source-map upload is skipped, runtime error capture still works
+// via the DSN alone. Satisfies the zero-env-var build requirement.
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: true,
+  widenClientFileUpload: true,
+  disableLogger: true,
+  automaticVercelMonitors: false,
+});

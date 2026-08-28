@@ -3,31 +3,24 @@
 import React from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { BILLING_PLANS } from '@/modules/billing/plans';
 
 const plans = [
   {
-    name: 'Starter',
-    price: 'R8,000',
+    name: BILLING_PLANS.starter.name,
+    price: `R${BILLING_PLANS.starter.priceZar.toLocaleString('en-US')}`,
     period: '/month',
-    description: 'For solo clearing agents and small operations.',
-    features: ['1 User', '50 Documents / month', 'Compliance Shield', 'HS Code Classifier', 'Email Support'],
+    description: BILLING_PLANS.starter.description,
+    features: BILLING_PLANS.starter.features,
     cta: 'Start Free Trial',
     featured: false,
   },
   {
-    name: 'Growth',
-    price: 'R18,000',
+    name: BILLING_PLANS.growth.name,
+    price: `R${BILLING_PLANS.growth.priceZar.toLocaleString('en-US')}`,
     period: '/month',
-    description: 'For growing freight teams and mid-size clearing agencies.',
-    features: [
-      '5 Users',
-      '200 Documents / month',
-      'All Starter features',
-      'CarrierInvoice Auditor',
-      'Shadow Audit',
-      'Container Tracking',
-      'Priority Support',
-    ],
+    description: BILLING_PLANS.growth.description,
+    features: BILLING_PLANS.growth.features,
     cta: 'Start Free Trial',
     featured: true,
   },

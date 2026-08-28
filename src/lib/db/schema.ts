@@ -284,3 +284,47 @@ export const campaignEventsRelations = relations(campaignEvents, ({ one }) => ({
   prospect: one(prospects, { fields: [campaignEvents.prospectId], references: [prospects.id] }),
   brief: one(briefs, { fields: [campaignEvents.briefId], references: [briefs.id] }),
 }));
+
+// ─── BILLING (PayFast subscriptions) ───────────────────────
+// Additive only, per repo convention -- no existing tables modified.
+export const subscriptions = pgTable('subscriptions', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  tenantId: varchar('tenant_id', { length: 36 }).notNull().references(() => tenants.id),
+  planId: varchar('plan_id', { length: 50 }).notNull(), // 'starter' | 'growth'
+  status: varchar('status', { length: 30 }).default('pending').notNull(), // pending, active, past_due, cancelled
+  payfastToken: varchar('payfast_token', { length: 100 }), // PayFast subscription token, set once ITN confirms
+  payfastPaymentId: varchar('payfast_payment_id', { length: 100 }),
+  amountZar: decimal('amount_zar', { precision: 10, scale: 2 }).notNull(),
+  currentPeriodStart: timestamp('current_period_start'),
+  currentPeriodEnd: timestamp('current_period_end'),
+  cancelledAt: timestamp('cancelled_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  tenantIdx: index('subscriptions_tenant_idx').on(table.tenantId),
+}));
+
+// Every inbound PayFast ITN, stored for idempotency (dedupe on pf_payment_id)
+// and audit trail, regardless of whether it passed validation.
+export const paymentEvents = pgTable('payment_events', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  tenantId: varchar('tenant_id', { length: 36 }).references(() => tenants.id),
+  subscriptionId: varchar('subscription_id', { length: 36 }).references(() => subscriptions.id),
+  pfPaymentId: varchar('pf_payment_id', { length: 100 }).notNull().unique(),
+  paymentStatus: varchar('payment_status', { length: 30 }).notNull(),
+  amountGross: decimal('amount_gross', { precision: 10, scale: 2 }),
+  signatureValid: boolean('signature_valid').notNull(),
+  sourceValid: boolean('source_valid').notNull(),
+  rawPayload: text('raw_payload').notNull(),
+  processedAt: timestamp('processed_at').defaultNow().notNull(),
+});
+
+export const subscriptionsRelations = relations(subscriptions, ({ one, many }) => ({
+  tenant: one(tenants, { fields: [subscriptions.tenantId], references: [tenants.id] }),
+  paymentEvents: many(paymentEvents),
+}));
+
+export const paymentEventsRelations = relations(paymentEvents, ({ one }) => ({
+  tenant: one(tenants, { fields: [paymentEvents.tenantId], references: [tenants.id] }),
+  subscription: one(subscriptions, { fields: [paymentEvents.subscriptionId], references: [subscriptions.id] }),
+}));

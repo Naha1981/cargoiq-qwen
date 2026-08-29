@@ -230,10 +230,16 @@ export default function SettingsPage() {
     }
   }, [activeTab, fetchGatewayHealth, fetchCheckins, fetchDrivers]);
 
-  /* Load billing data on mount + tab switch; also detect the ?status=
-     query param PayFast's return_url redirects back to after checkout --
+  /* Load billing data on mount (used by both the Org tab's plan badge and
+     the Billing tab), and re-check on tab switch in case it changed since
+     mount (e.g. user just completed checkout in another tab). Also detect
+     the ?status= query param PayFast's return_url redirects back to --
      this is display-only, NEVER treated as payment confirmation (the ITN
      webhook is the only source of truth for that, per the billing service). */
+  useEffect(() => {
+    fetchSubscription();
+  }, [fetchSubscription]);
+
   useEffect(() => {
     if (activeTab === 'billing') {
       fetchSubscription();
@@ -454,7 +460,15 @@ export default function SettingsPage() {
                 <Input label="Organisation name" defaultValue="CargoIQ Demo Pty Ltd" />
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-on-surface">Plan status</span>
-                  <Badge variant="warning">Growth</Badge>
+                  {billingLoading && !subscriptionData ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-on-surface-variant" />
+                  ) : (
+                    <Badge variant={subscriptionData?.subscription?.status === 'active' ? 'success' : 'warning'}>
+                      {subscriptionData?.currentPlan
+                        ? subscriptionData.currentPlan.charAt(0).toUpperCase() + subscriptionData.currentPlan.slice(1)
+                        : 'Trial'}
+                    </Badge>
+                  )}
                 </div>
                 <Input label="Billing contact email" type="email" defaultValue="billing@cargoiq.io" />
                 <Button className="ember-button">Save changes</Button>

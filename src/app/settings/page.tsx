@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { cn } from '@/lib/utils';
+import { BILLING_PLANS } from '@/modules/billing/plans';
 import {
   Building2,
   Mail,
@@ -26,11 +27,13 @@ import {
   Send,
   Loader2,
   UserPlus,
+  CreditCard,
 } from 'lucide-react';
 
 
 const tabs = [
   { id: 'org', label: 'Org', icon: Building2 },
+  { id: 'billing', label: 'Billing', icon: CreditCard },
   { id: 'email', label: 'Email', icon: Mail },
   { id: 'portals', label: 'Portals', icon: Network },
   { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
@@ -71,6 +74,18 @@ interface DriverRow {
   createdAt: string;
 }
 
+/* ---- Billing tab types ---- */
+interface SubscriptionData {
+  currentPlan: string | null;
+  billingConfigured: boolean;
+  subscription: {
+    planId: string;
+    status: string;
+    amountZar: string;
+    currentPeriodEnd: string | null;
+  } | null;
+}
+
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('org');
   const [copied, setCopied] = useState(false);
@@ -102,6 +117,13 @@ export default function SettingsPage() {
   const [editPhone, setEditPhone] = useState('');
   const [editLocation, setEditLocation] = useState('');
   const [editLoading, setEditLoading] = useState(false);
+
+  /* ---- Billing tab state ---- */
+  const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
+  const [checkoutLoadingPlan, setCheckoutLoadingPlan] = useState<string | null>(null);
+  const [billingStatusBanner, setBillingStatusBanner] = useState<'success' | 'cancelled' | null>(null);
 
   /* ---- Poll refs ---- */
   const statusPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -160,6 +182,44 @@ export default function SettingsPage() {
     }
   }, []);
 
+  const fetchSubscription = useCallback(async () => {
+    try {
+      setBillingLoading(true);
+      setBillingError(null);
+      const res = await fetch('/api/v1/billing/subscription');
+      if (res.ok) {
+        setSubscriptionData(await res.json());
+      } else {
+        setBillingError('Could not load billing information.');
+      }
+    } catch {
+      setBillingError('Network error loading billing information.');
+    } finally {
+      setBillingLoading(false);
+    }
+  }, []);
+
+  const handleSubscribe = async (planId: 'starter' | 'growth') => {
+    setCheckoutLoadingPlan(planId);
+    try {
+      const res = await fetch('/api/v1/billing/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planId }),
+      });
+      const data = await res.json();
+      if (data.success && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        setBillingError(data.message || data.error || 'Could not start checkout.');
+        setCheckoutLoadingPlan(null);
+      }
+    } catch {
+      setBillingError('Network error starting checkout.');
+      setCheckoutLoadingPlan(null);
+    }
+  };
+
   /* Load gateway health on mount + tab switch */
   useEffect(() => {
     if (activeTab === 'whatsapp') {
@@ -169,6 +229,29 @@ export default function SettingsPage() {
       fetchDrivers();
     }
   }, [activeTab, fetchGatewayHealth, fetchCheckins, fetchDrivers]);
+
+  /* Load billing data on mount + tab switch; also detect the ?status=
+     query param PayFast's return_url redirects back to after checkout --
+     this is display-only, NEVER treated as payment confirmation (the ITN
+     webhook is the only source of truth for that, per the billing service). */
+  useEffect(() => {
+    if (activeTab === 'billing') {
+      fetchSubscription();
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get('status');
+      if (status === 'success' || status === 'cancelled') {
+        setBillingStatusBanner(status);
+        window.history.replaceState({}, '', '/settings');
+      }
+    }
+  }, [activeTab, fetchSubscription]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('status')) {
+      setActiveTab('billing');
+    }
+  }, []);
 
   /* Status poll: every 4s while on whatsapp tab, stops when not connected or off tab */
   useEffect(() => {
@@ -378,6 +461,93 @@ export default function SettingsPage() {
               </div>
             </Card>
             </>
+          )}
+
+          {activeTab === 'billing' && (
+            <div className="space-y-6">
+              {billingStatusBanner === 'success' && (
+                <div className="rounded-lg border border-outline-variant bg-surface-container-high p-4 text-sm text-on-surface">
+                  Checkout completed. It can take a minute for PayFast&apos;s confirmation to arrive and your
+                  plan to update below — this page does not treat the redirect itself as proof of payment.
+                </div>
+              )}
+              {billingStatusBanner === 'cancelled' && (
+                <div className="rounded-lg border border-outline-variant bg-surface-container-high p-4 text-sm text-on-surface-variant">
+                  Checkout was cancelled. No changes were made to your plan.
+                </div>
+              )}
+              {billingError && (
+                <div className="rounded-lg border border-risk-red/30 bg-risk-red/5 p-4 text-sm text-risk-red">
+                  {billingError}
+                </div>
+              )}
+
+              <Card title="Current plan" subtitle="Your organisation's active subscription.">
+                {billingLoading && !subscriptionData ? (
+                  <div className="flex items-center gap-2 py-4">
+                    <Loader2 className="h-4 w-4 animate-spin text-on-surface-variant" />
+                    <span className="text-sm text-on-surface-variant">Loading billing information…</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Badge variant={subscriptionData?.subscription?.status === 'active' ? 'success' : 'neutral'}>
+                        {subscriptionData?.currentPlan
+                          ? subscriptionData.currentPlan.charAt(0).toUpperCase() + subscriptionData.currentPlan.slice(1)
+                          : 'Trial'}
+                      </Badge>
+                      {subscriptionData?.subscription?.currentPeriodEnd && (
+                        <span className="text-xs text-on-surface-variant">
+                          Renews {new Date(subscriptionData.subscription.currentPeriodEnd).toLocaleDateString('en-US')}
+                        </span>
+                      )}
+                    </div>
+                    {!subscriptionData?.billingConfigured && (
+                      <span className="text-xs text-on-surface-variant">Payment processing not yet configured</span>
+                    )}
+                  </div>
+                )}
+              </Card>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                {Object.values(BILLING_PLANS).map((plan) => {
+                  const isCurrent = subscriptionData?.subscription?.planId === plan.id && subscriptionData?.subscription?.status === 'active';
+                  return (
+                    <Card key={plan.id} title={plan.name} subtitle={plan.description}>
+                      <div className="space-y-4">
+                        <p className="text-2xl font-bold text-on-surface">
+                          R{plan.priceZar.toLocaleString('en-US')}
+                          <span className="text-sm font-normal text-on-surface-variant"> /month</span>
+                        </p>
+                        <ul className="space-y-1.5">
+                          {plan.features.map((feature) => (
+                            <li key={feature} className="flex items-center gap-2 text-sm text-on-surface-variant">
+                              <Check className="h-3.5 w-3.5 text-success" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                        <Button
+                          className="ember-button w-full gap-2"
+                          disabled={isCurrent || checkoutLoadingPlan !== null || subscriptionData?.billingConfigured === false}
+                          onClick={() => handleSubscribe(plan.id)}
+                        >
+                          {checkoutLoadingPlan === plan.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <CreditCard className="h-4 w-4" />
+                          )}
+                          {isCurrent ? 'Current plan' : checkoutLoadingPlan === plan.id ? 'Redirecting…' : 'Subscribe'}
+                        </Button>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-on-surface-variant">
+                Need Enterprise pricing or a custom deployment? <a href="mailto:sales@cargoiq.io" className="text-primary underline">Contact sales</a>.
+              </p>
+            </div>
           )}
 
           {activeTab === 'email' && (

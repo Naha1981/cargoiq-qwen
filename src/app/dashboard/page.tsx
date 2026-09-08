@@ -1,225 +1,136 @@
-import { Globe } from "lucide-react";
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import { users } from '@/lib/db/schema';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
+import Link from "next/link";
+import { ArrowRight, AlertTriangle, CheckCircle2, Clock3, FileSearch, ShieldCheck, WalletCards } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { redirect } from "next/navigation";
 
 async function ensureTenant() {
   const { userId } = await auth();
-  if (!userId) return redirect('/login');
-  if (!db) return redirect('/login');
+  if (!userId) return redirect("/login");
+  if (!db) return redirect("/login");
 
   const user = await db.query.users.findFirst({
     where: (users, { eq }) => eq(users.clerk_id, userId),
   });
 
-  if (!user) return redirect('/onboarding');
+  if (!user) return redirect("/onboarding");
 }
 
-const volumeData = Array.from({ length: 30 }, () => Math.floor(Math.random() * 80) + 20);
-
-const onboardingItems = [
-  { title: "Connect your first carrier portal", done: true, href: '/portals' },
-  { title: "Upload a shipment document", done: true, href: null },
-  { title: "Run your first Shadow Audit", done: false, href: '/shadow-audit' },
-  { title: "Review your ROI summary", done: false, href: '/dashboard' },
-  { title: "Invite your team", done: false, href: null },
+const signals = [
+  { label: "Recoverable leakage", value: "R 186,420", meta: "12 open findings", tone: "orange" },
+  { label: "Compliance exposure", value: "R 42,800", meta: "3 items need review", tone: "red" },
+  { label: "Protected value", value: "R 1.84M", meta: "This month", tone: "green" },
 ];
 
-function SampleTag() {
-  return (
-    <span className="rounded-full border border-outline-variant bg-surface-container-low px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-on-surface-variant">
-      Sample data
-    </span>
-  );
-}
+const activity = [
+  { icon: FileSearch, title: "Carrier invoice variance detected", detail: "MSC · INV-28491 · R 18,640", time: "8 min ago", tone: "orange" },
+  { icon: ShieldCheck, title: "SARS document check passed", detail: "SAD500 · SHP-10482", time: "31 min ago", tone: "green" },
+  { icon: Clock3, title: "Free-time window approaching", detail: "Durban · MSC · 17h remaining", time: "1 hr ago", tone: "red" },
+];
 
 export default async function DashboardPage() {
   await ensureTenant();
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-8">
-      <div className="mb-6 flex items-baseline justify-between gap-4">
-        <h1 className="text-2xl font-bold tracking-tight text-on-surface">Dashboard</h1>
-        <SampleTag />
-      </div>
-
-      {/* Honest sample-data banner — preserved */}
-      <div className="mb-6 rounded-xl border border-outline-variant bg-surface-container-low p-4">
-        <p className="text-sm text-on-surface">
-          <strong>You're viewing sample data.</strong> Connect a portal or upload a document to see real numbers.
-        </p>
-        <div className="mt-3">
-          <Link
-            href="/portals"
-            className="ember-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-95"
-          >
-            <Globe className="h-4 w-4" />
-            Connect a portal
+    <div className="min-h-screen bg-[#F7F8FA]">
+      <div className="mx-auto max-w-[1440px] px-5 py-7 sm:px-8 lg:px-10 lg:py-9">
+        <header className="mb-8 flex flex-col gap-5 border-b border-[#E2E6EB] pb-7 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8A939F]">CARGOIQ / OPERATIONS</p>
+            <h1 className="mt-2 text-[30px] font-semibold tracking-[-0.035em] text-[#111827]">Freight operations at a glance.</h1>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[#667085]">Find leakage, resolve compliance exposure, and protect margin before the money leaves.</p>
+          </div>
+          <Link href="/shadow-audit" className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[#F97316] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#EA580C]">
+            Run an audit <ArrowRight className="h-4 w-4" />
           </Link>
-        </div>
-      </div>
+        </header>
 
-      {/* KPI cards */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Shipments Processed</p>
-            <SampleTag />
-          </div>
-          <div className="flex items-baseline justify-between">
-            <span className="font-[var(--font-mono)] text-[28px] text-on-surface">142</span>
-            <span className="flex items-center text-xs font-bold text-primary">
-              <span className="material-symbols-outlined text-sm">trending_up</span> 23%
-            </span>
-          </div>
-          <div className="mt-4 h-8 w-full overflow-hidden">
-            <svg className="h-full w-full fill-none stroke-[#C83A12] stroke-2" viewBox="0 0 100 20">
-              <polyline className="sparkline" points="0,15 10,12 20,18 30,10 40,8 50,14 60,10 70,12 80,5 90,7 100,2"></polyline>
-            </svg>
-          </div>
-        </div>
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Automation Rate</p>
-            <SampleTag />
-          </div>
-          <div className="flex items-baseline justify-between">
-            <span className="font-[var(--font-mono)] text-[28px] text-on-surface">87.4%</span>
-            <span className="flex items-center text-xs text-on-surface-variant">
-              <span className="material-symbols-outlined text-sm">image_arrow_up</span> 0.2%
-            </span>
-          </div>
-          <div className="mt-4 h-8 w-full overflow-hidden">
-            <svg className="h-full w-full fill-none stroke-on-surface-variant/40 stroke-2" viewBox="0 0 100 20">
-              <polyline className="sparkline" points="0,10 10,10 20,11 30,9 40,10 50,10 60,10 70,10 80,10 90,10 100,10"></polyline>
-            </svg>
-          </div>
-        </div>
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Total Value Protected</p>
-            <SampleTag />
-          </div>
-          <div className="flex items-baseline justify-between">
-            <span className="font-[var(--font-mono)] text-[28px] text-on-surface">R1 842 500</span>
-            <span className="flex items-center text-xs font-bold text-primary">
-              <span className="material-symbols-outlined text-sm">trending_up</span> 12%
-            </span>
-          </div>
-          <div className="mt-4 h-8 w-full overflow-hidden">
-            <svg className="h-full w-full fill-none stroke-[#C83A12] stroke-2" viewBox="0 0 100 20">
-              <polyline className="sparkline" points="0,18 20,14 40,15 60,10 80,5 100,2"></polyline>
-            </svg>
-          </div>
-        </div>
-        <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Compliance Pass Rate</p>
-            <SampleTag />
-          </div>
-          <div className="flex items-baseline justify-between">
-            <span className="font-[var(--font-mono)] text-[28px] text-on-surface">96.2%</span>
-            <span className="flex items-center text-xs font-bold text-error">
-              <span className="material-symbols-outlined text-sm">trending_down</span> 1.4%
-            </span>
-          </div>
-          <div className="mt-4 h-8 w-full overflow-hidden">
-            <svg className="h-full w-full fill-none stroke-error stroke-2" viewBox="0 0 100 20">
-              <polyline className="sparkline" points="0,2 20,4 40,3 60,6 80,10 100,12"></polyline>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      {/* Volume chart + ROI strip */}
-      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-5">
-        <div className="relative flex flex-col overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm lg:col-span-3">
-          <div className="z-10 mb-8 flex items-center justify-between">
-            <div>
-              <div className="mb-1 flex items-center gap-2">
-                <h3 className="text-lg font-bold text-on-surface">Volume — last 30 days</h3>
-                <SampleTag />
+        <section aria-label="Priority signals" className="grid gap-px overflow-hidden rounded-lg border border-[#E2E6EB] bg-[#E2E6EB] md:grid-cols-3">
+          {signals.map((signal) => (
+            <div key={signal.label} className="bg-white px-6 py-5">
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-xs font-medium text-[#667085]">{signal.label}</p>
+                <span className={`h-2 w-2 rounded-full ${signal.tone === "red" ? "bg-[#DC2626]" : signal.tone === "green" ? "bg-[#059669]" : "bg-[#F97316]"}`} />
               </div>
-              <p className="text-sm text-on-surface-variant">Daily cargo throughput monitored across all portals.</p>
-            </div>
-            <div className="flex gap-2">
-              <button type="button" className="rounded-md border border-primary/50 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">Bar View</button>
-              <button type="button" className="rounded-md border border-outline-variant bg-transparent px-3 py-1 text-xs text-on-surface-variant transition-colors hover:border-primary/30">Line View</button>
-            </div>
-          </div>
-          <div className="relative z-10 flex flex-1 items-end gap-1.5 pb-8">
-            {volumeData.map((h, i) => (
-              <div key={i} className="group relative h-[40%] flex-1 rounded-t-sm bg-primary/20 transition-colors hover:bg-primary">
-                <div className="absolute -top-8 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-surface-container-highest px-2 py-1 text-[10px] group-hover:block">May 01: 42</div>
-              </div>
-            ))}
-          </div>
-          <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-6 opacity-10">
-            <div className="w-full border-t border-on-surface"></div>
-            <div className="w-full border-t border-on-surface"></div>
-            <div className="w-full border-t border-on-surface"></div>
-            <div className="w-full border-t border-on-surface"></div>
-            <div className="w-full border-t border-on-surface"></div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center gap-8 rounded-xl border border-outline-variant bg-surface-container-low p-6 shadow-sm md:flex-row lg:col-span-2">
-          <div className="flex-1 border-outline-variant pr-0 md:border-r md:pr-8">
-            <h4 className="ember-accent mb-1 text-xs font-semibold uppercase tracking-widest text-primary">ROI Summary</h4>
-            <p className="text-xs text-on-surface-variant">Calculation based on annual subscription vs recovery value.</p>
-          </div>
-          <div className="flex items-center gap-8 py-2">
-            <div className="text-center">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-on-surface-variant">PAID</p>
-              <p className="font-[var(--font-mono)] text-xl text-on-surface">R24 900</p>
-            </div>
-            <div className="text-center">
-              <span className="material-symbols-outlined text-on-surface-variant/40">arrow_forward</span>
-            </div>
-            <div className="text-center">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-on-surface-variant">VALUE DELIVERED</p>
-              <p className="font-[var(--font-mono)] text-xl text-on-surface">R1 842 500</p>
-            </div>
-            <div className="rounded border border-primary/20 bg-primary/10 px-4 py-2 text-center">
-              <p className="ember-accent mb-1 text-[10px] font-semibold uppercase tracking-wide text-primary">ROI MULTIPLE</p>
-              <p className="ember-accent font-[var(--font-mono)] text-2xl font-bold text-primary">74.0×</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Onboarding checklist */}
-      <div className="flex h-full flex-col rounded-xl border border-outline-variant bg-surface-container-lowest shadow-sm">
-        <div className="border-b border-outline-variant p-5">
-          <h3 className="text-lg font-bold text-on-surface">Get the most out of CargoIQ</h3>
-          <p className="mt-1 text-xs text-on-surface-variant">Unlock 100% compliance automation.</p>
-        </div>
-        <div className="flex-1 space-y-6 p-5">
-          {onboardingItems.map((item, i) => (
-            <div key={i} className="group">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 grid h-5 w-5 place-items-center rounded-sm bg-primary">
-                  <span className="material-symbols-outlined text-sm font-bold text-on-primary">check</span>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-on-surface line-through decoration-on-surface-variant">{item.title}</p>
-                  <p className="mt-0.5 text-[11px] text-on-surface-variant">Primary workspace verified.</p>
-                </div>
-              </div>
+              <p className="mt-3 font-mono text-[25px] font-semibold tracking-[-0.03em] text-[#111827]">{signal.value}</p>
+              <p className="mt-1 text-xs text-[#8A939F]">{signal.meta}</p>
             </div>
           ))}
-        </div>
-        <div className="border-t border-outline-variant bg-surface-container-low p-5">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-on-surface-variant">SET-UP PROGRESS</span>
-            <span className="ember-accent font-[var(--font-mono)] text-xs font-bold text-primary">20%</span>
+        </section>
+
+        <section className="mt-7 grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,.8fr)]">
+          <div className="rounded-lg border border-[#E2E6EB] bg-white">
+            <div className="flex items-center justify-between border-b border-[#E2E6EB] px-6 py-5">
+              <div>
+                <h2 className="text-sm font-semibold text-[#111827]">Recovery pipeline</h2>
+                <p className="mt-1 text-xs text-[#8A939F]">Where identified value is sitting right now.</p>
+              </div>
+              <Link href="/queue" className="text-xs font-semibold text-[#C2410C] hover:text-[#9A3412]">View queue</Link>
+            </div>
+            <div className="space-y-5 px-6 py-6">
+              {[
+                ["Detected", "R 186,420", 82, "#F97316"],
+                ["Under review", "R 74,900", 45, "#D97706"],
+                ["Claimed / recovered", "R 111,520", 61, "#059669"],
+              ].map(([label, value, width, color]) => (
+                <div key={label as string}>
+                  <div className="mb-2 flex items-center justify-between gap-4 text-xs">
+                    <span className="font-medium text-[#475467]">{label}</span>
+                    <span className="font-mono font-semibold text-[#111827]">{value}</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-[#EEF1F4]">
+                    <div className="h-full rounded-full" style={{ width: `${width}%`, backgroundColor: color as string }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-3 border-t border-[#E2E6EB]">
+              <div className="px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Findings</p><p className="mt-1 font-mono text-lg font-semibold text-[#111827]">27</p></div>
+              <div className="border-l border-[#E2E6EB] px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Open cases</p><p className="mt-1 font-mono text-lg font-semibold text-[#111827]">12</p></div>
+              <div className="border-l border-[#E2E6EB] px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Recovered</p><p className="mt-1 font-mono text-lg font-semibold text-[#059669]">R 111.5k</p></div>
+            </div>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
-            <div className="ember-gradient-bar h-full w-[20%] rounded-full bg-[linear-gradient(90deg,#7E2410,#C83A12,#F2451C)]"></div>
+
+          <div className="rounded-lg border border-[#E2E6EB] bg-white">
+            <div className="border-b border-[#E2E6EB] px-6 py-5">
+              <h2 className="text-sm font-semibold text-[#111827]">Needs attention</h2>
+              <p className="mt-1 text-xs text-[#8A939F]">Only the items that require a decision.</p>
+            </div>
+            <div className="divide-y divide-[#E2E6EB]">
+              <Link href="/queue" className="block px-6 py-5 transition hover:bg-[#FAFAFB]">
+                <div className="flex gap-3"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#F97316]" /><div><p className="text-sm font-medium text-[#111827]">12 recovery cases are waiting</p><p className="mt-1 text-xs leading-5 text-[#667085]">Review evidence and decide which claims to pursue.</p></div></div>
+              </Link>
+              <Link href="/sentinel" className="block px-6 py-5 transition hover:bg-[#FAFAFB]">
+                <div className="flex gap-3"><Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" /><div><p className="text-sm font-medium text-[#111827]">3 free-time windows are at risk</p><p className="mt-1 text-xs leading-5 text-[#667085]">Act before storage or detention starts accumulating.</p></div></div>
+              </Link>
+              <Link href="/portals" className="block px-6 py-5 transition hover:bg-[#FAFAFB]">
+                <div className="flex gap-3"><WalletCards className="mt-0.5 h-4 w-4 shrink-0 text-[#475467]" /><div><p className="text-sm font-medium text-[#111827]">1 carrier portal needs reconnection</p><p className="mt-1 text-xs leading-5 text-[#667085]">Reconnect to keep automated monitoring active.</p></div></div>
+              </Link>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section className="mt-6 rounded-lg border border-[#E2E6EB] bg-white">
+          <div className="flex items-center justify-between border-b border-[#E2E6EB] px-6 py-5">
+            <div><h2 className="text-sm font-semibold text-[#111827]">Latest activity</h2><p className="mt-1 text-xs text-[#8A939F]">Recent events across your freight operations.</p></div>
+            <Link href="/inbox" className="text-xs font-semibold text-[#C2410C] hover:text-[#9A3412]">Open inbox</Link>
+          </div>
+          <div className="divide-y divide-[#E2E6EB]">
+            {activity.map((item) => { const Icon = item.icon; return (
+              <div key={item.title} className="flex items-center gap-4 px-6 py-4">
+                <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-md ${item.tone === "red" ? "bg-[#FEF2F2] text-[#DC2626]" : item.tone === "green" ? "bg-[#ECFDF5] text-[#059669]" : "bg-[#FFF7ED] text-[#EA580C]"}`}><Icon className="h-4 w-4" /></div>
+                <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-[#111827]">{item.title}</p><p className="mt-1 truncate text-xs text-[#8A939F]">{item.detail}</p></div>
+                <span className="shrink-0 text-xs text-[#98A2B3]">{item.time}</span>
+              </div>
+            ); })}
+          </div>
+        </section>
+
+        <footer className="mt-8 flex flex-col gap-2 border-t border-[#E2E6EB] pt-5 text-[10px] uppercase tracking-[0.12em] text-[#98A2B3] sm:flex-row sm:items-center sm:justify-between">
+          <span>CARGOIQ · COMPLIANCE · RECOVERY</span>
+          <span className="inline-flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-[#059669]" /> Systems operational</span>
+        </footer>
       </div>
     </div>
   );

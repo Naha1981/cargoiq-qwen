@@ -1,24 +1,11 @@
-import React from 'react';
-import { Hero } from '@/components/landing/Hero';
-import { PainPoints } from '@/components/landing/PainPoints';
-import { HowItWorks } from '@/components/landing/HowItWorks';
-import { FeaturesGrid } from '@/components/landing/FeaturesGrid';
-import { ShadowAuditSection } from '@/components/landing/ShadowAuditSection';
-import { Pricing } from '@/components/landing/Pricing';
-import { ROIStats } from '@/components/landing/ROIStats';
-import { Footer } from '@/components/landing/Footer';
+import { redirect } from "next/navigation";
 
+/**
+ * CargoIQ is a product application, not a marketing site at the root route.
+ * Send authenticated users straight to the operations command centre.
+ * The public marketing sections remain available in the landing components
+ * for a future dedicated marketing route if needed.
+ */
 export default function HomePage() {
-  return (
-    <main className="bg-[#2A0B04]">
-      <Hero />
-      <PainPoints />
-      <HowItWorks />
-      <FeaturesGrid />
-      <ShadowAuditSection />
-      <Pricing />
-      <ROIStats />
-      <Footer />
-    </main>
-  );
+  redirect("/dashboard");
 }

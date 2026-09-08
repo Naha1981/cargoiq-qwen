@@ -29,6 +29,9 @@ const activity = [
   { icon: Clock3, title: "Free-time window approaching", detail: "Durban · MSC · 17h remaining", time: "1 hr ago", tone: "red" },
 ];
 
+const displayFont = { fontFamily: "var(--font-display-lg)" };
+const monoFont = { fontFamily: "var(--font-mono)" };
+
 export default async function DashboardPage() {
   await ensureTenant();
 
@@ -37,9 +40,9 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-[1440px] px-5 py-7 sm:px-8 lg:px-10 lg:py-9">
         <header className="mb-8 flex flex-col gap-5 border-b border-[#E2E6EB] pb-7 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#8A939F]">CARGOIQ / OPERATIONS</p>
-            <h1 className="mt-2 text-[30px] font-semibold tracking-[-0.035em] text-[#111827]">Freight operations at a glance.</h1>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-[#667085]">Find leakage, resolve compliance exposure, and protect margin before the money leaves.</p>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-[#8A939F]">CARGOIQ / OPERATIONS</p>
+            <h1 style={displayFont} className="mt-2 text-[34px] font-semibold leading-[1.05] tracking-[-0.045em] text-[#111827] sm:text-[42px]">Freight operations at a glance.</h1>
+            <p className="mt-3 max-w-xl text-[15px] leading-6 text-[#667085]">Find leakage, resolve compliance exposure, and protect margin before the money leaves.</p>
           </div>
           <Link href="/shadow-audit" className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[#F97316] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#EA580C]">
             Run an audit <ArrowRight className="h-4 w-4" />
@@ -50,10 +53,10 @@ export default async function DashboardPage() {
           {signals.map((signal) => (
             <div key={signal.label} className="bg-white px-6 py-5">
               <div className="flex items-center justify-between gap-4">
-                <p className="text-xs font-medium text-[#667085]">{signal.label}</p>
+                <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#667085]">{signal.label}</p>
                 <span className={`h-2 w-2 rounded-full ${signal.tone === "red" ? "bg-[#DC2626]" : signal.tone === "green" ? "bg-[#059669]" : "bg-[#F97316]"}`} />
               </div>
-              <p className="mt-3 font-mono text-[25px] font-semibold tracking-[-0.03em] text-[#111827]">{signal.value}</p>
+              <p style={monoFont} className="mt-3 text-[25px] font-semibold tracking-[-0.03em] text-[#111827]">{signal.value}</p>
               <p className="mt-1 text-xs text-[#8A939F]">{signal.meta}</p>
             </div>
           ))}
@@ -63,7 +66,7 @@ export default async function DashboardPage() {
           <div className="rounded-lg border border-[#E2E6EB] bg-white">
             <div className="flex items-center justify-between border-b border-[#E2E6EB] px-6 py-5">
               <div>
-                <h2 className="text-sm font-semibold text-[#111827]">Recovery pipeline</h2>
+                <h2 style={displayFont} className="text-base font-semibold tracking-[-0.02em] text-[#111827]">Recovery pipeline</h2>
                 <p className="mt-1 text-xs text-[#8A939F]">Where identified value is sitting right now.</p>
               </div>
               <Link href="/queue" className="text-xs font-semibold text-[#C2410C] hover:text-[#9A3412]">View queue</Link>
@@ -77,7 +80,7 @@ export default async function DashboardPage() {
                 <div key={label as string}>
                   <div className="mb-2 flex items-center justify-between gap-4 text-xs">
                     <span className="font-medium text-[#475467]">{label}</span>
-                    <span className="font-mono font-semibold text-[#111827]">{value}</span>
+                    <span style={monoFont} className="font-semibold text-[#111827]">{value}</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-[#EEF1F4]">
                     <div className="h-full rounded-full" style={{ width: `${width}%`, backgroundColor: color as string }} />
@@ -86,15 +89,15 @@ export default async function DashboardPage() {
               ))}
             </div>
             <div className="grid grid-cols-3 border-t border-[#E2E6EB]">
-              <div className="px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Findings</p><p className="mt-1 font-mono text-lg font-semibold text-[#111827]">27</p></div>
-              <div className="border-l border-[#E2E6EB] px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Open cases</p><p className="mt-1 font-mono text-lg font-semibold text-[#111827]">12</p></div>
-              <div className="border-l border-[#E2E6EB] px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Recovered</p><p className="mt-1 font-mono text-lg font-semibold text-[#059669]">R 111.5k</p></div>
+              <div className="px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Findings</p><p style={monoFont} className="mt-1 text-lg font-semibold text-[#111827]">27</p></div>
+              <div className="border-l border-[#E2E6EB] px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Open cases</p><p style={monoFont} className="mt-1 text-lg font-semibold text-[#111827]">12</p></div>
+              <div className="border-l border-[#E2E6EB] px-6 py-4"><p className="text-[10px] uppercase tracking-[.12em] text-[#98A2B3]">Recovered</p><p style={monoFont} className="mt-1 text-lg font-semibold text-[#059669]">R 111.5k</p></div>
             </div>
           </div>
 
           <div className="rounded-lg border border-[#E2E6EB] bg-white">
             <div className="border-b border-[#E2E6EB] px-6 py-5">
-              <h2 className="text-sm font-semibold text-[#111827]">Needs attention</h2>
+              <h2 style={displayFont} className="text-base font-semibold tracking-[-0.02em] text-[#111827]">Needs attention</h2>
               <p className="mt-1 text-xs text-[#8A939F]">Only the items that require a decision.</p>
             </div>
             <div className="divide-y divide-[#E2E6EB]">
@@ -113,7 +116,7 @@ export default async function DashboardPage() {
 
         <section className="mt-6 rounded-lg border border-[#E2E6EB] bg-white">
           <div className="flex items-center justify-between border-b border-[#E2E6EB] px-6 py-5">
-            <div><h2 className="text-sm font-semibold text-[#111827]">Latest activity</h2><p className="mt-1 text-xs text-[#8A939F]">Recent events across your freight operations.</p></div>
+            <div><h2 style={displayFont} className="text-base font-semibold tracking-[-0.02em] text-[#111827]">Latest activity</h2><p className="mt-1 text-xs text-[#8A939F]">Recent events across your freight operations.</p></div>
             <Link href="/inbox" className="text-xs font-semibold text-[#C2410C] hover:text-[#9A3412]">Open inbox</Link>
           </div>
           <div className="divide-y divide-[#E2E6EB]">

@@ -33,7 +33,7 @@ export function buildForecastSignal(
   const excess = Math.max(0, observedPeak - input.threshold.threshold);
   if (excess <= 0) return null;
 
-  const score = clamp(excess / scale);
+  const score = Number(clamp(excess / scale).toFixed(4));
   const horizonStart = input.threshold.horizonStart;
   const horizonEnd = input.threshold.horizonEnd;
 

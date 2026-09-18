@@ -7,6 +7,7 @@ import {
 } from "@/lib/db/investigation-schema";
 import { generateId } from "@/lib/utils";
 import { calculateDemurrage } from "./demurrage";
+import { moneyToMinor } from "./money.ts";
 
 type ClaimRow = typeof evidenceClaims.$inferSelect;
 
@@ -33,8 +34,6 @@ function numberValue(claim: ClaimRow | undefined): number | undefined {
   if (typeof value === "string" && value.trim() && Number.isFinite(Number(value))) return Number(value);
   return undefined;
 }
-
-import { moneyToMinor } from "./money.ts";
 
 export async function calculateCaseDemurrage(tenantId: string, caseId: string) {
   if (!db) throw new Error("DATABASE_NOT_CONFIGURED");

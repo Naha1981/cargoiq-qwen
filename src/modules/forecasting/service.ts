@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import {
   forecastRuns,
   forecastSignals,
+  investigationAuditEvents,
 } from "@/lib/db/investigation-schema";
 import { generateId } from "@/lib/utils";
 import {
@@ -80,6 +81,26 @@ export async function runAndStoreForecastSignal(input: {
       originId: signal.seriesId,
     });
     caseId = createdCase.id;
+
+    await db.insert(investigationAuditEvents).values({
+      id: generateId(),
+      tenantId: input.tenantId,
+      caseId,
+      actorUserId: null,
+      action: "FORECAST_SIGNAL_CREATED_CASE",
+      targetType: "forecast_signal",
+      targetId: signal.seriesId,
+      payload: {
+        seriesId: signal.seriesId,
+        entityType: signal.entityType,
+        entityId: signal.entityId,
+        metric: signal.metric,
+        signalType: signal.signalType,
+        score: signal.score,
+        provenance: signal.provenance,
+      },
+      createdAt: new Date(),
+    });
   }
 
   const runId = generateId();

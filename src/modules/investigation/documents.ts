@@ -28,7 +28,7 @@ async function malwareScan(buffer: Buffer) {
   const response = await fetch(endpoint.replace(/\/$/, "") + "/scan", {
     method: "POST",
     headers: { "content-type": "application/octet-stream" },
-    body: buffer,
+    body: new Uint8Array(buffer),
     cache: "no-store",
   });
 

@@ -25,6 +25,12 @@ export function validateInvestigationDocument(input: {
   }
 }
 
+export function assertPdfBytes(buffer: Buffer): void {
+  if (buffer.length < 5 || buffer.subarray(0, 5).toString("ascii") !== "%PDF-") {
+    throw new Error("INVALID_PDF_SIGNATURE");
+  }
+}
+
 export function sanitizeFileName(value: string): string {
   return value.replace(/[^a-zA-Z0-9._ -]/g, "_").slice(0, 255);
 }

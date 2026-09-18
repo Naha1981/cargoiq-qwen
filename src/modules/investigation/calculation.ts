@@ -34,6 +34,29 @@ function numberValue(claim: ClaimRow | undefined): number | undefined {
   return undefined;
 }
 
+function moneyToMinor(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    const minor = Math.round(value * 100);
+    return Number.isSafeInteger(minor) ? minor : undefined;
+  }
+
+  if (typeof value !== "string") return undefined;
+  const normalized = value
+    .trim()
+    .replace(/[R$€£]/g, "")
+    .replace(/\s/g, "")
+    .replace(/,/g, "");
+
+  if (!/^-?\d+(?:\.\d{1,2})?$/.test(normalized)) return undefined;
+
+  const negative = normalized.startsWith("-");
+  const unsigned = negative ? normalized.slice(1) : normalized;
+  const [whole, fraction = ""] = unsigned.split(".");
+  const minor = Number(whole) * 100 + Number((fraction + "00").slice(0, 2));
+  if (!Number.isSafeInteger(minor)) return undefined;
+  return negative ? -minor : minor;
+}
+
 export async function calculateCaseDemurrage(tenantId: string, caseId: string) {
   if (!db) throw new Error("DATABASE_NOT_CONFIGURED");
 
@@ -52,9 +75,9 @@ export async function calculateCaseDemurrage(tenantId: string, caseId: string) {
     stringValue(latestClaim(claims, "AVAILABLE_TIME"));
   const release = stringValue(latestClaim(claims, "RELEASE_TIME"));
   const freeDays = numberValue(latestClaim(claims, "FREE_DAYS"));
-  const dailyRate = numberValue(latestClaim(claims, "DAILY_RATE"));
+  const dailyRate = moneyToMinor(latestClaim(claims, "DAILY_RATE")?.normalizedValue);
   const currency = stringValue(latestClaim(claims, "CURRENCY"));
-  const chargedAmount = numberValue(latestClaim(claims, "CHARGED_AMOUNT"));
+  const chargedAmount = moneyToMinor(latestClaim(claims, "CHARGED_AMOUNT")?.normalizedValue);
 
   if (!start || !release || freeDays === undefined || dailyRate === undefined || !currency) {
     throw new Error("INSUFFICIENT_DEMURRAGE_EVIDENCE");
@@ -94,7 +117,7 @@ export async function calculateCaseDemurrage(tenantId: string, caseId: string) {
   });
 
   const chargedAmountMinor =
-    chargedAmount === undefined ? null : String(Math.trunc(chargedAmount));
+    chargedAmount === undefined ? null : String(chargedAmount);
   const calculatedAmountMinor = String(result.amountMinor);
   const potentialRecovery =
     chargedAmount === undefined

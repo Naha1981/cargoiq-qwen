@@ -2,6 +2,8 @@ import { defineConfig } from '@playwright/test';
 
 const baseURL = process.env.BASE_URL || 'http://localhost:3000';
 const isLocal = baseURL.includes('localhost') || baseURL.includes('127.0.0.1');
+const shouldStartWebServer =
+  !process.env.CI || process.env.PLAYWRIGHT_START_SERVER === 'true';
 
 export default defineConfig({
   testDir: './e2e',
@@ -20,7 +22,14 @@ export default defineConfig({
     screenshot: 'on',
     trace: 'retain-on-failure',
   },
-  ...(isLocal
-    ? { webServer: { command: 'npm run dev', url: baseURL, reuseExistingServer: true, timeout: 120_000 } }
+  ...(isLocal && shouldStartWebServer
+    ? {
+        webServer: {
+          command: 'npm run dev',
+          url: baseURL,
+          reuseExistingServer: true,
+          timeout: 120_000,
+        },
+      }
     : {}),
 });

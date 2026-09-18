@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { sha256Buffer, assertPdfBytes, validateInvestigationDocument } from "../src/modules/investigation/storage.ts";
-import { detectClaimContradictions } from "../src/modules/investigation/contradictions.ts";
+import { detectClaimContradictions } from "../src/modules/investigation/contradictions-core.ts";
 import { createSceneToken, verifySceneToken } from "../src/modules/investigation/scene-token.ts";
 import { calculateDemurrage } from "../src/modules/investigation/demurrage.ts";
 

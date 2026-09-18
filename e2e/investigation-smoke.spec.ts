@@ -118,7 +118,7 @@ test.describe("Investigation smoke", () => {
       return route.continue();
     });
 
-    await page.route("**/api/v1/investigations/browser-case", async (route) => {
+    await page.route("**/api/v1/investigations/browser-case**", async (route) => {
       const path = new URL(route.request().url()).pathname;
 
       if (path === "/api/v1/investigations/browser-case" && route.request().method() === "GET") {

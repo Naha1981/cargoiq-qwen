@@ -21,6 +21,18 @@ assert.deepEqual(result.chargeableDates, [
   "2026-09-07",
 ]);
 
+assert.throws(
+  () =>
+    calculateDemurrage({
+      chargeStart: "2026-01-01",
+      chargeEnd: "9999-12-31",
+      freeDays: 0,
+      dailyRateMinor: Number.MAX_SAFE_INTEGER,
+      currency: "ZAR",
+    }),
+  /DEMURRAGE_RESULT_EXCEEDS_SAFE_INTEGER/,
+);
+
 assert.equal(
   canTransitionProvenance("INFERRED", "VERIFIED"),
   false,

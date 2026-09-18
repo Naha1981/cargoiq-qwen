@@ -4,7 +4,10 @@ import {
   forecastSignals,
 } from "@/lib/db/investigation-schema";
 import { generateId } from "@/lib/utils";
-import { getInvestigationCase } from "@/modules/investigation/service";
+import {
+  createInvestigationCase,
+  getInvestigationCase,
+} from "@/modules/investigation/service";
 import { buildForecastSignal } from "./risk";
 import { createTimesFmEngineFromEnv } from "./timesfm";
 import type {
@@ -56,13 +59,36 @@ export async function runAndStoreForecastSignal(input: {
     threshold: input.threshold,
   });
 
+  let caseId = input.caseId;
+  if (!caseId && signal) {
+    const disputeType =
+      input.series.metric.toLowerCase().includes("dwell") ||
+      input.series.metric.toLowerCase().includes("demurrage") ||
+      input.series.metric.toLowerCase().includes("free_time")
+        ? "DEMURRAGE"
+        : input.series.metric.toLowerCase().includes("waiting")
+          ? "WAITING_TIME"
+          : "OTHER";
+
+    const createdCase = await createInvestigationCase(input.tenantId, {
+      title: `Forecast investigation — ${input.series.entityId} — ${input.series.metric}`,
+      reference: `FORECAST:${input.series.seriesId}`,
+      disputeType,
+      baseCurrency: input.threshold.currency ?? "ZAR",
+      notes: signal.rationale,
+      originType: "FORECAST_SIGNAL",
+      originId: signal.seriesId,
+    });
+    caseId = createdCase.id;
+  }
+
   const runId = generateId();
   const now = new Date(result.generatedAt);
 
   await db.insert(forecastRuns).values({
     id: runId,
     tenantId: input.tenantId,
-    caseId: input.caseId ?? null,
+    caseId: caseId ?? null,
     seriesId: input.series.seriesId,
     entityType: input.series.entityType,
     entityId: input.series.entityId,

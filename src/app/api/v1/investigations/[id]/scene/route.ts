@@ -2,7 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { contradictions, externalObservations } from "@/lib/db/investigation-schema";
-import { getTenantContext, getInvestigationCase } from "@/modules/investigation/service";
+import { getInvestigationCase } from "@/modules/investigation/service";
 import { getCaseClaims } from "@/modules/investigation/documents";
 import { latestCalculation } from "@/modules/investigation/calculation";
 import { verifySceneToken } from "@/modules/investigation/scene-token";
@@ -17,8 +17,8 @@ export async function GET(request: Request, context: Context) {
     return NextResponse.json({ error: "INVALID_SCENE_TOKEN" }, { status: 401 });
   }
 
-  const tenantId = process.env.CARGOiQ_GEV_SCENE_TENANT_ID;
-  if (!tenantId || !db) {
+  const tenantId = payload.tenantId;
+  if (!db) {
     return NextResponse.json({ error: "SCENE_NOT_CONFIGURED" }, { status: 503 });
   }
 

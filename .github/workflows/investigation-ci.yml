@@ -29,6 +29,9 @@ jobs:
       - name: Forecasting unit checks
         run: npm run test:forecasting
 
+      - name: Investigation vertical checks
+        run: npm run test:investigation:vertical
+
       - name: TimesFM runtime syntax check
         run: python -m py_compile services/timesfm/app.py
 

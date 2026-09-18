@@ -50,6 +50,7 @@ export async function POST(request: Request, context: Context) {
           claimsCreated: result.claimsCreated,
           contradictionsCreated: result.contradictionsCreated,
           extraction: result.extraction ?? null,
+          inProgress: result.inProgress ?? false,
         },
       },
       { status: result.duplicate ? 200 : 201 },
@@ -62,7 +63,9 @@ export async function POST(request: Request, context: Context) {
         ? 503
         : message === "MALWARE_DETECTED"
           ? 422
-          : 400;
+          : message === "DOCUMENT_EXTRACTION_IN_PROGRESS"
+            ? 409
+            : 400;
     return NextResponse.json({ error: "DOCUMENT_INGESTION_FAILED", message }, { status });
   }
 }

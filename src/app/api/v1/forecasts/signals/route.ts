@@ -32,7 +32,7 @@ const requestSchema = z.object({
     signalType: z.enum(["EXPOSURE_RISK", "DELAY_RISK", "ANOMALY"]),
     horizonStart: z.string().datetime(),
     horizonEnd: z.string().datetime(),
-    expectedAmountMinor: z.string().regex(/^\\d+$/).optional(),
+    expectedAmountMinor: z.string().regex(/^\d+$/).optional(),
     currency: z.string().regex(/^[A-Z]{3}$/).optional(),
   }),
 });

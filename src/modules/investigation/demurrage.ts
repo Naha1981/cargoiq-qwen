@@ -1,4 +1,4 @@
-import type { DemurrageInput, DemurrageResult } from "./types";
+import type { DemurrageInput, DemurrageResult } from "./types.ts";
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 

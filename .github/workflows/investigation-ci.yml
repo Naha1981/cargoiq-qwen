@@ -58,6 +58,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Start production server
+        env:
+          CARGOIQ_E2E_MODE: true
         run: |
           npm run start -- --hostname 127.0.0.1 > /tmp/cargoiq-next.log 2>&1 &
           for i in {1..60}; do

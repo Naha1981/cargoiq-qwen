@@ -168,6 +168,16 @@ export default function InvestigationDetailPage({
       target.searchParams.set("cargoiqCase", caseId);
       target.searchParams.set("cargoiqToken", body.token);
       target.searchParams.set("cargoiqApi", window.location.origin);
+      const focus = observations.find((item) => item.latitude && item.longitude);
+      if (focus?.latitude && focus?.longitude) {
+        target.searchParams.set("lat", Number(focus.latitude).toFixed(4));
+        target.searchParams.set("lon", Number(focus.longitude).toFixed(4));
+        target.searchParams.set("alt", "40000");
+      } else {
+        target.searchParams.set("lat", "-29.86");
+        target.searchParams.set("lon", "31.02");
+        target.searchParams.set("alt", "50000");
+      }
       window.open(target.toString(), "_blank", "noopener,noreferrer");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not open God’s Eye View.");

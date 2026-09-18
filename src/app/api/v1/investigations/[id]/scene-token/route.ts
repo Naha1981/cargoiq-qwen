@@ -19,7 +19,7 @@ export async function POST(_request: Request, context: Context) {
 
   try {
     return NextResponse.json({
-      token: createSceneToken(id),
+      token: createSceneToken(id, tenant.id),
       expiresInSeconds: 900,
     });
   } catch (error) {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { getTenantContext } from "@/modules/investigation/service";
-import { forecastInvestigationSignal } from "@/modules/forecasting/service";
+import { runAndStoreForecastSignal } from "@/modules/forecasting/service";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -24,7 +24,7 @@ const requestSchema = z.object({
     horizon: z.number().int().min(1).max(1000),
     metadata: z.record(z.string(), z.unknown()).optional(),
   }),
-  threshold: z.object({
+  caseId: z.string().max(64).optional(),\n  threshold: z.object({
     metric: z.string().min(1).max(100),
     threshold: z.number().finite(),
     scale: z.number().finite().positive(),
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      data: signal,
+      data: signal,\n      forecastRunId: stored.runId,\n      forecastSignalId: stored.signalId ?? null,
       queueAction: signal
         ? {
             action: "CREATE_INVESTIGATION_CANDIDATE",

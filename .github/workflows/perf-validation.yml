@@ -1,0 +1,26 @@
+name: CargoIQ performance harness validation
+
+on:
+  push:
+    branches:
+      - 'perf/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --check scripts/load-test-50.mjs
+      - run: npm run test:investigation
+      - run: npm run test:forecasting
+      - run: npm run test:investigation:vertical
+      - run: npm run build

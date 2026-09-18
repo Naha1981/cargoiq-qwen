@@ -43,11 +43,51 @@ export const DISPUTE_TYPE = [
 
 export type DisputeType = (typeof DISPUTE_TYPE)[number];
 
+export const CLAIM_VALUE_TYPE = [
+  "TEXT",
+  "NUMBER",
+  "DATE_TIME",
+  "DATE",
+  "MONEY",
+  "IDENTIFIER",
+] as const;
+
+export type ClaimValueType = (typeof CLAIM_VALUE_TYPE)[number];
+
+export const DEMURRAGE_CLAIM_TYPES = [
+  "CONTAINER_ID",
+  "VESSEL_NAME",
+  "VESSEL_MMSI",
+  "TERMINAL",
+  "ARRIVAL_TIME",
+  "DISCHARGE_TIME",
+  "AVAILABLE_TIME",
+  "FREE_TIME_START",
+  "FREE_DAYS",
+  "FREE_TIME_EXPIRY",
+  "RELEASE_TIME",
+  "CHARGED_DAYS",
+  "DAILY_RATE",
+  "CHARGED_AMOUNT",
+  "CURRENCY",
+  "INVOICE_NUMBER",
+  "INVOICE_DATE",
+  "PORT_LAT",
+  "PORT_LON",
+] as const;
+
+export type DemurrageClaimType = (typeof DEMURRAGE_CLAIM_TYPES)[number];
+
 export interface EvidenceClaimInput {
   caseId: string;
   sourceId: string;
+  documentVersionId?: string;
   claimType: string;
   claimText: string;
+  normalizedValue?: unknown;
+  valueType?: ClaimValueType;
+  sourceQuote?: string;
+  pageNumber?: number;
   observedAt?: string;
   timezone?: string;
   confidence?: number;

@@ -7,6 +7,7 @@ import {
 } from "@/lib/db/investigation-schema";
 import { generateId } from "@/lib/utils";
 import { calculateDemurrage } from "./demurrage";
+import { moneyToMinor } from "./money.ts";
 
 type ClaimRow = typeof evidenceClaims.$inferSelect;
 
@@ -52,9 +53,9 @@ export async function calculateCaseDemurrage(tenantId: string, caseId: string) {
     stringValue(latestClaim(claims, "AVAILABLE_TIME"));
   const release = stringValue(latestClaim(claims, "RELEASE_TIME"));
   const freeDays = numberValue(latestClaim(claims, "FREE_DAYS"));
-  const dailyRate = numberValue(latestClaim(claims, "DAILY_RATE"));
+  const dailyRate = moneyToMinor(latestClaim(claims, "DAILY_RATE")?.normalizedValue);
   const currency = stringValue(latestClaim(claims, "CURRENCY"));
-  const chargedAmount = numberValue(latestClaim(claims, "CHARGED_AMOUNT"));
+  const chargedAmount = moneyToMinor(latestClaim(claims, "CHARGED_AMOUNT")?.normalizedValue);
 
   if (!start || !release || freeDays === undefined || dailyRate === undefined || !currency) {
     throw new Error("INSUFFICIENT_DEMURRAGE_EVIDENCE");
@@ -94,7 +95,7 @@ export async function calculateCaseDemurrage(tenantId: string, caseId: string) {
   });
 
   const chargedAmountMinor =
-    chargedAmount === undefined ? null : String(Math.trunc(chargedAmount));
+    chargedAmount === undefined ? null : String(chargedAmount);
   const calculatedAmountMinor = String(result.amountMinor);
   const potentialRecovery =
     chargedAmount === undefined

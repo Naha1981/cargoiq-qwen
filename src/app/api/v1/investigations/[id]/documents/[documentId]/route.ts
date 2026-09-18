@@ -40,7 +40,7 @@ export async function GET(_request: Request, context: Context) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   }
 
-  return new Response(document.contentBytes, {
+  return new Response(new Uint8Array(document.contentBytes), {
     headers: {
       "content-type": document.mimeType,
       "content-disposition": `inline; filename="${document.fileName}"`,

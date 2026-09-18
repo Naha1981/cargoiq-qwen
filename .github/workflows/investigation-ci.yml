@@ -35,5 +35,11 @@ jobs:
       - name: TimesFM runtime syntax check
         run: python -m py_compile services/timesfm/app.py
 
+      - name: Drizzle schema export
+        run: npx drizzle-kit export --config=drizzle.config.ts > /tmp/cargoiq-schema.sql
+
+      - name: Migration runner syntax
+        run: node --experimental-strip-types --check scripts/migrate-investigation.ts
+
       - name: Production build
         run: npm run build

@@ -80,7 +80,7 @@ STATUS: CONTRACT + TIMESFM ADAPTER IMPLEMENTED
 ## Phase 8 — Hardening
 
 - Cross-tenant security tests.
-- Upload security.
+- Upload security. Failed extraction must be retryable without mutating the immutable original PDF.
 - Source freshness.
 - Background job idempotency.
 - Observability.

@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   evidenceClaims,
@@ -28,7 +28,7 @@ async function malwareScan(buffer: Buffer) {
   const response = await fetch(endpoint.replace(/\/$/, "") + "/scan", {
     method: "POST",
     headers: { "content-type": "application/octet-stream" },
-    body: buffer,
+    body: new Uint8Array(buffer),
     cache: "no-store",
   });
 
@@ -73,32 +73,100 @@ export async function ingestDemurragePdf(input: {
     )
     .limit(1);
 
-  if (duplicate) return { document: duplicate, duplicate: true, claimsCreated: 0, contradictionsCreated: 0 };
-
-  const scanStatus = await malwareScan(input.file.buffer);
   const now = new Date();
-  const documentId = generateId();
-  const versionId = generateId();
+  let document = duplicate ?? null;
+  let documentId = duplicate?.id ?? generateId();
+  let versionId = generateId();
+  let isRetry = false;
 
-  const [document] = await db
-    .insert(investigationDocuments)
-    .values({
-      id: documentId,
-      tenantId: input.tenantId,
-      caseId: input.caseId,
-      fileName: sanitizeFileName(input.file.name),
-      mimeType: input.file.type,
-      sha256,
-      documentType: input.documentType ?? "DEMURRAGE_DOCUMENT",
-      sourceLabel: input.sourceLabel ?? "Customer primary source",
-      originalStorageKey: `db:${documentId}`,
-      sizeBytes: input.file.size,
-      contentBytes: input.file.buffer,
-      immutable: true,
-      malwareScanStatus: scanStatus,
-      createdAt: now,
-    })
-    .returning();
+  if (duplicate) {
+    const versions = await db
+      .select()
+      .from(investigationDocumentVersions)
+      .where(
+        and(
+          eq(investigationDocumentVersions.tenantId, input.tenantId),
+          eq(investigationDocumentVersions.documentId, duplicate.id),
+        ),
+      )
+      .orderBy(desc(investigationDocumentVersions.createdAt));
+
+    if (versions.some((item) => item.extractionStatus === "COMPLETE")) {
+      return {
+        document: duplicate,
+        duplicate: true,
+        claimsCreated: 0,
+        contradictionsCreated: 0,
+      };
+    }
+
+    if (versions.some((item) => item.extractionStatus === "PROCESSING")) {
+      return {
+        document: duplicate,
+        duplicate: true,
+        inProgress: true,
+        claimsCreated: 0,
+        contradictionsCreated: 0,
+      };
+    }
+
+    const abandonedVersionIds = versions
+      .filter((item) => item.extractionStatus !== "COMPLETE")
+      .map((item) => item.id);
+
+    if (abandonedVersionIds.length) {
+      await db
+        .delete(evidenceClaims)
+        .where(
+          and(
+            eq(evidenceClaims.tenantId, input.tenantId),
+            eq(evidenceClaims.caseId, input.caseId),
+            inArray(evidenceClaims.documentVersionId, abandonedVersionIds),
+          ),
+        );
+      isRetry = true;
+    }
+  } else {
+    const scanStatus = await malwareScan(input.file.buffer);
+
+    [document] = await db
+      .insert(investigationDocuments)
+      .values({
+        id: documentId,
+        tenantId: input.tenantId,
+        caseId: input.caseId,
+        fileName: sanitizeFileName(input.file.name),
+        mimeType: input.file.type,
+        sha256,
+        documentType: input.documentType ?? "DEMURRAGE_DOCUMENT",
+        sourceLabel: input.sourceLabel ?? "Customer primary source",
+        originalStorageKey: `db:${documentId}`,
+        sizeBytes: input.file.size,
+        contentBytes: input.file.buffer,
+        immutable: true,
+        malwareScanStatus: scanStatus,
+        createdAt: now,
+      })
+      .returning();
+  }
+
+  const versionNumber = duplicate
+    ? String(Number(
+        (
+          await db
+            .select()
+            .from(investigationDocumentVersions)
+            .where(
+              and(
+                eq(investigationDocumentVersions.tenantId, input.tenantId),
+                eq(investigationDocumentVersions.documentId, documentId),
+              ),
+            )
+            .orderBy(desc(investigationDocumentVersions.createdAt))
+            .limit(1)
+        )[0]?.version ?? "0",
+      ) + 1)
+    : "1";
 
   const [version] = await db
     .insert(investigationDocumentVersions)
@@ -106,7 +174,7 @@ export async function ingestDemurragePdf(input: {
       id: versionId,
       tenantId: input.tenantId,
       documentId,
-      version: "1",
+      version: versionNumber,
       extractionStatus: "PROCESSING",
       parser: "gemini-demurrage-evidence",
       parserVersion: "v1",
@@ -186,13 +254,13 @@ export async function ingestDemurragePdf(input: {
     });
 
     return {
-      document,
+      document: document!,
       version,
       extraction,
       claims: createdClaims,
       claimsCreated: createdClaims.length,
       contradictionsCreated: contradictions.length,
-      duplicate: false,
+      duplicate: isRetry,
     };
   } catch (error) {
     await db

@@ -5,7 +5,8 @@ import {
   evidenceClaims,
 } from "@/lib/db/investigation-schema";
 import { generateId } from "@/lib/utils";
-export { detectClaimContradictions } from "./contradictions-core.ts";
+import { detectClaimContradictions } from "./contradictions-core.ts";
+export { detectClaimContradictions };
 
 export async function persistClaimContradictions(
   tenantId: string,

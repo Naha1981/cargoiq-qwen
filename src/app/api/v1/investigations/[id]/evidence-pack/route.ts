@@ -23,7 +23,7 @@ export async function POST(_request: Request, context: Context) {
 
   try {
     const data = await generateEvidencePack(tenant.id, id);
-    return new Response(data.contentBytes, {
+    return new Response(new Uint8Array(data.contentBytes), {
       status: 201,
       headers: {
         "content-type": "application/pdf",
@@ -48,7 +48,7 @@ export async function GET(_request: Request, context: Context) {
   const pack = await latestEvidencePack(tenant.id, id);
   if (!pack?.contentBytes) return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
 
-  return new Response(pack.contentBytes, {
+  return new Response(new Uint8Array(pack.contentBytes), {
     headers: {
       "content-type": "application/pdf",
       "content-disposition": `inline; filename="cargoiq-${id}-evidence-pack.pdf"`,

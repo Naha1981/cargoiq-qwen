@@ -14,7 +14,8 @@
     "test:e2e:report": "playwright show-report",
     "test:e2e:ui": "playwright test --ui",
     "test:forecasting": "node --experimental-strip-types scripts/test-forecasting.ts",
-    "test:investigation:vertical": "node --experimental-strip-types scripts/test-investigation-vertical.ts"
+    "test:investigation:vertical": "node --experimental-strip-types scripts/test-investigation-vertical.ts",
+    "db:migrate:investigation": "node --experimental-strip-types scripts/migrate-investigation.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.9",

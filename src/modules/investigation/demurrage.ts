@@ -64,6 +64,13 @@ export function calculateDemurrage(input: DemurrageInput): DemurrageResult {
 
   const chargeableDates = eligible.slice(Math.min(input.freeDays, eligible.length));
 
+  if (
+    input.dailyRateMinor > 0 &&
+    chargeableDates.length > Math.floor(Number.MAX_SAFE_INTEGER / input.dailyRateMinor)
+  ) {
+    throw new Error("DEMURRAGE_RESULT_EXCEEDS_SAFE_INTEGER");
+  }
+
   return {
     totalDays: dates.length,
     freeDaysApplied: Math.min(input.freeDays, eligible.length),
@@ -78,7 +85,7 @@ export function calculateDemurrage(input: DemurrageInput): DemurrageResult {
       input.weekendBillable === false
         ? "Weekend days are excluded from billable time."
         : "Weekend days are billable unless the applicable commercial rule says otherwise.",
-      holidays.length > 0
+      holidays.size > 0
         ? "Supplied public-holiday dates are excluded from billable time."
         : "No public-holiday exclusions were supplied.",
     ],

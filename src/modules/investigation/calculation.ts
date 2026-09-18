@@ -34,7 +34,7 @@ function numberValue(claim: ClaimRow | undefined): number | undefined {
   return undefined;
 }
 
-function moneyToMinor(value: unknown): number | undefined {
+export function moneyToMinor(value: unknown): number | undefined {
   if (typeof value === "number" && Number.isFinite(value)) {
     const minor = Math.round(value * 100);
     return Number.isSafeInteger(minor) ? minor : undefined;

@@ -76,7 +76,7 @@ Initial source families:
 
 Provider adapters must normalize to an external-observation contract before case linkage.
 
-## Financial engine
+## Forecasting engine\n\n- Forecast operational series such as dwell time, free-time utilisation, waiting time, and dispute exposure indicators.\n- Treat forecasts as INFERRED prioritisation signals only.\n- Never convert a forecast into evidence or a financial fact.\n- Keep the model provider behind a ForecastEngine interface.\n- Use TimesFM 2.5 or another commercially permitted model for production; review model-weight licensing before enabling any newer checkpoint.\n- The investigation agent may create a triage candidate from a signal, but human review remains required for the evidence case.\n\n## Financial engine
 
 Start with demurrage only.
 

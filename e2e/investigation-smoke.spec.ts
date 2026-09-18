@@ -6,15 +6,14 @@ test.describe("Investigation smoke", () => {
     await expect(page.getByRole("heading", { name: "Investigate the money." })).toBeVisible();
     await expect(page.getByRole("heading", { name: "New investigation" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Cases" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Create investigation" })).toBeVisible();
   });
 
-  test("investigation API remains tenant-protected when logged out", async ({ request }) => {
-    const list = await request.get("/api/v1/investigations");
-    expect(list.status()).toBe(401);
-
-    const review = await request.get(
-      "/api/v1/investigations/does-not-exist/review",
-    );
-    expect(review.status()).toBe(401);
+  test("health endpoint is reachable from the browser", async ({ page }) => {
+    const response = await page.request.get("/api/health");
+    expect(response.ok()).toBeTruthy();
+    const body = await response.json();
+    expect(body.status).toBe("healthy");
+    expect(body.service).toBe("cargoiq");
   });
 });

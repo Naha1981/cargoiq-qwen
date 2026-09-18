@@ -133,7 +133,7 @@ export async function runAndStoreForecastSignal(input: {
   await db.insert(forecastSignals).values({
     id: signalId,
     tenantId: input.tenantId,
-    caseId: input.caseId ?? null,
+    caseId: caseId ?? null,
     forecastRunId: runId,
     seriesId: signal.seriesId,
     entityType: signal.entityType,

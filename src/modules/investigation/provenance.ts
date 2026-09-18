@@ -1,7 +1,7 @@
 import {
   PROVENANCE_STATUS,
   type ProvenanceStatus,
-} from "./types";
+} from "./types.ts";
 
 const DIRECT_TRANSITIONS: Record<ProvenanceStatus, ReadonlySet<ProvenanceStatus>> = {
   VERIFIED: new Set(["VERIFIED", "DISPUTED"]),

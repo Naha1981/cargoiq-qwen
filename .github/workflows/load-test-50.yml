@@ -1,1 +1,22 @@
-name: CargoIQ 50-business load test\n\non:\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\njobs:\n  load-test:\n    runs-on: ubuntu-latest\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@v4\n      - name: Run 50-business authenticated pilot test\n        env:\n          CARGOIQ_LOAD_TEST_URL: ${{ secrets.CARGOIQ_LOAD_TEST_URL }}\n          CARGOIQ_TEST_TOKENS: ${{ secrets.CARGOIQ_TEST_TOKENS }}\n          NAHALLM_URL: ${{ secrets.NAHALLM_URL }}\n          NAHALLM_API_KEY: ${{ secrets.NAHALLM_API_KEY }}\n          LOAD_TEST_CONCURRENCY: '50'\n        run: node scripts/load-test-50.mjs\n
+name: CargoIQ 50-business load test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  load-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run 50-business authenticated pilot test
+        env:
+          CARGOIQ_LOAD_TEST_URL: ${{ secrets.CARGOIQ_LOAD_TEST_URL }}
+          CARGOIQ_TEST_TOKENS: ${{ secrets.CARGOIQ_TEST_TOKENS }}
+          NAHALLM_URL: ${{ secrets.NAHALLM_URL }}
+          NAHALLM_API_KEY: ${{ secrets.NAHALLM_API_KEY }}
+          LOAD_TEST_CONCURRENCY: '50'
+        run: node scripts/load-test-50.mjs

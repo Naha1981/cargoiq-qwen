@@ -34,9 +34,9 @@ STATUS: STARTED
 - Add reproducibility fixtures.
 - Never let an LLM own final arithmetic.
 
-STATUS: FOUNDATION IMPLEMENTED
+STATUS: FOUNDATION IMPLEMENTED\n\n## Forecasting status\n\nSTATUS: CONTRACT + TIMESFM ADAPTER IMPLEMENTED
 
-## Phase 4 — Corroboration
+## Phase 4 — Forecasting & Corroboration\n\n- Add ForecastEngine contract.\n- Add TimesFM HTTP adapter behind server-side credentials.\n- Convert forecast threshold crossings into INFERRED investigation signals.\n- Keep forecast results separate from evidence claims.\n- Persist forecast runs/signals after the first contract slice is stable.\n- Then implement one AIS adapter.
 
 - Implement one AIS adapter.
 - Implement Copernicus Sentinel discovery.

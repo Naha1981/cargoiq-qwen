@@ -3,7 +3,7 @@ import { sha256Buffer, assertPdfBytes, validateInvestigationDocument } from "../
 import { detectClaimContradictions } from "../src/modules/investigation/contradictions-core.ts";
 import { createSceneToken, verifySceneToken } from "../src/modules/investigation/scene-token.ts";
 import { calculateDemurrage } from "../src/modules/investigation/demurrage.ts";
-import { moneyToMinor } from "../src/modules/investigation/calculation.ts";
+import { moneyToMinor } from "../src/modules/investigation/money.ts";
 
 process.env.CARGOiQ_GEV_SCENE_SECRET = "test-secret";
 

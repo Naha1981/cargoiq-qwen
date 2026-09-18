@@ -98,13 +98,20 @@ export function extractionToClaims(
   extraction: DemurrageExtraction,
   input: { caseId: string; documentId: string; documentVersionId: string },
 ): EvidenceClaimInput[] {
-  return extraction.facts.map((fact) => ({
+  return extraction.facts.map((fact) => {
+    const normalizedValue =
+      (fact.claimType === "DAILY_RATE" || fact.claimType === "CHARGED_AMOUNT") &&
+      typeof fact.value === "number"
+        ? Math.round(fact.value * 100)
+        : fact.value;
+
+    return {
     caseId: input.caseId,
     sourceId: input.documentId,
     documentVersionId: input.documentVersionId,
     claimType: fact.claimType,
     claimText: fact.claimText,
-    normalizedValue: fact.value,
+    normalizedValue,
     valueType: fact.valueType,
     sourceQuote: fact.sourceQuote,
     pageNumber: fact.pageNumber,
@@ -114,5 +121,6 @@ export function extractionToClaims(
     provenance: "DERIVED",
     sourceType: "CUSTOMER_PRIMARY",
     locationRef: `page:${fact.pageNumber}`,
-  }));
+    };
+  });
 }

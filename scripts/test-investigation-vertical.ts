@@ -3,6 +3,7 @@ import { sha256Buffer, assertPdfBytes, validateInvestigationDocument } from "../
 import { detectClaimContradictions } from "../src/modules/investigation/contradictions-core.ts";
 import { createSceneToken, verifySceneToken } from "../src/modules/investigation/scene-token.ts";
 import { calculateDemurrage } from "../src/modules/investigation/demurrage.ts";
+import { moneyToMinor } from "../src/modules/investigation/calculation.ts";
 
 process.env.CARGOiQ_GEV_SCENE_SECRET = "test-secret";
 
@@ -63,6 +64,9 @@ const calculation = calculateDemurrage({
   weekendBillable: false,
 });
 assert.equal(calculation.amountMinor, 555000);
+assert.equal(moneyToMinor(1850), 185000);
+assert.equal(moneyToMinor("1,850.50"), 185050);
+assert.equal(moneyToMinor("R1 850.50"), undefined);
 
 const token = createSceneToken("case-123", "tenant-456", 60);
 const verified = verifySceneToken(token);

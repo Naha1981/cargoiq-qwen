@@ -2,7 +2,7 @@ import type {
   ForecastResult,
   ForecastSignal,
   ForecastThreshold,
-} from "./types";
+} from "./types.ts";
 
 function clamp(value: number): number {
   return Math.max(0, Math.min(1, value));

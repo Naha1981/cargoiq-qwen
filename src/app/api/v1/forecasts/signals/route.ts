@@ -20,7 +20,7 @@ const requestSchema = z.object({
         timestamp: z.string().datetime(),
         value: z.number().finite(),
       }),
-    ).min(2).max(20000),
+    ).min(32).max(20000),
     horizon: z.number().int().min(1).max(1000),
     metadata: z.record(z.string(), z.unknown()).optional(),
   }),

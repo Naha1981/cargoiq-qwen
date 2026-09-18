@@ -64,6 +64,13 @@ export function calculateDemurrage(input: DemurrageInput): DemurrageResult {
 
   const chargeableDates = eligible.slice(Math.min(input.freeDays, eligible.length));
 
+  if (
+    input.dailyRateMinor > 0 &&
+    chargeableDates.length > Math.floor(Number.MAX_SAFE_INTEGER / input.dailyRateMinor)
+  ) {
+    throw new Error("DEMURRAGE_RESULT_EXCEEDS_SAFE_INTEGER");
+  }
+
   return {
     totalDays: dates.length,
     freeDaysApplied: Math.min(input.freeDays, eligible.length),

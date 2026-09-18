@@ -33,6 +33,35 @@ type ExtractionFact = {
   sourceQuote: string;
 };
 
+type ReviewClaim = ExtractionFact & {
+  id: string;
+  provenance: string;
+  humanReviewed: boolean;
+  claimText: string;
+  sourceQuote: string | null;
+  pageNumber: number | null;
+};
+
+type ReviewContradiction = {
+  id: string;
+  contradictionType: string;
+  explanation: string;
+  severity: string;
+  resolved: boolean;
+};
+
+type ReviewState = {
+  claims: ReviewClaim[];
+  contradictions: ReviewContradiction[];
+  latestPack: { id: string; status: string; version: string; contentHash: string | null } | null;
+  reviewSummary: {
+    totalClaims: number;
+    verifiedClaims: number;
+    pendingClaims: number;
+    unresolvedContradictions: number;
+  };
+};
+
 function factValue(facts: ExtractionFact[] | undefined, type: string): string | undefined {
   const item = facts?.find((fact) => fact.claimType === type);
   return item ? String(item.value) : undefined;
@@ -46,6 +75,7 @@ export default function InvestigationDetailPage({
   const [caseRecord, setCaseRecord] = useState<CaseRecord | null>(null);
   const [observations, setObservations] = useState<Observation[]>([]);
   const [facts, setFacts] = useState<ExtractionFact[]>([]);
+  const [review, setReview] = useState<ReviewState | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,16 +86,20 @@ export default function InvestigationDetailPage({
       const { id } = await params;
       setCaseId(id);
       try {
-        const [caseResponse, geoResponse] = await Promise.all([
+        const [caseResponse, geoResponse, reviewResponse] = await Promise.all([
           fetch(`/api/v1/investigations/${id}`, { cache: "no-store" }),
           fetch(`/api/v1/investigations/${id}/geospatial`, { cache: "no-store" }),
+          fetch(`/api/v1/investigations/${id}/review`, { cache: "no-store" }),
         ]);
         const caseBody = await caseResponse.json();
         const geoBody = await geoResponse.json();
+        const reviewBody = await reviewResponse.json();
         if (!caseResponse.ok) throw new Error(caseBody?.message ?? "Could not load the investigation.");
         if (!geoResponse.ok) throw new Error(geoBody?.message ?? "Could not load geospatial evidence.");
+        if (!reviewResponse.ok) throw new Error(reviewBody?.message ?? "Could not load review state.");
         setCaseRecord(caseBody.data);
         setObservations(geoBody.entities ?? []);
+        setReview(reviewBody.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Could not load the investigation.");
       }
@@ -145,10 +179,43 @@ export default function InvestigationDetailPage({
         window.open(`/api/v1/investigations/${caseId}/evidence-pack`, "_blank", "noopener,noreferrer");
       }
       const geo = await fetch(`/api/v1/investigations/${caseId}/geospatial`, { cache: "no-store" });
+      const reviewResponse = await fetch(`/api/v1/investigations/${caseId}/review`, { cache: "no-store" });
+      const reviewBody = await reviewResponse.json();
+      if (reviewResponse.ok) setReview(reviewBody.data);
+
       const geoBody = await geo.json();
       if (geo.ok) setObservations(geoBody.entities ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Investigation run failed.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const performReview = async (action: string, targetId?: string) => {
+    if (!caseId) return;
+    setBusy(`review:${action}`);
+    setError(null);
+    try {
+      const body: Record<string, string> = { action };
+      if (targetId) {
+        if (action === "RESOLVE_CONTRADICTION") body.contradictionId = targetId;
+        else body.claimId = targetId;
+      }
+      const response = await fetch(`/api/v1/investigations/${caseId}/review`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload?.message ?? payload?.error ?? "Review action failed.");
+      const refreshed = await fetch(`/api/v1/investigations/${caseId}/review`, { cache: "no-store" });
+      const refreshedBody = await refreshed.json();
+      if (!refreshed.ok) throw new Error(refreshedBody?.message ?? "Could not refresh review state.");
+      setReview(refreshedBody.data);
+      setMessage("Review action recorded in the investigation audit trail.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Review action failed.");
     } finally {
       setBusy(null);
     }
@@ -273,6 +340,117 @@ export default function InvestigationDetailPage({
                   ))}
                 </div>
               )}
+            </section>
+
+            <section className="rounded-lg border border-[#E2E6EB] bg-white">
+              <div className="border-b border-[#E2E6EB] px-6 py-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-semibold text-[#111827]">Human review</h2>
+                    <p className="mt-1 text-xs text-[#8A939F]">
+                      Verify or dispute extracted claims, resolve contradictions, then approve the evidence pack.
+                    </p>
+                  </div>
+                  {review?.reviewSummary && (
+                    <div className="flex gap-2 font-mono text-[10px] uppercase tracking-[0.08em] text-[#667085]">
+                      <span>{review.reviewSummary.verifiedClaims} verified</span>
+                      <span>·</span>
+                      <span>{review.reviewSummary.pendingClaims} pending</span>
+                      <span>·</span>
+                      <span>{review.reviewSummary.unresolvedContradictions} conflicts</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="divide-y divide-[#E2E6EB]">
+                {review?.claims.filter((claim) => !claim.humanReviewed).map((claim) => (
+                  <article key={claim.id} className="px-6 py-4">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-[#111827]">{claim.claimType}</p>
+                        <p className="mt-1 text-xs leading-5 text-[#475467]">{claim.claimText}</p>
+                        {claim.sourceQuote && (
+                          <p className="mt-2 text-[11px] italic leading-5 text-[#8A939F]">“{claim.sourceQuote}” · p.{claim.pageNumber ?? "?"}</p>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => void performReview("VERIFY_CLAIM", claim.id)}
+                          disabled={busy !== null || claim.provenance === "INFERRED"}
+                          className="rounded-md bg-[#111827] px-3 py-2 text-[11px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          Verify
+                        </button>
+                        <button
+                          onClick={() => void performReview("DISPUTE_CLAIM", claim.id)}
+                          disabled={busy !== null}
+                          className="rounded-md border border-[#D0D5DD] px-3 py-2 text-[11px] font-semibold text-[#111827] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          Dispute
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+                {review && review.reviewSummary.pendingClaims === 0 && (
+                  <div className="px-6 py-8 text-sm text-[#667085]">All extracted claims have a recorded human review decision.</div>
+                )}
+              </div>
+            </section>
+
+            <section className="rounded-lg border border-[#E2E6EB] bg-white">
+              <div className="border-b border-[#E2E6EB] px-6 py-5">
+                <h2 className="text-sm font-semibold text-[#111827]">Contradiction review</h2>
+                <p className="mt-1 text-xs text-[#8A939F]">Deterministic conflicts stay visible until a reviewer records that they were resolved.</p>
+              </div>
+              <div className="divide-y divide-[#E2E6EB]">
+                {(review?.contradictions ?? []).map((item) => (
+                  <article key={item.id} className="px-6 py-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-[#111827]">{item.contradictionType}</p>
+                          <span className="rounded-full border border-[#E2E6EB] px-2 py-1 text-[10px] uppercase text-[#667085]">{item.severity}</span>
+                        </div>
+                        <p className="mt-2 text-xs leading-5 text-[#475467]">{item.explanation}</p>
+                      </div>
+                      {item.resolved ? (
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#667085]">Resolved</span>
+                      ) : (
+                        <button
+                          onClick={() => void performReview("RESOLVE_CONTRADICTION", item.id)}
+                          disabled={busy !== null}
+                          className="rounded-md border border-[#D0D5DD] px-3 py-2 text-[11px] font-semibold text-[#111827] disabled:opacity-40"
+                        >
+                          Mark resolved
+                        </button>
+                      )}
+                    </div>
+                  </article>
+                ))}
+                {review?.contradictions.length === 0 && (
+                  <div className="px-6 py-8 text-sm text-[#667085]">No deterministic contradictions are currently stored.</div>
+                )}
+              </div>
+            </section>
+
+            <section className="rounded-lg border border-[#E2E6EB] bg-white p-6">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8A939F]">Final review</p>
+                  <p className="mt-2 text-sm font-semibold text-[#111827]">Approve the latest evidence pack</p>
+                  <p className="mt-1 text-xs leading-5 text-[#667085]">
+                    Approval is a human action. CargoIQ blocks this step while deterministic contradictions remain unresolved.
+                  </p>
+                </div>
+                <button
+                  onClick={() => void performReview("APPROVE_EVIDENCE_PACK")}
+                  disabled={busy !== null || !review?.latestPack || (review.reviewSummary.unresolvedContradictions > 0) || review.latestPack.status === "APPROVED"}
+                  className="rounded-md bg-[#F97316] px-4 py-2.5 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {review?.latestPack?.status === "APPROVED" ? "Pack approved" : "Approve pack"}
+                </button>
+              </div>
             </section>
 
             <section className="rounded-lg border border-[#E2E6EB] bg-white">

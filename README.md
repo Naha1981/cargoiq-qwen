@@ -51,7 +51,12 @@ The repository now contains:
 - source/licence register;
 - purpose-built CargoIQ Claude Code skills;
 - a repeatable investigation unit-test command;
-- a replaceable ForecastEngine with persisted forecast runs/signals and inferred investigation triage.
+- a replaceable ForecastEngine with persisted forecast runs/signals and inferred investigation triage;
+- an immutable PDF evidence path with SHA-256 + source-linked extraction claims;
+- deterministic contradiction detection and demurrage calculation;
+- AISStream + Copernicus Sentinel corroboration adapters;
+- signed God’s Eye View case-scene payloads;
+- immutable evidence-pack PDF generation.
 
 ### API foundation
 
@@ -61,6 +66,13 @@ POST /api/v1/investigations
 GET  /api/v1/investigations/{id}
 GET  /api/v1/investigations/{id}/geospatial
 POST /api/v1/forecasts/signals
+POST /api/v1/investigations/{id}/documents
+GET  /api/v1/investigations/{id}/documents/{documentId}
+POST /api/v1/investigations/{id}/calculate/demurrage
+POST /api/v1/investigations/{id}/corroborate
+POST /api/v1/investigations/{id}/evidence-pack
+POST /api/v1/investigations/{id}/scene-token
+GET  /api/v1/investigations/{id}/scene?token=...
 ```
 
 The geospatial endpoint is the contract between CargoIQ and the God’s Eye View visual investigation surface.

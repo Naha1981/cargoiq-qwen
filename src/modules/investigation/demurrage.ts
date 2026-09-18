@@ -4,11 +4,11 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
 function assertDateOnly(value: string, field: string): Date {
   if (!DATE_ONLY.test(value)) {
-    throw new Error(\`INVALID_\${field.toUpperCase()}: expected YYYY-MM-DD\`);
+    throw new Error(`INVALID_${field.toUpperCase()}: expected YYYY-MM-DD`);
   }
-  const date = new Date(\`\${value}T00:00:00.000Z\`);
+  const date = new Date(`${value}T00:00:00.000Z`);
   if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) {
-    throw new Error(\`INVALID_\${field.toUpperCase()}: invalid calendar date\`);
+    throw new Error(`INVALID_${field.toUpperCase()}: invalid calendar date`);
   }
   return date;
 }

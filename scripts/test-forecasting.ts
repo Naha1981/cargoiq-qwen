@@ -34,7 +34,7 @@ assert.equal(signal.peakForecastValue, 7.1);
 assert.equal(signal.peakUpperValue, 8.4);
 assert.equal(signal.provenance, "INFERRED");
 assert.equal(signal.requiresInvestigation, true);
-assert.equal(signal.score, 0.6);
+assert.ok(Math.abs(signal.score - 0.6) < 1e-9);
 
 const noSignal = buildForecastSignal(result, {
   entityType: "CONTAINER",

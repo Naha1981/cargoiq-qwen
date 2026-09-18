@@ -31,7 +31,8 @@ Evidence pack
 - **App:** Next.js App Router + TypeScript
 - **Database:** Neon PostgreSQL + Drizzle
 - **Auth / tenancy:** Clerk
-- **AI extraction:** Vercel AI SDK + Google Gemini\n- **Forecasting:** ForecastEngine + TimesFM HTTP adapter
+- **AI extraction:** Vercel AI SDK + Google Gemini
+- **Forecasting:** ForecastEngine + TimesFM HTTP adapter
 - **Testing:** Playwright + investigation unit checks
 - **Observability:** Sentry
 - **Geospatial target:** PostGIS + God’s Eye View / Cesium
@@ -49,7 +50,8 @@ The repository now contains:
 - geospatial case API;
 - source/licence register;
 - purpose-built CargoIQ Claude Code skills;
-- a repeatable investigation unit-test command;\n- a replaceable ForecastEngine with persisted forecast runs/signals and inferred investigation triage.
+- a repeatable investigation unit-test command;
+- a replaceable ForecastEngine with persisted forecast runs/signals and inferred investigation triage.
 
 ### API foundation
 
@@ -57,10 +59,13 @@ The repository now contains:
 GET  /api/v1/investigations
 POST /api/v1/investigations
 GET  /api/v1/investigations/{id}
-GET  /api/v1/investigations/{id}/geospatial\nPOST /api/v1/forecasts/signals
+GET  /api/v1/investigations/{id}/geospatial
+POST /api/v1/forecasts/signals
 ```
 
-The geospatial endpoint is the contract between CargoIQ and the God’s Eye View visual investigation surface.\n\nThe forecasting endpoint uses a server-side TimesFM adapter. Forecast signals are triage inputs only; they are stored as INFERRED and must be independently proven by the evidence engine.
+The geospatial endpoint is the contract between CargoIQ and the God’s Eye View visual investigation surface.
+
+The forecasting endpoint uses a server-side TimesFM adapter. Forecast signals are triage inputs only; they are stored as INFERRED and must be independently proven by the evidence engine.
 
 ### Important truthfulness rule
 
@@ -70,7 +75,8 @@ Public/independent observations are corroboration, not automatic shipment-specif
 
 ```bash
 npm install
-npm run test:investigation\nnpm run test:forecasting
+npm run test:investigation
+npm run test:forecasting
 npm run dev
 ```
 

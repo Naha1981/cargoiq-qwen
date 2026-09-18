@@ -4,7 +4,17 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [feat/investigative-evidence-foundation]
+    branches:
+      - main
+      - 'feat/**'
+  workflow_dispatch:
+
+concurrency:
+  group: cargoiq-investigation-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   verify:

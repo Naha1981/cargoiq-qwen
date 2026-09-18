@@ -1,53 +1,104 @@
 # CargoIQ
 
-South Africa's first AI-powered compliance and cost-containment platform for freight forwarders and customs clearing agents running CargoWise.
+## Investigative Evidence Platform
 
-## Architecture
+CargoIQ is being rebuilt as a freight-payment and operational dispute investigation platform.
 
-AI-Native Enterprise Full-Stack Standard v4.1
+**Promise:** reconstruct what happened, connect material facts to evidence, calculate financial exposure deterministically, corroborate the timeline with permitted external observations, and produce a human-reviewed evidence pack.
 
-- **Framework:** Next.js App Router (TypeScript strict)
-- **Database:** Neon PostgreSQL + Drizzle ORM
-- **Auth:** Better Auth
-- **AI:** Vercel AI SDK + Google Gemini
-- **Realtime:** Ably
-- **Background Jobs:** Inngest + Vercel Cron
-- **Portal Automation:** Render Worker (Node.js + Playwright)
-- **WhatsApp:** Evolution API (Render)
-- **Payments:** PayFast (Phase 2)
-- **Deployment:** Vercel (app) + Render (worker)
+### Core workflow
 
-## Getting Started
+```
+Documents + records + external observations
+        ↓
+Evidence claims
+        ↓
+Freight timeline
+        ↓
+Contradictions
+        ↓
+Commercial rules
+        ↓
+Deterministic money
+        ↓
+Human review
+        ↓
+Evidence pack
+```
 
-1. Copy `.env.example` to `.env` and fill in credentials
-2. `npm install`
-3. `npx drizzle-kit push` (apply schema to Neon)
-4. `npm run dev`
+### Architecture
 
-## Deployment
+- **App:** Next.js App Router + TypeScript
+- **Database:** Neon PostgreSQL + Drizzle
+- **Auth / tenancy:** Clerk
+- **AI extraction:** Vercel AI SDK + Google Gemini
+- **Forecasting:** ForecastEngine + TimesFM HTTP adapter
+- **Testing:** Playwright + investigation unit checks
+- **Observability:** Sentry
+- **Geospatial target:** PostGIS + God’s Eye View / Cesium
+- **Document target:** Docling + OCRmyPDF + ClamAV
+- **Spatial/ETL target:** GDAL + STAC + DuckDB + GeoParquet + H3
 
-- **Vercel:** Import repo → Set env vars → Deploy
-- **Render Worker:** New Web Service → Root: `render-worker` → Build: `npm install && npx playwright install chromium --with-deps` → Start: `npm start` → Free tier
+### Current investigation foundation
 
-## Modules (14 total)
+The repository now contains:
 
-| # | Module | Status |
-|---|--------|--------|
-| 1 | Compliance Shield | Built |
-| 2 | Carrier Invoice Auditor | Next |
-| 3 | Driver Check-In | Built |
-| 4 | RLA Sentinel | Next |
-| 5 | HS Code Classifier | Next |
-| 6 | Section 99(2) Tracker | Next |
-| 7 | Email Intelligence | Next |
-| 8 | Shadow Audit | Next |
-| 9 | VOC Tracker | Next |
-| 10 | Invoice Generator | Next |
-| 11 | TMS Pre-Declaration | Next |
-| 12 | Container Tracking | Next |
-| 13 | Savings Certificate | Next |
-| 14 | Deal Hunter CRM | Next |
+- tenant-scoped investigation cases;
+- evidence/provenance types;
+- deterministic demurrage calculation;
+- investigation database tables;
+- geospatial case API;
+- source/licence register;
+- purpose-built CargoIQ Claude Code skills;
+- a repeatable investigation unit-test command;
+- a replaceable ForecastEngine with persisted forecast runs/signals and inferred investigation triage;
+- an immutable PDF evidence path with SHA-256 + source-linked extraction claims;
+- deterministic contradiction detection and demurrage calculation;
+- AISStream + Copernicus Sentinel corroboration adapters;
+- signed God’s Eye View case-scene payloads;
+- immutable evidence-pack PDF generation.
 
----
+### API foundation
+
+```
+GET  /api/v1/investigations
+POST /api/v1/investigations
+GET  /api/v1/investigations/{id}
+GET  /api/v1/investigations/{id}/geospatial
+POST /api/v1/forecasts/signals
+POST /api/v1/investigations/{id}/documents
+GET  /api/v1/investigations/{id}/documents/{documentId}
+POST /api/v1/investigations/{id}/calculate/demurrage
+POST /api/v1/investigations/{id}/corroborate
+POST /api/v1/investigations/{id}/evidence-pack
+POST /api/v1/investigations/{id}/scene-token
+GET  /api/v1/investigations/{id}/scene?token=...
+```
+
+The geospatial endpoint is the contract between CargoIQ and the God’s Eye View visual investigation surface.
+
+The forecasting endpoint uses a server-side TimesFM adapter. Forecast signals are triage inputs only; they are stored as INFERRED and must be independently proven by the evidence engine.
+
+### Important truthfulness rule
+
+Public/independent observations are corroboration, not automatic shipment-specific proof. AIS, satellite, weather, traffic, CCTV and general port notices retain source-specific limitations.
+
+### Run locally
+
+```bash
+npm install
+npm run test:investigation
+npm run test:forecasting
+npm run dev
+```
+
+Database migrations are managed through Drizzle. No production migration should be run until the generated migration is reviewed.
+
+### Product documents
+
+- `PRD.md`
+- `Plan.md`
+- `Execution-Plan.md`
+- `docs/SOURCE-LICENSE-REGISTER.md`
 
 NahaLabs (Pty) Ltd | Confidential

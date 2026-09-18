@@ -64,7 +64,7 @@ export async function extractDemurrageEvidenceFromPdf(
     "Every fact MUST include an exact short quote from the document and the PDF page number.",
     "A fact without an exact quote is invalid.",
     "Use null by omitting a fact when the source does not clearly show it.",
-    "For money, preserve the document's amount and currency.",
+    "For money, preserve the document's displayed major-unit amount exactly (for example 1850.00), plus the currency. Do not convert money into cents/minor units during extraction.",
     "For dates/times, preserve the document's timezone when stated.",
     "Do not treat headers, boilerplate, or generic terms as shipment-specific facts.",
     "Extract multiple conflicting facts when the document contains them; CargoIQ will investigate contradictions later.",
@@ -99,19 +99,13 @@ export function extractionToClaims(
   input: { caseId: string; documentId: string; documentVersionId: string },
 ): EvidenceClaimInput[] {
   return extraction.facts.map((fact) => {
-    const normalizedValue =
-      (fact.claimType === "DAILY_RATE" || fact.claimType === "CHARGED_AMOUNT") &&
-      typeof fact.value === "number"
-        ? Math.round(fact.value * 100)
-        : fact.value;
-
     return {
     caseId: input.caseId,
     sourceId: input.documentId,
     documentVersionId: input.documentVersionId,
     claimType: fact.claimType,
     claimText: fact.claimText,
-    normalizedValue,
+    normalizedValue: fact.value,
     valueType: fact.valueType,
     sourceQuote: fact.sourceQuote,
     pageNumber: fact.pageNumber,

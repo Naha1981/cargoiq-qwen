@@ -26,5 +26,11 @@ jobs:
       - name: Investigation unit checks
         run: npm run test:investigation
 
+      - name: Forecasting unit checks
+        run: npm run test:forecasting
+
+      - name: TimesFM runtime syntax check
+        run: python -m py_compile services/timesfm/app.py
+
       - name: Production build
         run: npm run build

@@ -1,3 +1,4 @@
+import { extractionToClaims } from "../src/modules/investigation/extraction.ts";
 import assert from "node:assert/strict";
 import { sha256Buffer, assertPdfBytes, validateInvestigationDocument } from "../src/modules/investigation/storage.ts";
 import { detectClaimContradictions } from "../src/modules/investigation/contradictions-core.ts";
@@ -73,5 +74,121 @@ const verified = verifySceneToken(token);
 assert.equal(verified?.caseId, "case-123");
 assert.equal(verified?.tenantId, "tenant-456");
 assert.equal(verifySceneToken(token + "x"), null);
+
+const realInvoiceShape = extractionToClaims(
+  {
+    facts: [
+      {
+        claimType: "CONTAINER_ID",
+        claimText: "Container MRSU5474591",
+        value: "MRSU5474591",
+        valueType: "IDENTIFIER",
+        sourceQuote: "Demurrage Fee MRSU5474591",
+        pageNumber: 1,
+        observedAt: null,
+        timezone: null,
+        confidence: 0.99,
+      },
+      {
+        claimType: "FREE_TIME_START",
+        claimText: "Free time starts 6 August 2024",
+        value: "2024-08-06T00:00:00Z",
+        valueType: "DATE_TIME",
+        sourceQuote: "Freetime 06.Aug.2024 11.Aug.2024",
+        pageNumber: 1,
+        observedAt: "2024-08-06T00:00:00Z",
+        timezone: "Africa/Johannesburg",
+        confidence: 0.99,
+      },
+      {
+        claimType: "FREE_TIME_EXPIRY",
+        claimText: "Free time ends 11 August 2024",
+        value: "2024-08-11T23:59:59Z",
+        valueType: "DATE_TIME",
+        sourceQuote: "Freetime 06.Aug.2024 11.Aug.2024 6 DAY",
+        pageNumber: 1,
+        observedAt: "2024-08-11T23:59:59Z",
+        timezone: "Africa/Johannesburg",
+        confidence: 0.99,
+      },
+      {
+        claimType: "RELEASE_TIME",
+        claimText: "Charge date 12 August 2024",
+        value: "2024-08-12T00:00:00Z",
+        valueType: "DATE_TIME",
+        sourceQuote: "Demurrage Fee MRSU5474591 12.Aug.2024",
+        pageNumber: 1,
+        observedAt: "2024-08-12T00:00:00Z",
+        timezone: "Africa/Johannesburg",
+        confidence: 0.99,
+      },
+      {
+        claimType: "FREE_DAYS",
+        claimText: "Six free days",
+        value: 6,
+        valueType: "NUMBER",
+        sourceQuote: "Freetime 06.Aug.2024 11.Aug.2024 6 DAY",
+        pageNumber: 1,
+        observedAt: null,
+        timezone: null,
+        confidence: 0.99,
+      },
+      {
+        claimType: "DAILY_RATE",
+        claimText: "ZAR 4459 per day",
+        value: 4459,
+        valueType: "MONEY",
+        sourceQuote: "1 DAY(s) / 4459.00 ZAR per DAY",
+        pageNumber: 1,
+        observedAt: null,
+        timezone: null,
+        confidence: 0.99,
+      },
+      {
+        claimType: "CHARGED_AMOUNT",
+        claimText: "Total due ZAR 4459",
+        value: 4459,
+        valueType: "MONEY",
+        sourceQuote: "Total Due: 4,459.00",
+        pageNumber: 1,
+        observedAt: null,
+        timezone: null,
+        confidence: 0.99,
+      },
+      {
+        claimType: "CURRENCY",
+        claimText: "ZAR",
+        value: "ZAR",
+        valueType: "TEXT",
+        sourceQuote: "Total Due: 4,459.00",
+        pageNumber: 1,
+        observedAt: null,
+        timezone: null,
+        confidence: 0.99,
+      },
+      {
+        claimType: "INVOICE_NUMBER",
+        claimText: "Invoice 5183877996",
+        value: "5183877996",
+        valueType: "IDENTIFIER",
+        sourceQuote: "DEMURRAGE TAX INVOICE Number: 5183877996",
+        pageNumber: 1,
+        observedAt: null,
+        timezone: null,
+        confidence: 0.99,
+      },
+    ],
+    parserNotes: [],
+  },
+  {
+    caseId: "fixture-case",
+    documentId: "fixture-document",
+    documentVersionId: "fixture-version",
+  },
+);
+assert.equal(realInvoiceShape.length, 9);
+assert.equal(realInvoiceShape.find((claim) => claim.claimType === "DAILY_RATE")?.normalizedValue, 4459);
+assert.equal(realInvoiceShape.find((claim) => claim.claimType === "CHARGED_AMOUNT")?.normalizedValue, 4459);
+assert.equal(realInvoiceShape.find((claim) => claim.claimType === "CONTAINER_ID")?.normalizedValue, "MRSU5474591");
 
 console.log("CargoIQ investigation vertical checks: PASS");

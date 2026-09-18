@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   evidenceClaims,
@@ -80,7 +80,7 @@ export async function ingestDemurragePdf(input: {
   let isRetry = false;
 
   if (duplicate) {
-    const [latestVersion] = await db
+    const versions = await db
       .select()
       .from(investigationDocumentVersions)
       .where(
@@ -89,10 +89,9 @@ export async function ingestDemurragePdf(input: {
           eq(investigationDocumentVersions.documentId, duplicate.id),
         ),
       )
-      .orderBy(desc(investigationDocumentVersions.createdAt))
-      .limit(1);
+      .orderBy(desc(investigationDocumentVersions.createdAt));
 
-    if (latestVersion?.extractionStatus === "COMPLETE") {
+    if (versions.some((item) => item.extractionStatus === "COMPLETE")) {
       return {
         document: duplicate,
         duplicate: true,
@@ -101,14 +100,28 @@ export async function ingestDemurragePdf(input: {
       };
     }
 
-    if (latestVersion) {
+    if (versions.some((item) => item.extractionStatus === "PROCESSING")) {
+      return {
+        document: duplicate,
+        duplicate: true,
+        inProgress: true,
+        claimsCreated: 0,
+        contradictionsCreated: 0,
+      };
+    }
+
+    const abandonedVersionIds = versions
+      .filter((item) => item.extractionStatus !== "COMPLETE")
+      .map((item) => item.id);
+
+    if (abandonedVersionIds.length) {
       await db
         .delete(evidenceClaims)
         .where(
           and(
             eq(evidenceClaims.tenantId, input.tenantId),
             eq(evidenceClaims.caseId, input.caseId),
-            eq(evidenceClaims.documentVersionId, latestVersion.id),
+            inArray(evidenceClaims.documentVersionId, abandonedVersionIds),
           ),
         );
       isRetry = true;

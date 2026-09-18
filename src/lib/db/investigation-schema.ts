@@ -250,6 +250,66 @@ export const currencyRates = pgTable(
   ],
 );
 
+export const forecastRuns = pgTable(
+  "forecast_runs",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    tenantId: varchar("tenant_id", { length: 36 }).notNull(),
+    caseId: varchar("case_id", { length: 64 }),
+    seriesId: varchar("series_id", { length: 255 }).notNull(),
+    entityType: varchar("entity_type", { length: 100 }).notNull(),
+    entityId: varchar("entity_id", { length: 255 }).notNull(),
+    metric: varchar("metric", { length: 100 }).notNull(),
+    engine: varchar("engine", { length: 50 }).notNull(),
+    modelVersion: varchar("model_version", { length: 100 }).notNull(),
+    frequency: varchar("frequency", { length: 30 }).notNull(),
+    horizon: varchar("horizon", { length: 20 }).notNull(),
+    generatedAt: timestamp("generated_at").notNull(),
+    inputSnapshot: jsonb("input_snapshot").notNull(),
+    output: jsonb("output").notNull(),
+    limitations: jsonb("limitations"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("forecast_runs_tenant_case_idx").on(table.tenantId, table.caseId),
+    index("forecast_runs_series_idx").on(table.seriesId),
+  ],
+);
+
+export const forecastSignals = pgTable(
+  "forecast_signals",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    tenantId: varchar("tenant_id", { length: 36 }).notNull(),
+    caseId: varchar("case_id", { length: 64 }),
+    forecastRunId: varchar("forecast_run_id", { length: 64 }).notNull(),
+    seriesId: varchar("series_id", { length: 255 }).notNull(),
+    entityType: varchar("entity_type", { length: 100 }).notNull(),
+    entityId: varchar("entity_id", { length: 255 }).notNull(),
+    metric: varchar("metric", { length: 100 }).notNull(),
+    signalType: varchar("signal_type", { length: 50 }).notNull(),
+    score: decimal("score", { precision: 5, scale: 4 }).notNull(),
+    triggerThreshold: decimal("trigger_threshold", { precision: 20, scale: 6 }).notNull(),
+    peakForecastValue: decimal("peak_forecast_value", { precision: 20, scale: 6 }).notNull(),
+    peakUpperValue: decimal("peak_upper_value", { precision: 20, scale: 6 }),
+    expectedAmountMinor: varchar("expected_amount_minor", { length: 40 }),
+    currency: varchar("currency", { length: 3 }),
+    horizonStart: timestamp("horizon_start").notNull(),
+    horizonEnd: timestamp("horizon_end").notNull(),
+    rationale: text("rationale").notNull(),
+    provenance: varchar("provenance", { length: 30 }).default("INFERRED").notNull(),
+    requiresInvestigation: boolean("requires_investigation").default(true).notNull(),
+    status: varchar("status", { length: 30 }).default("NEW").notNull(),
+    limitations: jsonb("limitations"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("forecast_signals_tenant_status_idx").on(table.tenantId, table.status),
+    index("forecast_signals_case_idx").on(table.tenantId, table.caseId),
+    index("forecast_signals_entity_idx").on(table.entityType, table.entityId),
+  ],
+);
+
 export const calculationRuns = pgTable(
   "calculation_runs",
   {

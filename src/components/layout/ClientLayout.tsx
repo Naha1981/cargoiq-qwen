@@ -20,14 +20,15 @@ const dashboardRoutes = [
 interface ClientLayoutProps {
   children: React.ReactNode;
   identity: { tenantName: string | null; plan: string | null; userEmail: string; userName: string } | null;
+  ciE2EMode?: boolean;
 }
 
-export default function ClientLayout({ children, identity }: ClientLayoutProps) {
+export default function ClientLayout({ children, identity, ciE2EMode = false }: ClientLayoutProps) {
   const pathname = usePathname();
   const isDashboardRoute = dashboardRoutes.some((route) => pathname.startsWith(route));
 
   return (
-    <AuthProvider>
+    <AuthProvider bypassAuth={ciE2EMode}>
       {isDashboardRoute ? (
         <DashboardShell identity={identity}>{children}</DashboardShell>
       ) : (

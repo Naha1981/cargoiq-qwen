@@ -106,7 +106,7 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${ibmPlexSans.variable} font-body-md antialiased`}>
         {isCiE2EMode ? (
-          <ClientLayout identity={identity}>{children}</ClientLayout>
+          <ClientLayout identity={identity} ciE2EMode={isCiE2EMode}>{children}</ClientLayout>
         ) : (
           <ClerkProvider
             appearance={{

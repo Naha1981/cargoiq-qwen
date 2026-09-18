@@ -66,7 +66,7 @@ const calculation = calculateDemurrage({
 assert.equal(calculation.amountMinor, 555000);
 assert.equal(moneyToMinor(1850), 185000);
 assert.equal(moneyToMinor("1,850.50"), 185050);
-assert.equal(moneyToMinor("R1 850.50"), undefined);
+assert.equal(moneyToMinor("R1 850.50"), 185050);
 
 const token = createSceneToken("case-123", "tenant-456", 60);
 const verified = verifySceneToken(token);

@@ -24,7 +24,8 @@ const requestSchema = z.object({
     horizon: z.number().int().min(1).max(1000),
     metadata: z.record(z.string(), z.unknown()).optional(),
   }),
-  caseId: z.string().max(64).optional(),\n  threshold: z.object({
+  caseId: z.string().max(64).optional(),
+  threshold: z.object({
     metric: z.string().min(1).max(100),
     threshold: z.number().finite(),
     scale: z.number().finite().positive(),
@@ -65,7 +66,9 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      data: signal,\n      forecastRunId: stored.runId,\n      forecastSignalId: stored.signalId ?? null,
+      data: signal,
+      forecastRunId: stored.runId,
+      forecastSignalId: stored.signalId ?? null,
       queueAction: signal
         ? {
             action: "CREATE_INVESTIGATION_CANDIDATE",

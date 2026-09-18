@@ -1,6 +1,6 @@
 import {
   boolean,
-  bytea,
+  customType,
   decimal,
   integer,
   index,
@@ -10,6 +10,12 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 export const investigationCases = pgTable(
   "investigation_cases",

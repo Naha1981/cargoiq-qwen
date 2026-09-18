@@ -51,9 +51,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isCiE2EMode =
+    process.env.CARGOIQ_E2E_MODE === 'true' &&
+    process.env.VERCEL !== '1';
+
   let identity: { tenantName: string | null; plan: string | null; userEmail: string; userName: string } | null = null;
 
-  try {
+  if (!isCiE2EMode) try {
     const authResult = await (await import('@clerk/nextjs/server')).auth();
     const userId = authResult.userId;
 
@@ -101,8 +105,11 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable} ${ibmPlexSans.variable} font-body-md antialiased`}>
-        <ClerkProvider
-          appearance={{
+        {isCiE2EMode ? (
+          <ClientLayout identity={identity}>{children}</ClientLayout>
+        ) : (
+          <ClerkProvider
+            appearance={{
             variables: {
               colorPrimary: '#F97316',
               colorForeground: '#101318',
@@ -122,10 +129,11 @@ export default async function RootLayout({
               formFieldInput: 'bg-white text-[#101318] border border-[#D0D5DD]',
               footerActionLink: 'text-[#C83A12]',
             },
-          }}
-        >
-          <ClientLayout identity={identity}>{children}</ClientLayout>
-        </ClerkProvider>
+            }}
+          >
+            <ClientLayout identity={identity}>{children}</ClientLayout>
+          </ClerkProvider>
+        )}
       </body>
     </html>
   );

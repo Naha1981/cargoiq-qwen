@@ -14,6 +14,8 @@ export interface CreateInvestigationInput {
   disputeType: DisputeType;
   baseCurrency: string;
   notes?: string;
+  originType?: string;
+  originId?: string;
 }
 
 export async function getTenantContext(userId: string) {
@@ -48,6 +50,8 @@ export async function createInvestigationCase(
       status: "OPEN",
       baseCurrency: input.baseCurrency,
       notes: input.notes ?? null,
+      originType: input.originType ?? null,
+      originId: input.originId ?? null,
       createdAt: now,
       updatedAt: now,
     })

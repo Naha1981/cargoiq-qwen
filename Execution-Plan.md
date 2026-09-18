@@ -16,6 +16,7 @@ Version 2.0 | 2026-09-18
 - Add deterministic provenance transitions.
 - Add human review transitions and audit-backed approval actions.
 - Add browser smoke coverage to the release gate.
+- Keep CI browser mode explicit and disabled on Vercel runtime.
 
 STATUS: IMPLEMENTED
 

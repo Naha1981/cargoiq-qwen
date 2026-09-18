@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 type SceneTokenPayload = {
   caseId: string;
+  tenantId: string;
   exp: number;
 };
 
@@ -19,9 +20,10 @@ function sign(body: string) {
   return createHmac("sha256", secret()).update(body).digest("base64url");
 }
 
-export function createSceneToken(caseId: string, ttlSeconds = 900) {
+export function createSceneToken(caseId: string, tenantId: string, ttlSeconds = 900) {
   const payload: SceneTokenPayload = {
     caseId,
+    tenantId,
     exp: Math.floor(Date.now() / 1000) + ttlSeconds,
   };
   const body = encode(payload);
@@ -37,7 +39,7 @@ export function verifySceneToken(token: string): SceneTokenPayload | null {
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   try {
     const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as SceneTokenPayload;
-    if (!payload?.caseId || !Number.isInteger(payload.exp) || payload.exp < Math.floor(Date.now() / 1000)) return null;
+    if (!payload?.caseId || !payload?.tenantId || !Number.isInteger(payload.exp) || payload.exp < Math.floor(Date.now() / 1000)) return null;
     return payload;
   } catch {
     return null;

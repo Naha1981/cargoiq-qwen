@@ -58,12 +58,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const signal = await forecastInvestigationSignal({
+    const stored = await runAndStoreForecastSignal({
+      tenantId: tenant.id,
+      caseId: parsed.data.caseId,
       series: parsed.data.series,
-      entityType: parsed.data.series.entityType,
-      entityId: parsed.data.series.entityId,
       threshold: parsed.data.threshold,
     });
+    const signal = stored.signal;
 
     return NextResponse.json({
       data: signal,

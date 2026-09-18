@@ -7,7 +7,7 @@ CargoIQ investigates freight-payment and operational disputes by reconstructing 
 
 ## Core loop
 
-Source -> Evidence Claim -> Freight Event -> Timeline -> Contradiction -> Commercial Rule -> Calculation -> Human Review -> Evidence Pack -> Recovery/Dispute Outcome
+Operational data -> Forecast Signal -> Investigation Queue -> Source -> Evidence Claim -> Freight Event -> Timeline -> Contradiction -> Commercial Rule -> Calculation -> Human Review -> Evidence Pack -> Recovery/Dispute Outcome
 
 ## Primary users
 
@@ -43,7 +43,7 @@ Every material claim stores source, source location, observed/retrieved time, ti
 - Every customer-owned record is tenant scoped.
 - Third-party data is shown only when licence/terms permit it.
 
-## God’s Eye View role
+## Forecasting role\n\nCargoIQ includes a replaceable ForecastEngine. TimesFM is the first forecasting adapter.\n\nTimesFM may identify elevated future dwell/delay/exposure conditions and create an investigation candidate. Forecast output is always marked INFERRED and is never treated as evidence. The evidence engine must independently establish what actually happened.\n\nThe interface is model-agnostic: TimesFM, statistical forecasting, or another licensed forecast model can implement the same ForecastEngine contract.\n\nFor commercial production, CargoIQ should use a model/version whose weights and terms permit commercial use. TimesFM 2.5 weights are the current open-weight baseline; TimesFM 3.0 default pretrained weights are currently restricted to non-commercial/non-production use.\n\n## God’s Eye View role
 
 God’s Eye View is the visual investigation surface.
 
@@ -67,7 +67,7 @@ A user must be able to:
 7. Attach external corroboration.
 8. Open the investigation in God’s Eye View.
 9. Review calculations and limitations.
-10. Generate and approve an evidence pack.
+10. Generate and approve an evidence pack.\n11. Use forecast signals to prioritize which operational records become investigations.
 
 ## Non-goals for MVP
 

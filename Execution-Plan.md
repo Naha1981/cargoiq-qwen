@@ -14,8 +14,9 @@ Version 2.0 | 2026-09-18
 - Add tenant-scoped CRUD.
 - Add audit events.
 - Add deterministic provenance transitions.
+- Add human review transitions and audit-backed approval actions.
 
-STATUS: STARTED
+STATUS: IMPLEMENTED
 
 ## Phase 2 — Immutable documents
 

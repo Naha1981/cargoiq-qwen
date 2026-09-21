@@ -2,12 +2,15 @@ import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   calculationRuns,
+  contradictions,
   evidenceClaims,
   recoveryAssessments,
 } from "@/lib/db/investigation-schema";
 import { generateId } from "@/lib/utils";
 import { calculateDemurrage } from "./demurrage";
+import { persistClaimContradictions } from "./contradictions";
 import { moneyToMinor } from "./money.ts";
+import { CalculationBlockedError, findMaterialUnresolvedContradictions } from "./hardening";
 
 type ClaimRow = typeof evidenceClaims.$inferSelect;
 
@@ -47,6 +50,36 @@ export async function calculateCaseDemurrage(tenantId: string, caseId: string) {
         eq(evidenceClaims.caseId, caseId),
       ),
     );
+
+  await persistClaimContradictions(tenantId, caseId);
+  const contradictionRows = await db
+    .select({
+      id: contradictions.id,
+      leftClaimId: contradictions.leftClaimId,
+      rightClaimId: contradictions.rightClaimId,
+      resolved: contradictions.resolved,
+    })
+    .from(contradictions)
+    .where(and(
+      eq(contradictions.tenantId, tenantId),
+      eq(contradictions.caseId, caseId),
+    ));
+
+  const materialContradictions = findMaterialUnresolvedContradictions(
+    claims,
+    contradictionRows,
+    ["FREE_TIME_START", "AVAILABLE_TIME", "RELEASE_TIME", "FREE_DAYS", "DAILY_RATE", "CURRENCY", "CHARGED_AMOUNT"],
+  );
+  if (materialContradictions.length > 0) {
+    const claimTypes = new Set<string>();
+    for (const contradiction of materialContradictions) {
+      const leftType = claims.find((claim) => claim.id === contradiction.leftClaimId)?.claimType;
+      const rightType = claims.find((claim) => claim.id === contradiction.rightClaimId)?.claimType;
+      if (leftType) claimTypes.add(leftType);
+      if (rightType) claimTypes.add(rightType);
+    }
+    throw new CalculationBlockedError(materialContradictions.map((item) => item.id), [...claimTypes]);
+  }
 
   const start =
     stringValue(latestClaim(claims, "FREE_TIME_START")) ??

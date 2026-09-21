@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getInvestigationCase, getTenantContext } from "@/modules/investigation/service";
-import { calculateCaseDemurrage } from "@/modules/investigation/calculation";
+import {
+  CalculationBlockedError,
+  calculateCaseDemurrage,
+} from "@/modules/investigation/calculation";
 import { persistClaimContradictions } from "@/modules/investigation/contradictions";
 
 type Context = { params: Promise<{ id: string }> };
@@ -22,6 +25,20 @@ export async function POST(_request: Request, context: Context) {
     const contradictions = await persistClaimContradictions(tenant.id, id);
     return NextResponse.json({ data, contradictionsDetected: contradictions.length });
   } catch (error) {
+    if (error instanceof CalculationBlockedError) {
+      return NextResponse.json(
+        {
+          error: "CALCULATION_BLOCKED",
+          code: error.code,
+          message: error.message,
+          requiresHumanReview: true,
+          contradictionIds: error.contradictionIds,
+          claimTypes: error.claimTypes,
+        },
+        { status: 409 },
+      );
+    }
+
     const message = error instanceof Error ? error.message : "CALCULATION_FAILED";
     return NextResponse.json({ error: "CALCULATION_FAILED", message }, { status: 422 });
   }

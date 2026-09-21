@@ -42,6 +42,16 @@ jobs:
       - name: Investigation vertical checks
         run: npm run test:investigation:vertical
 
+      - name: Investigation integration and isolation checks
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -n "$DATABASE_URL" ]; then
+            npm run test:investigation:integration
+          else
+            echo "DATABASE_URL secret not configured; integration/security checks skipped."
+          fi
+
       - name: TimesFM runtime syntax check
         run: python -m py_compile services/timesfm/app.py
 

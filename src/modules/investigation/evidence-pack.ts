@@ -13,6 +13,8 @@ import { getCaseClaims } from "./documents";
 import { getInvestigationCase } from "./service";
 import { latestCalculation } from "./calculation";
 
+import { nextEvidencePackVersion } from "./hardening";
+
 function addWrapped(doc: jsPDF, text: string, x: number, y: number, maxWidth: number) {
   const lines = doc.splitTextToSize(text, maxWidth);
   doc.text(lines, x, y);
@@ -191,6 +193,15 @@ export async function generateEvidencePack(tenantId: string, caseId: string) {
   const contentBytes = Buffer.from(doc.output("arraybuffer"));
   const contentHash = sha256Buffer(contentBytes);
 
+  const existingPacks = await db
+    .select({ version: evidencePacks.version })
+    .from(evidencePacks)
+    .where(and(
+      eq(evidencePacks.tenantId, tenantId),
+      eq(evidencePacks.caseId, caseId),
+    ));
+  const version = nextEvidencePackVersion(existingPacks.map((item) => item.version));
+
   const [created] = await db
     .insert(evidencePacks)
     .values({
@@ -198,7 +209,7 @@ export async function generateEvidencePack(tenantId: string, caseId: string) {
       tenantId,
       caseId,
       status: "DRAFT",
-      version: "1",
+      version,
       contentHash,
       storageKey: `db:evidence-pack:${caseId}`,
       contentBytes,

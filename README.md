@@ -94,6 +94,14 @@ npm run dev
 
 Database migrations are managed through Drizzle. No production migration should be run until the generated migration is reviewed.
 
+### P0 hardening controls
+
+- Financial calculations are blocked when required inputs have unresolved contradictions and return a structured human-review response.
+- Evidence packs are versioned per investigation (1, 2, 3, ...), with each generated artifact SHA-256 hashed and retained.
+- Deployed environments require ClamAV configuration for document uploads; an unscanned-upload bypass is available only for explicit local development.
+- Cross-tenant investigation isolation is covered by a real-database integration test when DATABASE_URL is available.
+- Run npm run test:investigation:integration against a non-production database to execute the P0 integration/security checks.
+
 ### Product documents
 
 - `PRD.md`

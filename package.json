@@ -16,7 +16,8 @@
     "test:forecasting": "node --experimental-strip-types scripts/test-forecasting.ts",
     "test:investigation:vertical": "node --experimental-strip-types scripts/test-investigation-vertical.ts",
     "db:migrate:investigation": "node --experimental-strip-types scripts/migrate-investigation.ts",
-    "test:e2e:investigation": "playwright test e2e/investigation-smoke.spec.ts"
+    "test:e2e:investigation": "playwright test e2e/investigation-smoke.spec.ts",
+    "test:investigation:integration": "node --experimental-strip-types scripts/test-investigation-integration.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.9",

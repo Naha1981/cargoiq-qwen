@@ -15,28 +15,7 @@ import {
   validateInvestigationDocument,
 } from "./storage";
 import { persistClaimContradictions } from "./contradictions";
-
-async function malwareScan(buffer: Buffer) {
-  const endpoint = process.env.CLAMAV_URL;
-  if (!endpoint) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("MALWARE_SCAN_NOT_CONFIGURED");
-    }
-    return "NOT_CONFIGURED";
-  }
-
-  const response = await fetch(endpoint.replace(/\/$/, "") + "/scan", {
-    method: "POST",
-    headers: { "content-type": "application/octet-stream" },
-    body: new Uint8Array(buffer),
-    cache: "no-store",
-  });
-
-  if (!response.ok) throw new Error(`MALWARE_SCAN_${response.status}`);
-  const body = (await response.json().catch(() => null)) as { clean?: boolean } | null;
-  if (body?.clean !== true) throw new Error("MALWARE_DETECTED");
-  return "CLEAN";
-}
+import { malwareScan } from "./hardening";
 
 export async function ingestDemurragePdf(input: {
   tenantId: string;

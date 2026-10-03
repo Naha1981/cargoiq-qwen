@@ -5,6 +5,13 @@ import { detectClaimContradictions } from "../src/modules/investigation/contradi
 import { createSceneToken, verifySceneToken } from "../src/modules/investigation/scene-token.ts";
 import { calculateDemurrage } from "../src/modules/investigation/demurrage.ts";
 import { moneyToMinor } from "../src/modules/investigation/money.ts";
+import {
+  isLocalUploadBypassEnabled,
+  isMalwareScanRequired,
+  findMaterialUnresolvedContradictions,
+  malwareScan,
+  nextEvidencePackVersion,
+} from "../src/modules/investigation/hardening.ts";
 
 process.env.CARGOiQ_GEV_SCENE_SECRET = "test-secret";
 
@@ -68,6 +75,97 @@ assert.equal(calculation.amountMinor, 555000);
 assert.equal(moneyToMinor(1850), 185000);
 assert.equal(moneyToMinor("1,850.50"), 185050);
 assert.equal(moneyToMinor("R1 850.50"), 185050);
+
+assert.equal(
+  isLocalUploadBypassEnabled({
+    NODE_ENV: "development",
+    CARGOIQ_ALLOW_UNSCANNED_LOCAL_UPLOADS: "true",
+  }),
+  true,
+);
+assert.equal(
+  isMalwareScanRequired({
+    NODE_ENV: "development",
+    CARGOIQ_ALLOW_UNSCANNED_LOCAL_UPLOADS: "true",
+  }),
+  false,
+);
+assert.equal(
+  isMalwareScanRequired({
+    NODE_ENV: "development",
+    VERCEL_ENV: "preview",
+    CARGOIQ_ALLOW_UNSCANNED_LOCAL_UPLOADS: "true",
+  }),
+  true,
+);
+assert.equal(
+  isMalwareScanRequired({
+    NODE_ENV: "production",
+  }),
+  true,
+);
+assert.equal(nextEvidencePackVersion([]), "1");
+assert.equal(nextEvidencePackVersion(["1", "2", "7"]), "8");
+
+const requiredClaimTypes = ["FREE_TIME_START", "RELEASE_TIME", "FREE_DAYS", "DAILY_RATE", "CURRENCY"];
+const gateClaims = [
+  { id: "rate-1", claimType: "DAILY_RATE" },
+  { id: "rate-2", claimType: "DAILY_RATE" },
+  { id: "free-1", claimType: "FREE_DAYS" },
+  { id: "free-2", claimType: "FREE_DAYS" },
+];
+const dailyRateConflict = [{
+  id: "contradiction-rate",
+  leftClaimId: "rate-1",
+  rightClaimId: "rate-2",
+  resolved: false,
+}];
+const freeDaysConflict = [{
+  id: "contradiction-free",
+  leftClaimId: "free-1",
+  rightClaimId: "free-2",
+  resolved: false,
+}];
+
+assert.equal(
+  findMaterialUnresolvedContradictions(gateClaims, dailyRateConflict, requiredClaimTypes).length,
+  1,
+);
+assert.equal(
+  findMaterialUnresolvedContradictions(gateClaims, freeDaysConflict, requiredClaimTypes).length,
+  1,
+);
+assert.equal(
+  findMaterialUnresolvedContradictions(
+    gateClaims,
+    [{ ...dailyRateConflict[0], resolved: true }],
+    requiredClaimTypes,
+  ).length,
+  0,
+);
+
+const originalFetch = globalThis.fetch;
+const originalClamavUrl = process.env.CLAMAV_URL;
+try {
+  process.env.CLAMAV_URL = "https://clammock.test";
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ clean: true }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  assert.equal(await malwareScan(pdf), "CLEAN");
+
+  globalThis.fetch = async () =>
+    new Response(JSON.stringify({ clean: false }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  await assert.rejects(() => malwareScan(pdf), /MALWARE_DETECTED/);
+} finally {
+  globalThis.fetch = originalFetch;
+  if (originalClamavUrl === undefined) delete process.env.CLAMAV_URL;
+  else process.env.CLAMAV_URL = originalClamavUrl;
+}
 
 const token = createSceneToken("case-123", "tenant-456", 60);
 const verified = verifySceneToken(token);

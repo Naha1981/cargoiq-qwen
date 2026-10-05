@@ -39,6 +39,9 @@ jobs:
       - name: Forecasting unit checks
         run: npm run test:forecasting
 
+      - name: Gauge intelligence unit checks
+        run: npm run test:gauges
+
       - name: Investigation vertical checks
         run: npm run test:investigation:vertical
 

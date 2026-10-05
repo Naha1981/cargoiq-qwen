@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { EvidenceConfidenceGauge } from "@/components/gauges/EvidenceConfidenceGauge";
 
 type CaseRecord = {
   id: string;
@@ -40,6 +41,7 @@ type ReviewClaim = ExtractionFact & {
   claimText: string;
   sourceQuote: string | null;
   pageNumber: number | null;
+  confidence: number | string | null;
 };
 
 type ReviewContradiction = {
@@ -372,6 +374,15 @@ export default function InvestigationDetailPage({
                         {claim.sourceQuote && (
                           <p className="mt-2 text-[11px] italic leading-5 text-[#8A939F]">“{claim.sourceQuote}” · p.{claim.pageNumber ?? "?"}</p>
                         )}
+                        <div className="mt-4 flex flex-col gap-4 border-t border-[#E2E6EB] pt-4 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="min-w-0">
+                            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#8A939F]">Model output</p>
+                            <p className="mt-1 max-w-md text-[11px] leading-5 text-[#667085]">
+                              Extraction confidence is stored with the claim. It does not make the underlying fact VERIFIED.
+                            </p>
+                          </div>
+                          <EvidenceConfidenceGauge confidence={claim.confidence} size="compact" />
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <button

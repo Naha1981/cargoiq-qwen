@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getInvestigationCase, getTenantContext } from "@/modules/investigation/service";
-import {
-  CalculationBlockedError,
-  calculateCaseDemurrage,
-} from "@/modules/investigation/calculation";
+import { calculateCaseDemurrage } from "@/modules/investigation/calculation";
+import { CalculationBlockedError } from "@/modules/investigation/hardening";
 import { persistClaimContradictions } from "@/modules/investigation/contradictions";
 
 type Context = { params: Promise<{ id: string }> };
